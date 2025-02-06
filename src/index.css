@@ -1,0 +1,81 @@
+@import "tailwindcss";
+/* Configuração Tailwind */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilo base */
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+/* src/index.css */
+body {
+  min-height: 100vh;  /* Garante que o corpo ocupe 100% da altura da tela */
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #242424;
+  color: rgba(255, 255, 255, 0.87);
+  display: flex; /* Ajusta o layout para um modelo flexível */
+  flex-direction: column; /* Organiza o conteúdo em coluna */
+}
+
+h1 {
+  font-size: 2.5rem; /* Ajuste do tamanho para ser mais adequado ao layout */
+  line-height: 1.1;
+  margin-bottom: 2rem; /* Adicionar margem inferior */
+  text-align: center;  /* Garantir que o título fique centralizado */
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: background-color 0.25s ease, border-color 0.25s ease; /* Adicionando transição de cor */
+}
+
+button:hover {
+  background-color: #646cff;  /* Altera o fundo para azul ao passar o mouse */
+  border-color: #646cff;
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
