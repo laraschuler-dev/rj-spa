@@ -1,5 +1,3 @@
-@import "tailwindcss";
-/* Configuração Tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,42 +7,40 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Links */
 a {
   font-weight: 500;
-  color: #646cff;
+  color: theme('colors.primary');  /* Usando a cor primária configurada no Tailwind */
   text-decoration: inherit;
 }
+
 a:hover {
-  color: #535bf2;
+  color: theme('colors.accent');  /* Usando a cor de destaque */
 }
 
-/* src/index.css */
+/* Remova qualquer definição de background-color e color no body */
 body {
-  min-height: 100vh;  /* Garante que o corpo ocupe 100% da altura da tela */
+  min-height: 100vh;
   margin: 0;
-  font-family: 'Inter', sans-serif;
-  background-color: #242424;
-  color: rgba(255, 255, 255, 0.87);
-  display: flex; /* Ajusta o layout para um modelo flexível */
-  flex-direction: column; /* Organiza o conteúdo em coluna */
+  font-family: theme('fontFamily.body');  /* Usando a fonte do Tailwind */
+  display: flex;
+  flex-direction: column;
+  background-color: transparent; /* Deixe o Tailwind controlar */
+  color: inherit; /* Deixe o Tailwind controlar a cor do texto */
 }
 
+/* Remover estilos de h1 que podem entrar em conflito com o Tailwind */
 h1 {
-  font-size: 2.5rem; /* Ajuste do tamanho para ser mais adequado ao layout */
-  line-height: 1.1;
-  margin-bottom: 2rem; /* Adicionar margem inferior */
-  text-align: center;  /* Garantir que o título fique centralizado */
+  text-align: center; /* Apenas o alinhamento se necessário */
 }
 
+/* Estilos globais de botão */
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -52,30 +48,17 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: theme('colors.primary'); /* Usando a cor primária do Tailwind */
   cursor: pointer;
-  transition: background-color 0.25s ease, border-color 0.25s ease; /* Adicionando transição de cor */
+  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 button:hover {
-  background-color: #646cff;  /* Altera o fundo para azul ao passar o mouse */
-  border-color: #646cff;
+  background-color: theme('colors.secondary'); /* Usando a cor secundária */
+  border-color: theme('colors.secondary');
 }
 
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
 }

@@ -1,0 +1,53 @@
+/* @tailwind base já vai garantir a normalização básica de estilos */
+@tailwind base; 
+@tailwind components;
+@tailwind utilities;
+
+/* Ajustes adicionais no reset CSS */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Ajustes específicos para o HTML */
+html {
+  font-size: 16px; /* Mantém a base da tipografia */
+  font-family: 'Inter', sans-serif; /* Garantindo a fonte padrão */
+  background-color: #F8F9FA; /* Cor de fundo geral */
+  color: #1E293B; /* Cor de texto padrão */
+  line-height: 1.5;
+  scroll-behavior: smooth;
+}
+
+/* Garantindo um layout mínimo flexível no body */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Reset para listas */
+ul, ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Reset para links */
+a {
+  text-decoration: none;
+  color: inherit; /* Faz com que os links herdem a cor do texto */
+}
+
+/* Imagens responsivas */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Garantindo que botões não tenham estilos indesejados */
+button {
+  all: unset;
+  cursor: pointer;
+}

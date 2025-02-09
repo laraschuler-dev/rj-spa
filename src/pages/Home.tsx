@@ -1,45 +1,40 @@
-// src/pages/Home.tsx
+import React from "react";
+import Layout from "../components/layout/Layout";
+import Typography from "../components/ui/Typography";
+import Button from "../components/ui/Button";
 
 /**
- * Home Page - Página inicial do projeto Redefinindo Jornadas.
- * Esta página contém informações sobre o propósito da plataforma
- * e exibe um layout simples com um cabeçalho, conteúdo principal e rodapé.
- *
- * Responsividade está garantida usando classes utilitárias do TailwindCSS.
+ * Componente Home
+ * 
+ * Este componente representa a página inicial do aplicativo "Redefinindo Jornadas".
+ * Ele utiliza o componente Layout para estruturar a página e inclui elementos de tipografia
+ * e um botão de ação.
+ * 
+ * @returns {JSX.Element} A página inicial do aplicativo.
  */
-import React from 'react';
-
-const Home = () => {
+const Home: React.FC = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-900 text-white">
-      {/* Cabeçalho */}
-      <header className="p-4 bg-blue-600">
-        <h1 className="text-3xl text-center">
-          Bem-vindo ao Redefinindo Jornadas
-        </h1>
-      </header>
+    <Layout>
+      <div className="flex flex-col items-center justify-center text-center p-8 space-y-6 max-w-3xl mx-auto">
+        {/* Título principal */}
+        <Typography variant="h1">Bem-vindo ao Redefinindo Jornadas</Typography>
 
-      {/* Conteúdo Principal */}
-      <main className="flex-grow p-4 flex items-center justify-center text-center">
-        <div>
-          <h2 className="text-2xl mb-4">O que fazemos</h2>
-          <p className="text-lg mb-4">
-            Nosso objetivo é ajudar pessoas em situação de rua a encontrar
-            serviços assistenciais e oportunidades de reintegração social.
-          </p>
+        {/* Descrição */}
+        <Typography variant="p">
+          Nossa missão é conectar pessoas em situação de rua a oportunidades e
+          serviços assistenciais. Acreditamos que todos merecem dignidade, apoio
+          e novas chances para recomeçar.
+        </Typography>
 
-          <p className="text-lg">
-            Fique à vontade para explorar nossa plataforma e aprender mais sobre
-            como podemos ajudar.
-          </p>
-        </div>
-      </main>
+        <Typography variant="p">
+          Navegue pela plataforma, descubra formas de ajudar ou encontre o suporte
+          necessário. Juntos, podemos transformar vidas.
+        </Typography>
 
-      {/* Rodapé */}
-      <footer className="p-4 bg-blue-600 text-center">
-        <p>&copy; 2025 Redefinindo Jornadas. Todos os direitos reservados.</p>
-      </footer>
-    </div>
+        {/* Botão de ação */}
+        <Button variant="primary">Saiba Mais</Button>
+      </div>
+    </Layout>
   );
 };
 
