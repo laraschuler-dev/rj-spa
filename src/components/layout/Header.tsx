@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { FiLogIn, FiUser } from "react-icons/fi";
+import { CgLogIn, CgProfile } from "react-icons/cg";
 
 /**
  * Componente Header
@@ -30,12 +30,12 @@ const Header: React.FC = () => {
       <div>
         {isAuthenticated ? (
           <Link to="/perfil" className="flex items-center gap-2 hover:text-accent transition-colors">
-            <FiUser size={24} />
+            <CgProfile  size={24} />
             <span className="font-body">Perfil</span>
           </Link>
         ) : (
           <Link to="/login" className="flex items-center gap-2 hover:text-accent transition-colors">
-            <FiLogIn size={24} />
+            <CgLogIn size={24} />
             <span className="font-body">Entrar</span>
           </Link>
         )}
