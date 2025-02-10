@@ -17,7 +17,7 @@ html {
   background-color: #F8F9FA; /* Cor de fundo geral */
   color: #1E293B; /* Cor de texto padrão */
   line-height: 1.5;
-  scroll-behavior: smooth;
+  scroll-behavior: smooth; /* Suaviza o comportamento de rolagem */
 }
 
 /* Garantindo um layout mínimo flexível no body */

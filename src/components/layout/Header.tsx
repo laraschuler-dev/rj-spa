@@ -2,6 +2,13 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { FiLogIn, FiUser } from "react-icons/fi";
 
+/**
+ * Componente Header
+ * 
+ * Este componente representa o cabeçalho do aplicativo, incluindo a navegação e o botão de login/perfil.
+ * 
+ * @returns {JSX.Element} O cabeçalho do aplicativo.
+ */
 const Header: React.FC = () => {
   const isAuthenticated = false; // TODO: Substituir por lógica real de autenticação
 

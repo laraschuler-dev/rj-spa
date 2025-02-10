@@ -2,6 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { FiHome, FiUsers, FiSettings } from 'react-icons/fi';
 
+/**
+ * Componente Sidebar
+ * 
+ * Este componente representa a barra lateral de navegação do aplicativo.
+ * 
+ * @returns {JSX.Element} A barra lateral de navegação.
+ */
 const Sidebar: React.FC = () => {
   return (
     <aside className="hidden md:flex flex-col w-64 bg-sidebar text-white h-screen p-6 shadow-lg">
