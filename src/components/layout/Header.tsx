@@ -23,7 +23,9 @@ const Header: React.FC = () => {
       <nav className="hidden md:flex gap-6">
         <Link to="/quem-somos" className="hover:text-accent transition-colors">Quem Somos</Link>
         <Link to="/eventos" className="hover:text-accent transition-colors">Eventos</Link>
-        <Link to="/denuncia" className="hover:text-accent transition-colors">Serviços Disponíveis</Link>
+        <Link to="/denuncia" className="hover:text-accent transition-colors">Serviços</Link>
+        <Link to="/como-doar" className="hover:text-accent transition-colors">Como Doar</Link>
+        <Link to="/contatos" className="hover:text-accent transition-colors">Contato</Link>
       </nav>
 
       {/* Botão Login / Perfil */}
