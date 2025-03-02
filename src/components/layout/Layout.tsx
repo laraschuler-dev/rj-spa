@@ -1,11 +1,11 @@
-import React from "react";
-import Header from "./Header";
-import Sidebar from "./Sidebar";
-import Footer from "./Footer";
+import React from 'react';
+import Header from './Header';
+import Sidebar from './Sidebar';
+import Footer from './Footer';
 
 /**
  * Propriedades do componente Layout
- * 
+ *
  * @property {React.ReactNode} children - Os componentes filhos que serão renderizados dentro do layout.
  */
 interface LayoutProps {
@@ -14,10 +14,10 @@ interface LayoutProps {
 
 /**
  * Componente Layout
- * 
+ *
  * Este componente representa a estrutura de layout principal do aplicativo, incluindo o cabeçalho,
  * a barra lateral, o conteúdo principal e o rodapé.
- * 
+ *
  * @param {LayoutProps} props - As propriedades do componente.
  * @returns {JSX.Element} O layout principal do aplicativo.
  */

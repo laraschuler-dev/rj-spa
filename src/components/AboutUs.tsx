@@ -1,0 +1,59 @@
+import { motion } from 'framer-motion';
+
+const AboutUs = () => {
+  return (
+    <section
+      id="about"
+      className="relative min-h-screen flex flex-col justify-center items-center text-center px-6 md:px-12 lg:px-24 pt-20 pb-20 mb-6"
+    >
+      {/* Imagem de fundo com overlay */}
+      <div className="absolute inset-0 bg-[url('/img/about.jpg')] bg-cover bg-center brightness-50"></div>
+
+      {/* Conteúdo da seção */}
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="relative z-10 text-white"
+      >
+        {/* Título e Descrição */}
+        <h1 className="text-3xl md:text-5xl font-bold">Quem Somos</h1>
+        <p className="mt-4 text-base md:text-lg max-w-2xl mx-auto">
+          Somos uma rede social solidária que conecta pessoas em situação de rua
+          a serviços assistenciais e oportunidades de reintegração social.
+          Acreditamos que dignidade, inclusão e acolhimento são essenciais para
+          transformar vidas.
+        </p>
+
+        {/* Seções Missão, Visão e Valores */}
+        <div className="mt-8 space-y-4">
+          <div className="bg-primary text-white p-4 rounded-xl shadow-md min-h-[120px] md:min-h-0 flex flex-col justify-center">
+            <h2 className="font-bold text-lg">Nossa Missão</h2>
+            <p>
+              Conectar pessoas em situação de rua a serviços assistenciais e
+              oportunidades para reintegração social.
+            </p>
+          </div>
+          <div className="bg-primary text-white p-4 rounded-xl shadow-md min-h-[120px] md:min-h-0 flex flex-col justify-center">
+            <h2 className="font-bold text-lg">Nossa Visão</h2>
+            <p>
+              Criar um ambiente digital que transforme assistencialismo em
+              inclusão e emancipação.
+            </p>
+          </div>
+          <div className="bg-primary text-white p-4 rounded-xl shadow-md min-h-[120px] md:min-h-0 flex flex-col justify-center">
+            <h2 className="font-bold text-lg">Nossos Valores</h2>
+            <p>Empatia, dignidade e acesso igualitário a oportunidades.</p>
+          </div>
+        </div>
+
+        {/* Botão de Ação */}
+        <button className="mt-6 bg-primary text-white px-6 py-3 rounded-lg text-lg font-semibold shadow-md hover:bg-primary-dark transition">
+          Junte-se a nós!
+        </button>
+      </motion.div>
+    </section>
+  );
+};
+
+export default AboutUs;
