@@ -6,6 +6,8 @@ import {
   FaInstagram,
   FaLinkedin,
 } from 'react-icons/fa';
+import Typography from './ui/Typography';
+import SubmitButton from './ui/SubmitButton';
 
 const Contact = () => {
   return (
@@ -17,13 +19,19 @@ const Contact = () => {
         transition={{ duration: 0.8 }}
         className="max-w-3xl mx-auto"
       >
-        <h2 className="text-3xl md:text-5xl font-bold text-gray-900">
+        <Typography
+          variant="h2"
+          className="text-3xl md:text-5xl font-bold text-gray-900"
+        >
           Entre em Contato
-        </h2>
-        <p className="mt-4 text-base md:text-lg text-gray-600">
+        </Typography>
+        <Typography
+          variant="p"
+          className="mt-4 text-base md:text-lg text-gray-600"
+        >
           Fale conosco! Estamos aqui para esclarecer dúvidas, receber sugestões
           e conectar você a nossa rede social solidária.
-        </p>
+        </Typography>
       </motion.div>
 
       {/* Formulário de Contato */}
@@ -44,9 +52,7 @@ const Contact = () => {
             rows={4}
             className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none"
           ></textarea>
-          <button className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark transition">
-            Enviar Mensagem
-          </button>
+          <SubmitButton>Enviar Mensagem</SubmitButton>
         </form>
       </div>
 

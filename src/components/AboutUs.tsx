@@ -1,4 +1,6 @@
 import { motion } from 'framer-motion';
+import Typography from './ui/Typography';
+import Button from './ui/Button';
 
 const AboutUs = () => {
   return (
@@ -17,40 +19,58 @@ const AboutUs = () => {
         className="relative z-10 text-white"
       >
         {/* Título e Descrição */}
-        <h1 className="text-3xl md:text-5xl font-bold">Quem Somos</h1>
-        <p className="mt-4 text-base md:text-lg max-w-2xl mx-auto">
+        <Typography variant="h1" className="text-3xl md:text-5xl font-bold">
+          Quem Somos
+        </Typography>
+        <Typography
+          variant="p"
+          className="mt-4 text-base md:text-lg max-w-2xl mx-auto"
+        >
           Somos uma rede social solidária que conecta pessoas em situação de rua
           a serviços assistenciais e oportunidades de reintegração social.
           Acreditamos que dignidade, inclusão e acolhimento são essenciais para
           transformar vidas.
-        </p>
+        </Typography>
 
         {/* Seções Missão, Visão e Valores */}
         <div className="mt-8 space-y-4">
           <div className="bg-primary text-white p-4 rounded-xl shadow-md min-h-[120px] md:min-h-0 flex flex-col justify-center">
-            <h2 className="font-bold text-lg">Nossa Missão</h2>
-            <p>
+            <Typography variant="h2" className="font-bold text-lg">
+              Nossa Missão
+            </Typography>
+            <Typography variant="p">
               Conectar pessoas em situação de rua a serviços assistenciais e
               oportunidades para reintegração social.
-            </p>
+            </Typography>
           </div>
           <div className="bg-primary text-white p-4 rounded-xl shadow-md min-h-[120px] md:min-h-0 flex flex-col justify-center">
-            <h2 className="font-bold text-lg">Nossa Visão</h2>
-            <p>
+            <Typography variant="h2" className="font-bold text-lg">
+              Nossa Visão
+            </Typography>
+            <Typography variant="p">
               Criar um ambiente digital que transforme assistencialismo em
               inclusão e emancipação.
-            </p>
+            </Typography>
           </div>
           <div className="bg-primary text-white p-4 rounded-xl shadow-md min-h-[120px] md:min-h-0 flex flex-col justify-center">
-            <h2 className="font-bold text-lg">Nossos Valores</h2>
-            <p>Empatia, dignidade e acesso igualitário a oportunidades.</p>
+            <Typography variant="h2" className="font-bold text-lg">
+              Nossos Valores
+            </Typography>
+            <Typography variant="p">
+              Empatia, dignidade e acesso igualitário a oportunidades.
+            </Typography>
           </div>
         </div>
 
         {/* Botão de Ação */}
-        <button className="mt-6 bg-primary text-white px-6 py-3 rounded-lg text-lg font-semibold shadow-md hover:bg-primary-dark transition">
-          Junte-se a nós!
-        </button>
+        <div className="mt-8 text-center">
+          <Button
+            variant="primary"
+            className="mt-16 text-lg font-semibold shadow-md"
+          >
+            Junte-se a Nós
+          </Button>
+        </div>
       </motion.div>
     </section>
   );

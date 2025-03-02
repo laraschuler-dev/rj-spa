@@ -1,4 +1,6 @@
 import { motion } from 'framer-motion';
+import Typography from './ui/Typography';
+import Button from './ui/Button';
 
 const HowToDonate = () => {
   return (
@@ -19,14 +21,14 @@ const HowToDonate = () => {
         transition={{ duration: 0.8 }}
         className="relative z-10 text-white max-w-3xl mx-auto"
       >
-        <h2 className="text-3xl md:text-5xl font-bold">
+        <Typography variant="h2" className="text-3xl md:text-5xl font-bold">
           Faça a Diferença! Contribua com Nossa Causa
-        </h2>
-        <p className="mt-4 text-base md:text-lg max-w-2xl mx-auto">
+        </Typography>
+        <Typography variant="p" className="mt-4 text-base md:text-lg max-w-2xl mx-auto">
           Sua doação ajuda a transformar vidas, oferecendo suporte essencial
           para quem mais precisa. Escolha a melhor forma de contribuir e faça
           parte dessa rede de solidariedade!
-        </p>
+        </Typography>
       </motion.div>
 
       {/* Espaçamento extra antes do card */}
@@ -36,9 +38,9 @@ const HowToDonate = () => {
       <div className="relative z-20 mt-16">
         {/* Card com fundo translúcido */}
         <div className="max-w-sm mx-auto bg-white/20 backdrop-blur-md border border-white/30 rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold text-white text-center">
+          <Typography variant="h3" className="text-xl font-semibold text-white text-center">
             Doe Agora via Pix
-          </h3>
+          </Typography>
           <div className="mt-4 flex justify-center">
             <img
               src="/img/qrcode.png"
@@ -46,16 +48,16 @@ const HowToDonate = () => {
               className="w-48 h-48 object-contain"
             />
           </div>
-          <p className="mt-4 text-center text-white">
+          <Typography variant="p" className="mt-4 text-center text-white">
             Aponte sua câmera para o QR Code e faça uma doação via Pix.
-          </p>
+          </Typography>
         </div>
 
         {/* Botão para outras opções */}
         <div className="mt-8 text-center">
-          <button className="bg-primary text-white px-6 py-3 rounded-lg text-lg font-semibold shadow-md hover:bg-primary-dark transition">
+          <Button variant="primary" className="text-lg font-semibold shadow-md">
             Outras Opções
-          </button>
+          </Button>
         </div>
       </div>
     </section>

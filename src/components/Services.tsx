@@ -1,7 +1,9 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
-import { Pagination } from 'swiper/modules';
+import { Pagination, Navigation } from 'swiper/modules';
+import Typography from './ui/Typography';
+import CardButton from './ui/CardButton';
 
 const services = [
   {
@@ -34,22 +36,22 @@ const services = [
   },
 ];
 
-export default function Servicos() {
+export default function Services() {
   return (
     <section id="services" className="w-full py-12 px-4 md:px-8 bg-gray-50">
       <div className="max-w-3xl mx-auto text-center">
-        <h2 className="text-3xl font-bold text-gray-900">
+        <Typography variant="h2" className="text-3xl font-bold text-gray-900">
           Serviços Disponíveis
-        </h2>
-        <p className="text-gray-600 mt-2">
+        </Typography>
+        <Typography variant="p" className="text-gray-600 mt-2">
           Conheça os serviços oferecidos pela nossa rede social solidária,
           desenvolvidos para apoiar e transformar vidas.
-        </p>
+        </Typography>
       </div>
 
       <div className="mt-8 max-w-4xl mx-auto relative">
         <Swiper
-          modules={[Pagination]}
+          modules={[Pagination, Navigation]}
           spaceBetween={16}
           slidesPerView={1}
           pagination={{ clickable: true }}
@@ -71,15 +73,16 @@ export default function Servicos() {
                   className="w-full h-48 object-cover"
                 />
                 <div className="p-4">
-                  <h3 className="font-semibold text-lg text-gray-900">
+                  <Typography variant="h3" className="text-lg text-gray-900">
                     {service.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 mt-2">
+                  </Typography>
+                  <Typography
+                    variant="p"
+                    className="text-sm text-gray-600 mt-2"
+                  >
                     {service.description}
-                  </p>
-                  <button className="mt-4 px-4 py-2 bg-blue-600 text-white text-base rounded-md hover:bg-blue-700 w-full">
-                    Saiba Mais
-                  </button>
+                  </Typography>
+                  <CardButton>Saiba Mais</CardButton>
                 </div>
               </div>
             </SwiperSlide>
