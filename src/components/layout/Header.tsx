@@ -33,6 +33,14 @@ const Header: React.FC = () => {
           Quem Somos
         </ScrollLink>
         <ScrollLink
+          to="information"
+          smooth={true}
+          duration={500}
+          className="hover:text-accent transition-colors cursor-pointer"
+        >
+          Informações
+        </ScrollLink>
+        <ScrollLink
           to="events"
           smooth={true}
           duration={500}
@@ -103,7 +111,11 @@ const Header: React.FC = () => {
       )}
 
       {/* Menu Mobile */}
-      <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+      <MobileMenu
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        isAuthenticated={false}
+      />
     </header>
   );
 };

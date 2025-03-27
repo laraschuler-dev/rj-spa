@@ -79,6 +79,12 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           Quem Somos
         </button>
         <button
+          onClick={() => handleNavigation('/', 'information')}
+          className="hover:text-accent transition-colors"
+        >
+          Informações
+        </button>
+        <button
           onClick={() => handleNavigation('/', 'events')}
           className="hover:text-accent transition-colors"
         >

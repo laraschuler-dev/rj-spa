@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import Button from './ui/Button';
 import Typography from './ui/Typography';
-import { div } from 'framer-motion/client';
 
 const Introduction = () => {
   return (
@@ -37,13 +36,9 @@ const Introduction = () => {
           Navegue pela plataforma, descubra formas de ajudar ou encontre o
           suporte necessário. Juntos, podemos transformar vidas.
         </Typography>
+        {/* Botão de Ação */}
         <div className="mt-8 text-center">
-          <Button
-            variant="primary"
-            className="mt-16 text-lg font-semibold shadow-md"
-          >
-            Saiba Mais
-          </Button>
+          <Button variant="primary">Saiba mais</Button>
         </div>
       </motion.div>
     </section>

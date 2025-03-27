@@ -1,5 +1,5 @@
 /* @tailwind base já vai garantir a normalização básica de estilos */
-@tailwind base; 
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -14,8 +14,8 @@
 html {
   font-size: 16px; /* Mantém a base da tipografia */
   font-family: 'Inter', sans-serif; /* Garantindo a fonte padrão */
-  background-color: #F8F9FA; /* Cor de fundo geral */
-  color: #1E293B; /* Cor de texto padrão */
+  background-color: #f8f9fa; /* Cor de fundo geral */
+  color: #1e293b; /* Cor de texto padrão */
   line-height: 1.5;
   scroll-behavior: smooth; /* Suaviza o comportamento de rolagem */
 }
@@ -28,7 +28,8 @@ body {
 }
 
 /* Reset para listas */
-ul, ol {
+ul,
+ol {
   list-style: none;
   padding: 0;
   margin: 0;

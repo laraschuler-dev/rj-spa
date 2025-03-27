@@ -20,8 +20,8 @@ const Contact = () => {
         className="max-w-3xl mx-auto"
       >
         <Typography
-          variant="h2"
-          className="text-3xl md:text-5xl font-bold text-gray-900"
+          variant="h1"
+          className="text-3xl md:text-5xl font-bold text-primary"
         >
           Entre em Contato
         </Typography>

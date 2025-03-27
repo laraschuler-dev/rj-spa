@@ -6,6 +6,7 @@ import Events from '../components/Events';
 import Services from '../components/Services';
 import HowToDonate from '../components/HowToDonate';
 import Contact from '../components/Contact';
+import Information from '../components/Information';
 
 /**
  * Componente Home
@@ -22,6 +23,7 @@ const Home: React.FC = () => {
       <div className="min-h-screen flex flex-col">
         <Introduction />
         <AboutUs />
+        <Information />
         <Events />
         <Services />
         <HowToDonate />

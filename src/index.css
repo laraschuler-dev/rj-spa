@@ -17,19 +17,21 @@
 /* Links */
 a {
   font-weight: 500;
-  color: theme('colors.primary');  /* Usando a cor primária configurada no Tailwind */
+  color: theme(
+    'colors.primary'
+  ); /* Usando a cor primária configurada no Tailwind */
   text-decoration: inherit;
 }
 
 a:hover {
-  color: theme('colors.accent');  /* Usando a cor de destaque */
+  color: theme('colors.accent'); /* Usando a cor de destaque */
 }
 
 /* Remova qualquer definição de background-color e color no body */
 body {
   min-height: 100vh;
   margin: 0;
-  font-family: theme('fontFamily.body');  /* Usando a fonte do Tailwind */
+  font-family: theme('fontFamily.body'); /* Usando a fonte do Tailwind */
   display: flex;
   flex-direction: column;
   background-color: transparent; /* Deixe o Tailwind controlar */
@@ -49,9 +51,13 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: theme('colors.primary'); /* Usando a cor primária do Tailwind */
+  background-color: theme(
+    'colors.primary'
+  ); /* Usando a cor primária do Tailwind */
   cursor: pointer;
-  transition: background-color 0.25s ease, border-color 0.25s ease;
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 button:hover {

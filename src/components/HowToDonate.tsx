@@ -6,7 +6,7 @@ const HowToDonate = () => {
   return (
     <section
       id="donate"
-      className="relative py-16 px-6 md:px-12 lg:px-24 text-center"
+      className="relative py-16 px-6 md:px-12 lg:px-24 text-center mb-6"
     >
       {/* Imagem de fundo cobrindo toda a seção */}
       <div className="absolute inset-0 w-full h-full bg-[url('/img/doacao.jpg')] bg-cover bg-center brightness-50"></div>
@@ -21,10 +21,13 @@ const HowToDonate = () => {
         transition={{ duration: 0.8 }}
         className="relative z-10 text-white max-w-3xl mx-auto"
       >
-        <Typography variant="h2" className="text-3xl md:text-5xl font-bold">
+        <Typography variant="h1" className="text-3xl md:text-5xl font-bold">
           Faça a Diferença! Contribua com Nossa Causa
         </Typography>
-        <Typography variant="p" className="mt-4 text-base md:text-lg max-w-2xl mx-auto">
+        <Typography
+          variant="p"
+          className="mt-4 text-base md:text-lg max-w-2xl mx-auto"
+        >
           Sua doação ajuda a transformar vidas, oferecendo suporte essencial
           para quem mais precisa. Escolha a melhor forma de contribuir e faça
           parte dessa rede de solidariedade!
@@ -38,7 +41,10 @@ const HowToDonate = () => {
       <div className="relative z-20 mt-16">
         {/* Card com fundo translúcido */}
         <div className="max-w-sm mx-auto bg-white/20 backdrop-blur-md border border-white/30 rounded-lg shadow-lg p-6">
-          <Typography variant="h3" className="text-xl font-semibold text-white text-center">
+          <Typography
+            variant="h3"
+            className="text-xl font-semibold text-white text-center"
+          >
             Doe Agora via Pix
           </Typography>
           <div className="mt-4 flex justify-center">
@@ -55,9 +61,7 @@ const HowToDonate = () => {
 
         {/* Botão para outras opções */}
         <div className="mt-8 text-center">
-          <Button variant="primary" className="text-lg font-semibold shadow-md">
-            Outras Opções
-          </Button>
+          <Button variant="primary">Outras Opções</Button>
         </div>
       </div>
     </section>
