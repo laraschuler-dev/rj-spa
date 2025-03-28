@@ -1,0 +1,71 @@
+/* Importações do TailwindCSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilo base */
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Links */
+a {
+  font-weight: 500;
+  color: theme(
+    'colors.primary'
+  ); /* Usando a cor primária configurada no Tailwind */
+  text-decoration: inherit;
+}
+
+a:hover {
+  color: theme('colors.accent'); /* Usando a cor de destaque */
+}
+
+/* Remova qualquer definição de background-color e color no body */
+body {
+  min-height: 100vh;
+  margin: 0;
+  font-family: theme('fontFamily.body'); /* Usando a fonte do Tailwind */
+  display: flex;
+  flex-direction: column;
+  background-color: transparent; /* Deixe o Tailwind controlar */
+  color: inherit; /* Deixe o Tailwind controlar a cor do texto */
+}
+
+/* Remover estilos de h1 que podem entrar em conflito com o Tailwind */
+h1 {
+  text-align: center; /* Apenas o alinhamento se necessário */
+}
+
+/* Estilos globais de botão */
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: theme(
+    'colors.primary'
+  ); /* Usando a cor primária do Tailwind */
+  cursor: pointer;
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+button:hover {
+  background-color: theme('colors.secondary'); /* Usando a cor secundária */
+  border-color: theme('colors.secondary');
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
