@@ -6,10 +6,10 @@ const HowToDonate = () => {
   return (
     <section
       id="donate"
-      className="relative py-16 px-6 md:px-12 lg:px-24 text-center mb-6"
+      className="relative pt-32 pb-48 md:pb-56 lg:pb-64 px-6 md:px-12 lg:px-24 text-center"
     >
       {/* Imagem de fundo cobrindo toda a seção */}
-      <div className="absolute inset-0 w-full h-full bg-[url('/img/doacao.jpg')] bg-cover bg-center brightness-50"></div>
+      <div className="absolute inset-0 w-full h-full bg-[url('/img/doacao2.png')] bg-cover bg-center brightness-50"></div>
 
       {/* Overlay escuro para melhor legibilidade */}
       <div className="absolute inset-0 bg-black/50"></div>
