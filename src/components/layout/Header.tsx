@@ -3,6 +3,7 @@ import { Link as ScrollLink } from 'react-scroll';
 import { CgLogIn, CgProfile } from 'react-icons/cg';
 import { FiMenu } from 'react-icons/fi';
 import MobileMenu from '../ui/MobileMenu';
+import { Link } from 'react-router-dom';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -77,25 +78,21 @@ const Header: React.FC = () => {
       {/* Botão Login / Perfil */}
       <div className="hidden md:flex">
         {isAuthenticated ? (
-          <ScrollLink
-            to="profile"
-            smooth={true}
-            duration={500}
-            className="flex items-center gap-2 hover:text-accent transition-colors cursor-pointer"
+          <Link
+            to="/perfil"
+            className="flex items-center gap-2 hover:text-accent transition-colors"
           >
             <CgProfile size={24} />
             <span className="font-body">Perfil</span>
-          </ScrollLink>
+          </Link>
         ) : (
-          <ScrollLink
-            to="login"
-            smooth={true}
-            duration={500}
-            className="flex items-center gap-2 hover:text-accent transition-colors cursor-pointer"
+          <Link
+            to="/login"
+            className="flex items-center gap-2 hover:text-accent transition-colors"
           >
             <CgLogIn size={24} />
             <span className="font-body">Entrar</span>
-          </ScrollLink>
+          </Link>
         )}
       </div>
 
