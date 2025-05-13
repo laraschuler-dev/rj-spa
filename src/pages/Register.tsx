@@ -1,10 +1,52 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Typography from '../components/ui/Typography';
 import { FcGoogle } from 'react-icons/fc';
 import { FaFacebook } from 'react-icons/fa';
 import SubmitButton from '../components/ui/SubmitButton';
+import api from '../config/axiosConfig';
+import { toast } from 'react-toastify';
 
 const Register = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+  });
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    try {
+      await api.post('/auth/users', formData); // Envia os dados para o backend
+      toast.success('Conta criada com sucesso! Redirecionando para o login...');
+      navigate('/login'); // Redireciona para a página de login após o sucesso
+    } catch (err: any) {
+      if (err.response) {
+        // Exibe a mensagem de erro retornada pelo backend
+        const backendMessage =
+          err.response.data.message || 'Erro ao criar conta';
+        toast.error(backendMessage);
+      } else if (err.request) {
+        // Erro relacionado à requisição (ex.: sem resposta do servidor)
+        toast.error(
+          'Não foi possível conectar ao servidor. Verifique sua conexão.'
+        );
+      } else {
+        // Erro desconhecido
+        toast.error('Ocorreu um erro inesperado. Tente novamente.');
+      }
+    }
+  };
+
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
@@ -20,7 +62,7 @@ const Register = () => {
         </Typography>
 
         {/* Formulário de Registro */}
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label htmlFor="name" className="block mb-1 text-sm font-medium">
               Nome completo
@@ -28,20 +70,41 @@ const Register = () => {
             <input
               type="text"
               id="name"
+              value={formData.name}
+              onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Digite seu nome"
+              required
             />
           </div>
 
           <div>
             <label htmlFor="email" className="block mb-1 text-sm font-medium">
-              E-mail ou Telefone
+              E-mail
             </label>
             <input
               type="email"
               id="email"
+              value={formData.email}
+              onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="Digite seu e-mail ou telefone"
+              placeholder="Digite seu e-mail"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="phone" className="block mb-1 text-sm font-medium">
+              Telefone
+            </label>
+            <input
+              type="tel"
+              id="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="(99) 99999-9999"
+              required
             />
           </div>
 
@@ -55,10 +118,16 @@ const Register = () => {
             <input
               type="password"
               id="password"
+              value={formData.password}
+              onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Digite sua senha"
+              required
             />
           </div>
+
+          {/* Exibe mensagem de erro, se houver */}
+          {error && <p className="text-red-500 text-sm">{error}</p>}
 
           {/* Botão de Criar Conta */}
           <SubmitButton>Criar Conta</SubmitButton>

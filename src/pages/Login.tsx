@@ -1,11 +1,57 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Typography from '../components/ui/Typography';
 import { FcGoogle } from 'react-icons/fc';
 import SubmitButton from '../components/ui/SubmitButton';
 import { FaFacebook } from 'react-icons/fa';
+import api from '../config/axiosConfig';
+import { toast } from 'react-toastify';
 
 const Login: React.FC = () => {
+  const [formData, setFormData] = useState({
+    emailOrPhone: '',
+    password: '',
+  });
+  const navigate = useNavigate();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Dados enviados:', formData);
+    try {
+      // Envia os dados para o backend
+      const response = await api.post('/auth/session', formData);
+      console.log('Resposta do backend:', response.data); // Verifica a resposta do backend
+
+      // Exibe mensagem de sucesso
+      toast.success('Login realizado com sucesso!');
+
+      // Salva o token no localStorage (ou outro mecanismo de armazenamento)
+      localStorage.setItem('token', response.data.token);
+
+      // Redireciona o usuário para a página inicial ou dashboard
+      navigate('/dashboard');
+    } catch (err: any) {
+      if (err.response) {
+        // Exibe a mensagem de erro retornada pelo backend
+        const backendMessage =
+          err.response.data.error || 'Erro ao realizar login';
+        toast.error(backendMessage);
+      } else if (err.request) {
+        // Erro relacionado à requisição (ex.: sem resposta do servidor)
+        toast.error(
+          'Não foi possível conectar ao servidor. Verifique sua conexão.'
+        );
+      } else {
+        // Erro desconhecido
+        toast.error('Ocorreu um erro inesperado. Tente novamente.');
+      }
+    }
+  };
+
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
@@ -15,19 +61,22 @@ const Login: React.FC = () => {
         </Typography>
 
         {/* Formulário de Login */}
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label
-              htmlFor="identifier"
+              htmlFor="emailOrPhone"
               className="block mb-1 text-sm font-medium"
             >
               E-mail ou Telefone
             </label>
             <input
               type="text"
-              id="identifier"
+              id="emailOrPhone"
+              value={formData.emailOrPhone}
+              onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="exemplo@email.com ou (99) 99999-9999"
+              required
             />
           </div>
 
@@ -41,9 +90,22 @@ const Login: React.FC = () => {
             <input
               type="password"
               id="password"
+              value={formData.password}
+              onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="••••••••"
+              required
             />
+          </div>
+
+          {/* Link para "Esqueci minha senha" */}
+          <div className="text-right">
+            <Link
+              to="/forgot-password"
+              className="text-sm text-primary font-medium hover:underline"
+            >
+              Esqueci minha senha
+            </Link>
           </div>
 
           {/* Botão de Entrar */}
