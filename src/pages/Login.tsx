@@ -22,31 +22,21 @@ const Login: React.FC = () => {
     e.preventDefault();
     console.log('Dados enviados:', formData);
     try {
-      // Envia os dados para o backend
       const response = await api.post('/auth/session', formData);
-      console.log('Resposta do backend:', response.data); // Verifica a resposta do backend
-
-      // Exibe mensagem de sucesso
       toast.success('Login realizado com sucesso!');
-
-      // Salva o token no localStorage (ou outro mecanismo de armazenamento)
       localStorage.setItem('token', response.data.token);
-
-      // Redireciona o usuário para a página inicial ou dashboard
       navigate('/dashboard');
     } catch (err: any) {
-      if (err.response) {
-        // Exibe a mensagem de erro retornada pelo backend
+      if (err.response && err.response.data) {
+        // Verifica se a mensagem de erro está presente no backend
         const backendMessage =
           err.response.data.error || 'Erro ao realizar login';
         toast.error(backendMessage);
       } else if (err.request) {
-        // Erro relacionado à requisição (ex.: sem resposta do servidor)
         toast.error(
           'Não foi possível conectar ao servidor. Verifique sua conexão.'
         );
       } else {
-        // Erro desconhecido
         toast.error('Ocorreu um erro inesperado. Tente novamente.');
       }
     }

@@ -22,7 +22,7 @@ const ForgotPassword: React.FC = () => {
         'Se o e-mail estiver cadastrado, você receberá um link para redefinir sua senha.'
       );
     } catch (err: any) {
-      if (err.response) {
+      if (err.response && err.response.data) {
         const backendMessage =
           err.response.data.error || 'Erro ao solicitar recuperação de senha';
         toast.error(backendMessage);

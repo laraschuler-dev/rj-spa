@@ -30,10 +30,9 @@ const Register = () => {
       toast.success('Conta criada com sucesso! Redirecionando para o login...');
       navigate('/login'); // Redireciona para a página de login após o sucesso
     } catch (err: any) {
-      if (err.response) {
+      if (err.response && err.response.data) {
         // Exibe a mensagem de erro retornada pelo backend
-        const backendMessage =
-          err.response.data.message || 'Erro ao criar conta';
+        const backendMessage = err.response.data.error || 'Erro ao criar conta';
         toast.error(backendMessage);
       } else if (err.request) {
         // Erro relacionado à requisição (ex.: sem resposta do servidor)

@@ -35,7 +35,7 @@ const ResetPassword: React.FC = () => {
       );
       navigate('/login'); // Redireciona para a tela de login
     } catch (err: any) {
-      if (err.response) {
+      if (err.response && err.response.data) {
         const backendMessage =
           err.response.data.error || 'Erro ao redefinir a senha';
         toast.error(backendMessage);
