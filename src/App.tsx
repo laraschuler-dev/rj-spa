@@ -4,8 +4,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import CustomToastContainer from './components/ui/CustomToastContainer';
 
 const App = () => {
   return (
@@ -19,7 +18,7 @@ const App = () => {
           <Route path="/reset-password" element={<ResetPassword />} />
         </Routes>
       </Router>
-      <ToastContainer position="top-right" autoClose={5000} />
+      <CustomToastContainer />
     </>
   );
 };

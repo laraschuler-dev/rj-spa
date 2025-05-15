@@ -26,6 +26,7 @@ const ForgotPassword: React.FC = () => {
         const backendMessage =
           err.response.data.error || 'Erro ao solicitar recuperação de senha';
         toast.error(backendMessage);
+        console.log('Erro do backend:', backendMessage);
       } else if (err.request) {
         toast.error(
           'Não foi possível conectar ao servidor. Verifique sua conexão.'
