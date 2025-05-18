@@ -4,10 +4,13 @@ import { CgLogIn, CgProfile } from 'react-icons/cg';
 import { FiMenu } from 'react-icons/fi';
 import MobileMenu from '../ui/MobileMenu';
 import { Link } from 'react-router-dom';
+import useAuthStore from '../../stores/authStore';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const isAuthenticated = false; // TODO: Substituir por lógica real de autenticação
+  const token = useAuthStore((state) => state.token); // 👈 pegando token do Zustand
+  console.log('Token atual:', token);
+  const isAuthenticated = !!token; // se existir token, está logado
 
   return (
     <header className="bg-primary text-background py-4 px-6 shadow-md flex items-center justify-between fixed top-0 left-0 w-full z-50">
@@ -111,7 +114,7 @@ const Header: React.FC = () => {
       <MobileMenu
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
-        isAuthenticated={false}
+        isAuthenticated={isAuthenticated} // 👈 passar status real aqui também
       />
     </header>
   );

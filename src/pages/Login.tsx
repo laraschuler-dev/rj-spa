@@ -6,6 +6,7 @@ import SubmitButton from '../components/ui/SubmitButton';
 import { FaFacebook } from 'react-icons/fa';
 import api from '../config/axiosConfig';
 import { toast } from 'react-toastify';
+import useAuthStore from '../stores/authStore';
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,8 @@ const Login: React.FC = () => {
     password: '',
   });
   const navigate = useNavigate();
+
+  const setToken = useAuthStore((state) => state.setToken);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -24,6 +27,7 @@ const Login: React.FC = () => {
     try {
       const response = await api.post('/auth/session', formData);
       toast.success('Login realizado com sucesso!');
+      setToken(response.data.token); // Salva no Zustand
       localStorage.setItem('token', response.data.token);
       navigate('/dashboard');
     } catch (err: any) {
