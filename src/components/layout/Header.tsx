@@ -114,7 +114,7 @@ const Header: React.FC = () => {
       <MobileMenu
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
-        isAuthenticated={isAuthenticated} // 👈 passar status real aqui também
+        isAuthenticated={isAuthenticated}
       />
     </header>
   );

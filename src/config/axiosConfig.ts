@@ -7,7 +7,7 @@ const api = axios.create({
 
 // Adicionar headers globais (exemplo: autenticação)
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token'); // Obter token do localStorage
+  const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
