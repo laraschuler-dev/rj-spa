@@ -31,7 +31,7 @@ const Sidebar: React.FC = () => {
           <FiHeart size={20} /> Quero Voluntariar
         </Link>
         <Link
-          to="/doacoes"
+          to="/posts/create"
           className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
         >
           <FiGift size={20} /> Quero Doar

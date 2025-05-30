@@ -7,6 +7,7 @@ import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import CustomToastContainer from './components/ui/CustomToastContainer';
 import AuthInitializer from './components/AuthInitializer';
+import CreateDonationPost from './pages/posts/CreateDonationPost';
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/posts/create" element={<CreateDonationPost />} />
           </Routes>
         </AuthInitializer>
       </Router>
