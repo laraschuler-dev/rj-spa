@@ -11,6 +11,12 @@ import {
 import { IoMdClose } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import { animateScroll as scroll } from 'react-scroll';
+import {
+  MdOutlineCampaign,
+  MdEventAvailable,
+  MdOutlinePostAdd,
+} from 'react-icons/md';
+import { PiStudent } from 'react-icons/pi';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -123,39 +129,63 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
       {/* Opções adicionais */}
       <nav className="flex flex-col gap-4 mt-4">
         <Link
-          to="/voluntariar"
+          to="/posts/volunteer"
           className="flex items-center gap-2 hover:text-accent transition-colors"
           onClick={onClose}
         >
           <FiHeart /> Quero Voluntariar
         </Link>
         <Link
-          to="/quero-doar"
+          to="/posts/donation"
           className="flex items-center gap-2 hover:text-accent transition-colors"
           onClick={onClose}
         >
           <FiGift /> Quero Doar
         </Link>
         <Link
-          to="/solicitar-ajuda"
+          to="/posts/help"
           className="flex items-center gap-2 hover:text-accent transition-colors"
           onClick={onClose}
         >
           <FiUsers /> Solicitar Ajuda
         </Link>
         <Link
-          to="/anunciar-vaga"
+          to="/posts/job"
           className="flex items-center gap-2 hover:text-accent transition-colors"
           onClick={onClose}
         >
           <FiBriefcase /> Anunciar Vaga
         </Link>
         <Link
-          to="/denunciar"
+          to="/posts/complaint"
           className="flex items-center gap-2 hover:text-accent transition-colors"
           onClick={onClose}
         >
           <FiAlertCircle /> Denunciar Violência
+        </Link>
+        <Link
+          to="/posts/campaign"
+          className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
+        >
+          <MdOutlineCampaign size={20} /> Criar Campanha
+        </Link>
+        <Link
+          to="/posts/course"
+          className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
+        >
+          <PiStudent size={20} /> Oferecer Curso
+        </Link>
+        <Link
+          to="/posts/event"
+          className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
+        >
+          <MdEventAvailable size={20} /> Criar Evento
+        </Link>
+        <Link
+          to="/posts/general"
+          className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
+        >
+          <MdOutlinePostAdd size={20} /> Postar
         </Link>
       </nav>
     </motion.div>

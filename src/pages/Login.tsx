@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import Typography from '../components/ui/Typography';
 import { FcGoogle } from 'react-icons/fc';
 import SubmitButton from '../components/ui/SubmitButton';
@@ -14,8 +14,16 @@ const Login: React.FC = () => {
     password: '',
   });
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/dashboard';
 
   const setToken = useAuthStore((state) => state.setToken);
+  const token = useAuthStore((state) => state.token);
+
+  // Se já estiver logado, redireciona imediatamente
+  if (token) {
+    return <Navigate to={from} replace />;
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -29,7 +37,7 @@ const Login: React.FC = () => {
       toast.success('Login realizado com sucesso!');
       setToken(response.data.token); // Salva no Zustand
       localStorage.setItem('token', response.data.token);
-      navigate('/dashboard');
+      //navigate(from, { replace: true });
     } catch (err: any) {
       if (err.response && err.response.data) {
         // Verifica se a mensagem de erro está presente no backend
