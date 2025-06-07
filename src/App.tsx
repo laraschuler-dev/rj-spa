@@ -18,6 +18,7 @@ import CreateCoursePost from './pages/posts/CreateCoursePost';
 import CreateJobPost from './pages/posts/CreateJobPost';
 import CreateEventPost from './pages/posts/CreateEventPost';
 import CreateGeneralPost from './pages/posts/CreateGeneralPost';
+import Contact from './components/Contact';
 
 const App = () => {
   return (
@@ -31,6 +32,7 @@ const App = () => {
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/contact" element={<Contact />} />
 
             {/* Agrupamento das rotas privadas */}
             <Route element={<PrivateRoute />}>

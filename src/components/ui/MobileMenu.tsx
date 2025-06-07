@@ -165,27 +165,31 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
         </Link>
         <Link
           to="/posts/campaign"
-          className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
+          className="flex items-center gap-2 hover:text-accent transition-colors"
+          onClick={onClose}
         >
-          <MdOutlineCampaign size={20} /> Criar Campanha
+          <MdOutlineCampaign /> Criar Campanha
         </Link>
         <Link
           to="/posts/course"
-          className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
+          className="flex items-center gap-2 hover:text-accent transition-colors"
+          onClick={onClose}
         >
-          <PiStudent size={20} /> Oferecer Curso
+          <PiStudent /> Oferecer Curso
         </Link>
         <Link
           to="/posts/event"
-          className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
+          className="flex items-center gap-2 hover:text-accent transition-colors"
+          onClick={onClose}
         >
-          <MdEventAvailable size={20} /> Criar Evento
+          <MdEventAvailable /> Criar Evento
         </Link>
         <Link
           to="/posts/general"
-          className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
+          className="flex items-center gap-2 hover:text-accent transition-colors"
+          onClick={onClose}
         >
-          <MdOutlinePostAdd size={20} /> Postar
+          <MdOutlinePostAdd /> Postar
         </Link>
       </nav>
     </motion.div>
