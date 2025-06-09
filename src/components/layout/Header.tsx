@@ -82,11 +82,11 @@ const Header: React.FC = () => {
       <div className="hidden md:flex">
         {isAuthenticated ? (
           <Link
-            to="/perfil"
+            to="/feed"
             className="flex items-center gap-2 hover:text-accent transition-colors"
           >
             <CgProfile size={24} />
-            <span className="font-body">Perfil</span>
+            <span className="font-body">Feed</span>
           </Link>
         ) : (
           <Link

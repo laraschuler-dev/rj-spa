@@ -5,7 +5,6 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
-import Dashboard from './pages/Dashboard';
 import CreateDonationPost from './pages/posts/CreateDonationPost';
 import AuthInitializer from './components/AuthInitializer';
 import CustomToastContainer from './components/ui/CustomToastContainer';
@@ -19,6 +18,7 @@ import CreateJobPost from './pages/posts/CreateJobPost';
 import CreateEventPost from './pages/posts/CreateEventPost';
 import CreateGeneralPost from './pages/posts/CreateGeneralPost';
 import Contact from './components/Contact';
+import Feed from './pages/Feed';
 
 const App = () => {
   return (
@@ -36,7 +36,7 @@ const App = () => {
 
             {/* Agrupamento das rotas privadas */}
             <Route element={<PrivateRoute />}>
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/feed" element={<Feed />} />
               <Route path="/posts/donation" element={<CreateDonationPost />} />
               <Route
                 path="/posts/complaint"

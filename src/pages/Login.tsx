@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import Typography from '../components/ui/Typography';
 import { FcGoogle } from 'react-icons/fc';
@@ -15,15 +15,16 @@ const Login: React.FC = () => {
   });
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/dashboard';
+  const from = location.state?.from?.pathname || '/feed';
 
   const setToken = useAuthStore((state) => state.setToken);
   const token = useAuthStore((state) => state.token);
 
-  // Se já estiver logado, redireciona imediatamente
-  if (token) {
-    return <Navigate to={from} replace />;
-  }
+  useEffect(() => {
+    if (token) {
+      navigate(from, { replace: true });
+    }
+  }, [token, from, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });

@@ -17,7 +17,7 @@ import { PiStudent } from 'react-icons/pi';
  * Componente Sidebar
  *
  * Este componente representa a barra lateral de navegação do aplicativo,
- * destacando ações importantes que podem ser realizadas antes do login.
+ * destacando ações importantes que podem ser realizadas.
  *
  * @returns {JSX.Element} A barra lateral de navegação.
  */

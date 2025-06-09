@@ -34,7 +34,8 @@ const Button: React.FC<ButtonProps> = ({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={clsx('px-6 py-3 rounded-lg font-body text-lg transition-all', { // Aumentado o padding e fonte
+      className={clsx('px-6 py-3 rounded-lg font-body text-lg transition-all', {
+        // Aumentado o padding e fonte
         'bg-primary text-white hover:bg-secondary': variant === 'primary', // Azul por padrão, laranja no hover
         'bg-secondary text-white hover:bg-orange-700': variant === 'secondary',
         'border border-primary text-primary hover:bg-primary hover:text-white':

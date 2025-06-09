@@ -1,4 +1,3 @@
-// stores/authStore.ts
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import api from '../services/api';
@@ -30,7 +29,6 @@ const useAuthStore = create<AuthState>()(
 
       clearAuth: () => {
         set({ token: null, user: null });
-        // Dispara um evento global quando o auth é limpo
         window.dispatchEvent(new CustomEvent('authCleared'));
       },
 
@@ -47,8 +45,8 @@ const useAuthStore = create<AuthState>()(
           get().setUser(response.data);
         } catch (error) {
           console.warn('Token inválido ou expirado. Limpando sessão.');
-          get().clearAuth(); // Já dispara o evento 'authCleared'
-          throw error; // Para ser capturado no AuthInitializer
+          get().clearAuth();
+          throw error;
         }
       },
     }),
