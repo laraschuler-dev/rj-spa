@@ -9,22 +9,22 @@ import { toast } from 'react-toastify';
 import useAuthStore from '../stores/authStore';
 
 const Login: React.FC = () => {
-  const [formData, setFormData] = useState({
-    emailOrPhone: '',
-    password: '',
-  });
+  const [formData, setFormData] = useState({ emailOrPhone: '', password: '' });
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || '/feed';
 
   const setToken = useAuthStore((state) => state.setToken);
+  const validateToken = useAuthStore((state) => state.validateToken);
+  const user = useAuthStore((state) => state.user);
   const token = useAuthStore((state) => state.token);
 
+  // ✅ Redireciona só quando o usuário estiver disponível
   useEffect(() => {
-    if (token) {
+    if (token && user) {
       navigate(from, { replace: true });
     }
-  }, [token, from, navigate]);
+  }, [token, user, from, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -32,25 +32,22 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Dados enviados:', formData);
     try {
       const response = await api.post('/auth/session', formData);
+
       toast.success('Login realizado com sucesso!');
-      setToken(response.data.token); // Salva no Zustand
+      setToken(response.data.token);
       localStorage.setItem('token', response.data.token);
-      //navigate(from, { replace: true });
+
+      // ✅ Aguarda validar e carregar o usuário antes de redirecionar
+      await validateToken();
     } catch (err: any) {
-      if (err.response && err.response.data) {
-        // Verifica se a mensagem de erro está presente no backend
-        const backendMessage =
-          err.response.data.error || 'Erro ao realizar login';
-        toast.error(backendMessage);
+      if (err.response?.data?.error) {
+        toast.error(err.response.data.error);
       } else if (err.request) {
-        toast.error(
-          'Não foi possível conectar ao servidor. Verifique sua conexão.'
-        );
+        toast.error('Erro de conexão com o servidor.');
       } else {
-        toast.error('Ocorreu um erro inesperado. Tente novamente.');
+        toast.error('Erro inesperado ao fazer login.');
       }
     }
   };
