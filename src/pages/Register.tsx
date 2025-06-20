@@ -4,7 +4,7 @@ import Typography from '../components/ui/Typography';
 import { FcGoogle } from 'react-icons/fc';
 import { FaFacebook } from 'react-icons/fa';
 import SubmitButton from '../components/ui/SubmitButton';
-import api from '../config/axiosConfig';
+import api from '../services/api';
 import { toast } from 'react-toastify';
 
 const Register = () => {

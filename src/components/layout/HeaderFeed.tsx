@@ -2,15 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { FiBell, FiMail, FiMenu, FiLogOut } from 'react-icons/fi';
 import { CgProfile } from 'react-icons/cg';
-import useAuthStore from '../../stores/authStore';
 import MobileMenuFeed from '../ui/MobileMenuFeed';
 import { useLogout } from '../../hooks/useLogout';
 
 const HeaderFeed: React.FC = () => {
-  const token = useAuthStore((state) => state.token);
-  const isAuthenticated = !!token;
   const logout = useLogout();
-
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   return (

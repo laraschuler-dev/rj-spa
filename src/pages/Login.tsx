@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Typography from '../components/ui/Typography';
 import { FcGoogle } from 'react-icons/fc';
 import SubmitButton from '../components/ui/SubmitButton';
 import { FaFacebook } from 'react-icons/fa';
-import api from '../config/axiosConfig';
+import api from '../services/api';
 import { toast } from 'react-toastify';
 import useAuthStore from '../stores/authStore';
 
@@ -39,7 +39,6 @@ const Login: React.FC = () => {
       setToken(response.data.token);
       localStorage.setItem('token', response.data.token);
 
-      // ✅ Aguarda validar e carregar o usuário antes de redirecionar
       await validateToken();
     } catch (err: any) {
       if (err.response?.data?.error) {

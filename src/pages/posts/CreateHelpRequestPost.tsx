@@ -1,6 +1,6 @@
 import React, { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from '../../config/axiosConfig';
+import axios from '../../services/api';
 import { toast } from 'react-toastify';
 import Typography from '../../components/ui/Typography';
 import SubmitButton from '../../components/ui/SubmitButton';

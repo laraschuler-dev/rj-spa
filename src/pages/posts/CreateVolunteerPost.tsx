@@ -1,6 +1,6 @@
 import React, { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from '../../config/axiosConfig';
+import axios from '../../services/api';
 import { toast } from 'react-toastify';
 import Typography from '../../components/ui/Typography';
 import SubmitButton from '../../components/ui/SubmitButton';
@@ -45,10 +45,10 @@ const CreateVolunteerPost: React.FC = () => {
       await axios.post('/posts', postData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      toast.success('Chamada de voluntariado publicada com sucesso!');
+      toast.success('Voluntariado publicado com sucesso!');
       navigate('/dashboard');
     } catch (error: any) {
-      toast.error('Erro ao criar chamada de voluntariado.');
+      toast.error('Erro ao criar voluntariado.');
       console.error(error);
     }
   };

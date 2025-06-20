@@ -10,7 +10,7 @@ import {
 import Typography from './ui/Typography';
 import SubmitButton from './ui/SubmitButton';
 import { toast } from 'react-toastify';
-import axios from '../config/axiosConfig';
+import axios from '../services/api';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
