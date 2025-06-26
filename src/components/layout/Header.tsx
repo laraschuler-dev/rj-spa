@@ -3,10 +3,14 @@ import { Link as ScrollLink } from 'react-scroll';
 import { CgLogIn, CgProfile } from 'react-icons/cg';
 import { FiMenu } from 'react-icons/fi';
 import MobileMenu from '../ui/MobileMenu';
+import { Link } from 'react-router-dom';
+import useAuthStore from '../../stores/authStore';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const isAuthenticated = false; // TODO: Substituir por lógica real de autenticação
+  const token = useAuthStore((state) => state.token); // 👈 pegando token do Zustand
+  console.log('Token atual:', token);
+  const isAuthenticated = !!token; // se existir token, está logado
 
   return (
     <header className="bg-primary text-background py-4 px-6 shadow-md flex items-center justify-between fixed top-0 left-0 w-full z-50">
@@ -31,6 +35,14 @@ const Header: React.FC = () => {
           className="hover:text-accent transition-colors cursor-pointer"
         >
           Quem Somos
+        </ScrollLink>
+        <ScrollLink
+          to="information"
+          smooth={true}
+          duration={500}
+          className="hover:text-accent transition-colors cursor-pointer"
+        >
+          Informações
         </ScrollLink>
         <ScrollLink
           to="events"
@@ -69,25 +81,21 @@ const Header: React.FC = () => {
       {/* Botão Login / Perfil */}
       <div className="hidden md:flex">
         {isAuthenticated ? (
-          <ScrollLink
-            to="profile"
-            smooth={true}
-            duration={500}
-            className="flex items-center gap-2 hover:text-accent transition-colors cursor-pointer"
+          <Link
+            to="/feed"
+            className="flex items-center gap-2 hover:text-accent transition-colors"
           >
             <CgProfile size={24} />
-            <span className="font-body">Perfil</span>
-          </ScrollLink>
+            <span className="font-body">Feed</span>
+          </Link>
         ) : (
-          <ScrollLink
-            to="login"
-            smooth={true}
-            duration={500}
-            className="flex items-center gap-2 hover:text-accent transition-colors cursor-pointer"
+          <Link
+            to="/login"
+            className="flex items-center gap-2 hover:text-accent transition-colors"
           >
             <CgLogIn size={24} />
             <span className="font-body">Entrar</span>
-          </ScrollLink>
+          </Link>
         )}
       </div>
 
@@ -103,7 +111,11 @@ const Header: React.FC = () => {
       )}
 
       {/* Menu Mobile */}
-      <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+      <MobileMenu
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        isAuthenticated={isAuthenticated}
+      />
     </header>
   );
 };

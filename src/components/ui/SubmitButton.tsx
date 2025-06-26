@@ -16,9 +16,12 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={clsx('w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark transition', {
-        'opacity-50 cursor-not-allowed': disabled,
-      })}
+      className={clsx(
+        'w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark transition flex justify-center items-center',
+        {
+          'opacity-50 cursor-not-allowed': disabled,
+        }
+      )}
     >
       {children}
     </button>

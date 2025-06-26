@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   FiHeart,
@@ -7,56 +6,86 @@ import {
   FiUsers,
   FiBriefcase,
 } from 'react-icons/fi';
+import {
+  MdOutlineCampaign,
+  MdEventAvailable,
+  MdOutlinePostAdd,
+} from 'react-icons/md';
+import { PiStudent } from 'react-icons/pi';
 
 /**
  * Componente Sidebar
  *
  * Este componente representa a barra lateral de navegação do aplicativo,
- * destacando ações importantes que podem ser realizadas antes do login.
+ * destacando ações importantes que podem ser realizadas.
  *
  * @returns {JSX.Element} A barra lateral de navegação.
  */
-const Sidebar: React.FC = () => {
+function Sidebar() {
   return (
-    <aside className="hidden md:flex flex-col w-64 bg-sidebar text-white h-screen p-6 shadow-lg sticky top-0">
+    <aside className="hidden md:flex flex-col w-64 bg-sidebar text-white h-screen p-6 shadow-lg sticky top-16">
+      {' '}
       {/* Título */}
-      <h2 className="text-2xl font-heading mb-6">Ações</h2>
-
+      <h2 className="text-2xl mb-6">Ações</h2>
       {/* Links de Navegação */}
       <nav className="flex flex-col gap-4">
         <Link
-          to="/voluntariar"
+          to="/posts/volunteer"
           className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
         >
           <FiHeart size={20} /> Quero Voluntariar
         </Link>
         <Link
-          to="/doacoes"
+          to="/posts/donation"
           className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
         >
           <FiGift size={20} /> Quero Doar
         </Link>
         <Link
-          to="/ajuda"
+          to="/posts/help"
           className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
         >
           <FiUsers size={20} /> Solicitar Ajuda
         </Link>
         <Link
-          to="/empregos"
+          to="/posts/job"
           className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
         >
           <FiBriefcase size={20} /> Anunciar Vaga
         </Link>
         <Link
-          to="/denuncia"
+          to="/posts/complaint"
           className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
         >
           <FiAlertCircle size={20} /> Denunciar Violência
         </Link>
+        <Link
+          to="/posts/campaign"
+          className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
+        >
+          <MdOutlineCampaign size={20} /> Criar Campanha
+        </Link>
+        <Link
+          to="/posts/course"
+          className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
+        >
+          <PiStudent size={20} /> Oferecer Curso
+        </Link>
+        <Link
+          to="/posts/event"
+          className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
+        >
+          <MdEventAvailable size={20} /> Criar Evento
+        </Link>
+        <Link
+          to="/posts/general"
+          className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
+        >
+          <MdOutlinePostAdd size={20} /> Postar
+        </Link>
       </nav>
     </aside>
   );
-};
+}
 
 export default Sidebar;

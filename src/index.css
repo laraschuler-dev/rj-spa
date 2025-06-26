@@ -12,33 +12,38 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --color-primary: #004AAD;
+  --color-secondary: #F25C05;
+  --color-accent: #78C0E0;
+  --color-background: #F8F9FA;
+  --color-text: #1E293B;
 }
 
 /* Links */
 a {
   font-weight: 500;
-  color: theme('colors.primary');  /* Usando a cor primária configurada no Tailwind */
+  color: var(--color-primary);
   text-decoration: inherit;
 }
 
 a:hover {
-  color: theme('colors.accent');  /* Usando a cor de destaque */
+  color: var(--color-accent);
 }
 
 /* Remova qualquer definição de background-color e color no body */
 body {
   min-height: 100vh;
   margin: 0;
-  font-family: theme('fontFamily.body');  /* Usando a fonte do Tailwind */
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   display: flex;
   flex-direction: column;
-  background-color: transparent; /* Deixe o Tailwind controlar */
-  color: inherit; /* Deixe o Tailwind controlar a cor do texto */
+  background-color: transparent;
+  color: inherit;
 }
 
 /* Remover estilos de h1 que podem entrar em conflito com o Tailwind */
 h1 {
-  text-align: center; /* Apenas o alinhamento se necessário */
+  text-align: center;
 }
 
 /* Estilos globais de botão */
@@ -49,14 +54,16 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: theme('colors.primary'); /* Usando a cor primária do Tailwind */
+  background-color: var(--color-primary);
   cursor: pointer;
-  transition: background-color 0.25s ease, border-color 0.25s ease;
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 button:hover {
-  background-color: theme('colors.secondary'); /* Usando a cor secundária */
-  border-color: theme('colors.secondary');
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
 }
 
 button:focus,

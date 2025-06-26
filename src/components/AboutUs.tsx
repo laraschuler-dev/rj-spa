@@ -33,43 +33,47 @@ const AboutUs = () => {
         </Typography>
 
         {/* Seções Missão, Visão e Valores */}
-        <div className="mt-8 space-y-4">
-          <div className="bg-primary text-white p-4 rounded-xl shadow-md min-h-[120px] md:min-h-0 flex flex-col justify-center">
-            <Typography variant="h2" className="font-bold text-lg">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="bg-primary text-white p-6 rounded-lg shadow-md"
+          >
+            <Typography variant="h2" className="text-xl font-bold mb-2">
               Nossa Missão
             </Typography>
             <Typography variant="p">
               Conectar pessoas em situação de rua a serviços assistenciais e
               oportunidades para reintegração social.
             </Typography>
-          </div>
-          <div className="bg-primary text-white p-4 rounded-xl shadow-md min-h-[120px] md:min-h-0 flex flex-col justify-center">
-            <Typography variant="h2" className="font-bold text-lg">
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="bg-primary text-white p-6 rounded-lg shadow-md"
+          >
+            <Typography variant="h2" className="text-xl font-bold mb-2">
               Nossa Visão
             </Typography>
             <Typography variant="p">
               Criar um ambiente digital que transforme assistencialismo em
               inclusão e emancipação.
             </Typography>
-          </div>
-          <div className="bg-primary text-white p-4 rounded-xl shadow-md min-h-[120px] md:min-h-0 flex flex-col justify-center">
-            <Typography variant="h2" className="font-bold text-lg">
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="bg-primary text-white p-6 rounded-lg shadow-md"
+          >
+            <Typography variant="h2" className="text-xl font-bold mb-2">
               Nossos Valores
             </Typography>
             <Typography variant="p">
               Empatia, dignidade e acesso igualitário a oportunidades.
             </Typography>
-          </div>
+          </motion.div>
         </div>
 
         {/* Botão de Ação */}
         <div className="mt-8 text-center">
-          <Button
-            variant="primary"
-            className="mt-16 text-lg font-semibold shadow-md"
-          >
-            Junte-se a Nós
-          </Button>
+          <Button variant="primary">Junte-se a Nós</Button>
         </div>
       </motion.div>
     </section>

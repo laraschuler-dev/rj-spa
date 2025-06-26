@@ -30,12 +30,15 @@ Este repositório contém o frontend do projeto **Redefinindo Jornadas**, uma pl
 ## 1. Introdução
 
 ### 1.1 Propósito
+
 A Rede Social Solidária **Redefinindo Jornadas** tem como objetivo conectar entidades públicas, privadas e voluntários para facilitar o acesso de **pessoas em situação de rua** a serviços assistenciais e oportunidades de reintegração social. A plataforma busca transformar práticas assistencialistas em ações que promovam inclusão e emancipação desses indivíduos.
 
 ### 1.2 Escopo
+
 A plataforma permitirá a articulação de ações sociais por meio de entidades e voluntários, oferecendo recursos para organização de eventos, compartilhamento de experiências, recebimento de doações e disponibilização de oportunidades de socialização.
 
 ### 1.3 Justificativa
+
 O aumento da população em situação de rua exige ações efetivas e coordenadas entre diferentes agentes da sociedade. A falta de acesso a meios digitais por essa população torna essencial a intermediação de instituições e voluntários para garantir o acesso a serviços assistenciais e oportunidades de reinserção social.
 
 ---
@@ -60,7 +63,7 @@ A população em situação de rua enfrenta dificuldades para acessar serviços 
 ✅ Listagem e busca de serviços assistenciais  
 ✅ Publicação e gerenciamento de eventos sociais  
 ✅ Conexão entre voluntários e ONGs  
-✅ Interface responsiva e acessível  
+✅ Interface responsiva e acessível
 
 ---
 
@@ -77,11 +80,13 @@ A população em situação de rua enfrenta dificuldades para acessar serviços 
 ---
 
 ## 6. Metodologia
+
 O desenvolvimento deste projeto segue a metodologia **Kanban**, garantindo um fluxo de trabalho adaptável. O gerenciamento é feito via **Notion**.
 
 ---
 
 ## 7. Ferramentas Utilizadas
+
 - **Desenvolvimento:** VSCode, GitHub
 - **Backend:** Postman, Swagger
 - **Frontend:** React Developer Tools, TailwindCSS
@@ -89,17 +94,20 @@ O desenvolvimento deste projeto segue a metodologia **Kanban**, garantindo um fl
 ---
 
 ## 8. Restrições
+
 - O projeto deve utilizar apenas tecnologias de código aberto.
 - Deve garantir a segurança e privacidade dos usuários.
 
 ---
 
 ## 9. Suposições
+
 - A adesão de entidades públicas, privadas e voluntários será suficiente para garantir a oferta de serviços.
 
 ---
 
 ## 10. Dependências
+
 - Backend rodando corretamente para funcionamento do frontend.
 
 ---
@@ -107,16 +115,19 @@ O desenvolvimento deste projeto segue a metodologia **Kanban**, garantindo um fl
 ## 📦 Instalação e Configuração
 
 1. **Clone o repositório:**
+
    ```bash
    git clone https://github.com/laraschuler-dev/rj-spa.git
    ```
 
 2. **Acesse a pasta do projeto:**
+
    ```bash
    cd rj-spa
    ```
 
 3. **Instale as dependências:**
+
    ```bash
    npm install
    # ou
@@ -124,9 +135,11 @@ O desenvolvimento deste projeto segue a metodologia **Kanban**, garantindo um fl
    ```
 
 4. **Configure as variáveis de ambiente:**
+
    - Crie um arquivo `.env` na raiz do projeto e adicione as credenciais necessárias, como a URL da API backend.
 
 5. **Inicie o servidor de desenvolvimento:**
+
    ```bash
    npm run dev
    # ou
@@ -159,7 +172,7 @@ O desenvolvimento deste projeto segue a metodologia **Kanban**, garantindo um fl
 
 ## 🔗 Conectando ao Backend
 
-Este frontend se comunica com a API do projeto **Redefinindo Jornadas**, que pode ser encontrada [aqui](https://github.com/candidodev/rj-api). Certifique-se de que o backend esteja rodando para testar todas as funcionalidades corretamente. 
+Este frontend se comunica com a API do projeto **Redefinindo Jornadas**, que pode ser encontrada [aqui](https://github.com/candidodev/rj-api). Certifique-se de que o backend esteja rodando para testar todas as funcionalidades corretamente.
 
 ## 🤝 Contribuição
 
@@ -180,7 +193,7 @@ Este frontend se comunica com a API do projeto **Redefinindo Jornadas**, que pod
 ---
 
 ## 11. Licença
+
 Este projeto está licenciado sob a GNU License.
 
 💙 Desenvolvido por [Lara Schüler](https://github.com/laraschuler-dev)
-

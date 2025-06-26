@@ -31,9 +31,12 @@ const events = [
 
 export default function Eventos() {
   return (
-    <section id="events" className="w-full py-12 px-4 md:px-8 bg-white">
+    <section id="events" className="w-full py-12 px-4 md:px-8 bg-white mb-6">
       <div className="max-w-3xl mx-auto text-center">
-        <Typography variant="h2" className="text-3xl font-bold text-gray-900">
+        <Typography
+          variant="h1"
+          className="text-3xl md:text-5xl font-bold text-primary"
+        >
           Eventos
         </Typography>
         <Typography variant="p" className="text-gray-600 mt-2">
@@ -73,9 +76,7 @@ export default function Eventos() {
                     <strong>Data:</strong> {event.date} <br />
                     <strong>Local:</strong> {event.location}
                   </Typography>
-                  <CardButton>
-                    Saiba Mais
-                  </CardButton>
+                  <CardButton>Saiba Mais</CardButton>
                 </div>
               </div>
             </SwiperSlide>

@@ -11,6 +11,12 @@ import {
 import { IoMdClose } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import { animateScroll as scroll } from 'react-scroll';
+import {
+  MdOutlineCampaign,
+  MdEventAvailable,
+  MdOutlinePostAdd,
+} from 'react-icons/md';
+import { PiStudent } from 'react-icons/pi';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -79,6 +85,12 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           Quem Somos
         </button>
         <button
+          onClick={() => handleNavigation('/', 'information')}
+          className="hover:text-accent transition-colors"
+        >
+          Informações
+        </button>
+        <button
           onClick={() => handleNavigation('/', 'events')}
           className="hover:text-accent transition-colors"
         >
@@ -117,39 +129,67 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
       {/* Opções adicionais */}
       <nav className="flex flex-col gap-4 mt-4">
         <Link
-          to="/voluntariar"
+          to="/posts/volunteer"
           className="flex items-center gap-2 hover:text-accent transition-colors"
           onClick={onClose}
         >
           <FiHeart /> Quero Voluntariar
         </Link>
         <Link
-          to="/quero-doar"
+          to="/posts/donation"
           className="flex items-center gap-2 hover:text-accent transition-colors"
           onClick={onClose}
         >
           <FiGift /> Quero Doar
         </Link>
         <Link
-          to="/solicitar-ajuda"
+          to="/posts/help"
           className="flex items-center gap-2 hover:text-accent transition-colors"
           onClick={onClose}
         >
           <FiUsers /> Solicitar Ajuda
         </Link>
         <Link
-          to="/anunciar-vaga"
+          to="/posts/job"
           className="flex items-center gap-2 hover:text-accent transition-colors"
           onClick={onClose}
         >
           <FiBriefcase /> Anunciar Vaga
         </Link>
         <Link
-          to="/denunciar"
+          to="/posts/complaint"
           className="flex items-center gap-2 hover:text-accent transition-colors"
           onClick={onClose}
         >
           <FiAlertCircle /> Denunciar Violência
+        </Link>
+        <Link
+          to="/posts/campaign"
+          className="flex items-center gap-2 hover:text-accent transition-colors"
+          onClick={onClose}
+        >
+          <MdOutlineCampaign /> Criar Campanha
+        </Link>
+        <Link
+          to="/posts/course"
+          className="flex items-center gap-2 hover:text-accent transition-colors"
+          onClick={onClose}
+        >
+          <PiStudent /> Oferecer Curso
+        </Link>
+        <Link
+          to="/posts/event"
+          className="flex items-center gap-2 hover:text-accent transition-colors"
+          onClick={onClose}
+        >
+          <MdEventAvailable /> Criar Evento
+        </Link>
+        <Link
+          to="/posts/general"
+          className="flex items-center gap-2 hover:text-accent transition-colors"
+          onClick={onClose}
+        >
+          <MdOutlinePostAdd /> Postar
         </Link>
       </nav>
     </motion.div>
