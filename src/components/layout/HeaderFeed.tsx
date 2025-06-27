@@ -59,7 +59,7 @@ const HeaderFeed: React.FC = () => {
 
         {/* Só visível no desktop */}
         <Link
-          to="/perfil"
+          to="/profile"
           className="hidden md:flex items-center gap-1 hover:text-accent transition"
         >
           <CgProfile size={24} />

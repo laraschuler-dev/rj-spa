@@ -19,6 +19,8 @@ import CreateEventPost from './pages/posts/CreateEventPost';
 import CreateGeneralPost from './pages/posts/CreateGeneralPost';
 import Contact from './components/Contact';
 import Feed from './pages/Feed';
+import ProfileView from './pages/ProfileView';
+import ProfileEdit from './pages/ProfileEdit';
 
 const App = () => {
   return (
@@ -52,6 +54,8 @@ const App = () => {
               <Route path="/posts/job" element={<CreateJobPost />} />
               <Route path="/posts/event" element={<CreateEventPost />} />
               <Route path="/posts/general" element={<CreateGeneralPost />} />
+              <Route path="/profile" element={<ProfileView />} />
+              <Route path="/profile/edit" element={<ProfileEdit />} />
             </Route>
           </Routes>
         </AuthInitializer>
