@@ -21,6 +21,7 @@ import Contact from './components/Contact';
 import Feed from './pages/Feed';
 import ProfileView from './pages/ProfileView';
 import ProfileEdit from './pages/ProfileEdit';
+import AccountSettings from './pages/AccountSettings';
 
 const App = () => {
   return (
@@ -56,6 +57,8 @@ const App = () => {
               <Route path="/posts/general" element={<CreateGeneralPost />} />
               <Route path="/profile" element={<ProfileView />} />
               <Route path="/profile/edit" element={<ProfileEdit />} />
+              <Route path="/profile/edit" element={<ProfileEdit />} />
+              <Route path="/account-settings" element={<AccountSettings />} />
             </Route>
           </Routes>
         </AuthInitializer>

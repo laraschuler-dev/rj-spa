@@ -4,6 +4,7 @@ import { FiBell, FiMail, FiMenu, FiLogOut } from 'react-icons/fi';
 import { CgProfile } from 'react-icons/cg';
 import MobileMenuFeed from '../ui/MobileMenuFeed';
 import { useLogout } from '../../hooks/useLogout';
+import { FiSettings } from 'react-icons/fi';
 
 const HeaderFeed: React.FC = () => {
   const logout = useLogout();
@@ -64,13 +65,20 @@ const HeaderFeed: React.FC = () => {
         >
           <CgProfile size={24} />
         </Link>
-        <button
+        <Link
+          to="/account-settings"
+          className="hidden md:flex items-center gap-1 hover:text-accent transition"
+        >
+          <FiSettings size={24} />
+        </Link>
+        <Link
+          to="/login"
           onClick={logout}
           aria-label="Sair"
           className="hidden md:flex hover:text-red-300 transition"
         >
           <FiLogOut size={24} />
-        </button>
+        </Link>
       </div>
 
       {/* Mobile - menu hamburguer */}

@@ -9,7 +9,7 @@ import SubmitButton from '../components/ui/SubmitButton';
 import { Link } from 'react-router-dom';
 
 const profileOptions = [
-  { value: '', label: 'Perfil' }, // Opção padrão
+  { value: '', label: 'Perfil' },
   { value: 'psr', label: 'Pessoa em situação de rua' },
   { value: 'volunteer', label: 'Voluntário(a)' },
   { value: 'ong', label: 'ONG' },

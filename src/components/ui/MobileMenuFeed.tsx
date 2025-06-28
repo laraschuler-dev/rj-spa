@@ -7,6 +7,7 @@ import {
   FiUsers,
   FiBriefcase,
   FiLogOut,
+  FiSettings,
 } from 'react-icons/fi';
 import {
   MdOutlineCampaign,
@@ -64,7 +65,7 @@ const MobileMenuFeed: React.FC<MobileMenuFeedProps> = ({ isOpen, onClose }) => {
       {/* Menu de ações */}
       <nav className="flex flex-col gap-4">
         <Link
-          to="/perfil"
+          to="/profile"
           onClick={onClose}
           className="flex items-center gap-2 hover:text-accent transition-colors"
         >
@@ -133,17 +134,24 @@ const MobileMenuFeed: React.FC<MobileMenuFeedProps> = ({ isOpen, onClose }) => {
         >
           <MdOutlinePostAdd /> Postar
         </Link>
+
+        <hr className="border-background opacity-50 my-4" />
+
+        <Link
+          to="/account-settings"
+          onClick={onClose}
+          className="flex items-center gap-2 hover:text-accent"
+        >
+          <FiSettings /> Configurações
+        </Link>
+        <Link
+          onClick={handleLogout}
+          className="flex items-center gap-2 text-left hover:text-red-300 transition-colors"
+          to={''}
+        >
+          <FiLogOut /> Sair
+        </Link>
       </nav>
-
-      <hr className="border-background opacity-50 my-4" />
-
-      {/* Botão de logout */}
-      <button
-        onClick={handleLogout}
-        className="flex items-center gap-2 text-left hover:text-red-300 transition-colors"
-      >
-        <FiLogOut /> Sair
-      </button>
     </motion.div>
   );
 };
