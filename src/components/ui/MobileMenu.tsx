@@ -115,7 +115,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           Contato
         </button>
         <Link
-          to={isAuthenticated ? '/perfil' : '/login'}
+          to={isAuthenticated ? '/feed' : '/login'}
           className="hover:text-accent transition-colors flex items-center gap-2"
           onClick={onClose}
         >

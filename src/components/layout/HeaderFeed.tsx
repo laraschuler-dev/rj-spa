@@ -13,10 +13,7 @@ const HeaderFeed: React.FC = () => {
   return (
     <header className="bg-primary text-background py-4 px-6 shadow-md flex items-center justify-between fixed top-0 left-0 w-full z-50">
       {/* Logo / Home */}
-      <Link
-        to="/feed"
-        className="text-xl md:text-2xl font-heading cursor-pointer"
-      >
+      <Link to="/" className="text-xl md:text-2xl font-heading cursor-pointer">
         Redefinindo Jornadas
       </Link>
 

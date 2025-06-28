@@ -53,7 +53,7 @@ const MobileMenuFeed: React.FC<MobileMenuFeedProps> = ({ isOpen, onClose }) => {
       <h2
         className="text-xl font-heading mb-6 mt-10 cursor-pointer"
         onClick={() => {
-          window.location.href = '/feed';
+          window.location.href = '/';
           onClose();
         }}
       >

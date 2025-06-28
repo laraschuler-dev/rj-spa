@@ -13,6 +13,7 @@ const Register = () => {
     email: '',
     phone: '',
     password: '',
+    confirmPassword: '',
   });
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -25,8 +26,19 @@ const Register = () => {
     e.preventDefault();
     setError('');
 
+    // Verifica se as senhas coincidem
+    if (formData.password !== formData.confirmPassword) {
+      toast.error('As senhas não coincidem.');
+      return;
+    }
+
     try {
-      await api.post('/auth/users', formData); // Envia os dados para o backend
+      await api.post('/auth/users', {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+      });
       toast.success('Conta criada com sucesso! Redirecionando para o login...');
       navigate('/login'); // Redireciona para a página de login após o sucesso
     } catch (err: any) {
@@ -121,6 +133,23 @@ const Register = () => {
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Digite sua senha"
+              required
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="confirmPassword"
+              className="block mb-1 text-sm font-medium"
+            >
+              Confirmar Senha
+            </label>
+            <input
+              type="password"
+              id="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="Confirme sua senha"
               required
             />
           </div>
