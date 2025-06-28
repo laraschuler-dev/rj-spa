@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { CgProfile } from 'react-icons/cg';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 import useAuthStore from '../stores/authStore';
-import Button from '../components/ui/Button';
+import { FiEdit2 } from 'react-icons/fi';
 
 interface UserData {
   name: string;
@@ -134,10 +134,15 @@ const ProfileView: React.FC = () => {
           )}
         </div>
 
-        {/* Botão editar */}
-        <Link to="/profile/edit">
-          <Button>Editar Perfil</Button>
-        </Link>
+        <div className="flex justify-center">
+          <Link
+            to="/profile/edit"
+            className="inline-flex items-center gap-1 text-sm text-primary hover:underline hover:text-primary/80 transition"
+          >
+            <FiEdit2 size={16} />
+            Editar
+          </Link>
+        </div>
       </div>
     </main>
   );
