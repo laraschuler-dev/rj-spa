@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-// Configuração global do Axios
+// Usa a variável correta do .env
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
 });
 
-// Adicionar headers globais (exemplo: autenticação)
+// Adiciona token JWT se existir
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
