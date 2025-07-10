@@ -68,7 +68,7 @@ const AccountSettings: React.FC = () => {
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-xl bg-white p-8 rounded-2xl shadow-md space-y-8">
-        <Typography variant="h2" className="text-primary text-2xl font-bold">
+        <Typography variant="h2" className="text-primary text-center mb-6">
           Configurações da Conta
         </Typography>
 

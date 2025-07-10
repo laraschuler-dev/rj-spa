@@ -7,6 +7,7 @@ import useAuthStore from '../stores/authStore';
 import { CgProfile } from 'react-icons/cg';
 import SubmitButton from '../components/ui/SubmitButton';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const profileOptions = [
   { value: '', label: 'Perfil' },
@@ -94,8 +95,16 @@ const ProfileEdit: React.FC = () => {
         });
       }
 
+      toast.success('Perfil atualizado com sucesso!');
       navigate('/profile');
-    } catch (err) {
+    } catch (err: any) {
+      if (err.response?.data?.error) {
+        toast.error(err.response.data.error);
+      } else if (err.request) {
+        toast.error('Erro de conexão com o servidor.');
+      } else {
+        toast.error('Erro inesperado ao salvar perfil.');
+      }
       console.error('Erro ao salvar perfil:', err);
     }
   };

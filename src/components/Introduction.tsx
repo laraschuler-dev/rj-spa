@@ -6,7 +6,7 @@ const Introduction = () => {
   return (
     <section
       id="introduction"
-      className="relative h-screen flex flex-col justify-start pt-24 text-center px-6 md:px-12 lg:px-24 mb-6 mt-16"
+      className="relative h-screen flex flex-col justify-start pt-24 text-center px-6 md:px-12 lg:px-24 mb-6 mt-4"
     >
       {/* Imagem de fundo com overlay */}
       <div className="absolute inset-0 bg-[url('/img/intro-bg.jpg')] bg-cover bg-center brightness-50"></div>
