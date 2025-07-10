@@ -1,5 +1,6 @@
 import React from 'react';
 import Header from './Header';
+import HeaderFeed from './HeaderFeed';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
 
@@ -10,6 +11,7 @@ import Footer from './Footer';
  */
 interface LayoutProps {
   children: React.ReactNode;
+  variant?: 'default' | 'feed';
 }
 
 /**
@@ -21,14 +23,21 @@ interface LayoutProps {
  * @param {LayoutProps} props - As propriedades do componente.
  * @returns {JSX.Element} O layout principal do aplicativo.
  */
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC<LayoutProps> = ({ children, variant = 'default' }) => {
+  const isFeed = variant === 'feed';
+
   return (
-    <div className="flex flex-col min-h-screen bg-white text-black">
-      <Header />
-      <div className="flex flex-1">
-        <Sidebar />
-        <main className="flex-1 p-6 overflow-auto">{children}</main>
+    <div className="flex flex-col min-h-screen bg-background text-gray-800">
+      {isFeed ? <HeaderFeed /> : <Header />}
+
+      {/* compensação do header fixo com pt-20 (~80px) */}
+      <div className="flex flex-grow">
+        <Sidebar isFeed={isFeed} />
+        <main className="flex-1 pt-20 px-4 md:px-8 lg:px-12 pb-8 overflow-auto">
+          {children}
+        </main>
       </div>
+
       <Footer />
     </div>
   );
