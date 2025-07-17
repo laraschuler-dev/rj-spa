@@ -13,6 +13,10 @@ import {
 } from 'react-icons/md';
 import { PiStudent } from 'react-icons/pi';
 
+interface SidebarProps {
+  isFeed?: boolean;
+}
+
 /**
  * Componente Sidebar
  *
@@ -21,11 +25,10 @@ import { PiStudent } from 'react-icons/pi';
  *
  * @returns {JSX.Element} A barra lateral de navegação.
  */
-function Sidebar() {
+function Sidebar({ isFeed = false }: SidebarProps) {
   return (
     <aside className="hidden md:flex flex-col w-64 bg-sidebar text-white h-screen p-6 shadow-lg sticky top-16">
-      {' '}
-      {/* Título */}
+      <div className={`${isFeed ? 'pt-20' : 'pt-4'} px-4`}></div> {/* Título */}
       <h2 className="text-2xl mb-6">Ações</h2>
       {/* Links de Navegação */}
       <nav className="flex flex-col gap-4">
