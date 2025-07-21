@@ -42,7 +42,7 @@ const CreateJobPost: React.FC = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       toast.success('Vaga publicada com sucesso!');
-      navigate('/dashboard');
+      navigate('/feed');
     } catch (error: any) {
       toast.error('Erro ao publicar vaga.');
       console.error(error);

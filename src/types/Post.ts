@@ -1,0 +1,22 @@
+export interface PostListItem {
+  id: number;
+  content: string;
+  categoria_idcategoria: number;
+  metadata: {
+    title?: string;
+    itemType?: string;
+    condition?: string;
+    location?: string;
+    availability?: string;
+    [key: string]: any;
+  };
+  images: string[];
+  createdAt: string;
+  liked?: boolean;
+  user_iduser: {
+    id: number;
+    name: string;
+    avatarUrl?: string;
+    profileType?: string;
+  };
+}

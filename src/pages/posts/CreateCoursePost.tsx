@@ -46,7 +46,7 @@ const CreateCoursePost: React.FC = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       toast.success('Curso publicado com sucesso!');
-      navigate('/dashboard');
+      navigate('/feed');
     } catch (error: any) {
       toast.error('Erro ao publicar o curso.');
       console.error(error);
