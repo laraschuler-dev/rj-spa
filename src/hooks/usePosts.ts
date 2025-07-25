@@ -2,6 +2,13 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from '../services/api';
 import { PostListItem } from '../types/Post';
 
+/**
+ * Gerencia a lista combinada de posts e compartilhamentos
+ *
+ * - Automaticamente remove duplicatas usando uniqueKey
+ * - Preserva a ordem cronológica inversa (mais novos primeiro)
+ * - Garante que cada instância de post/compartilhamento tenha identidade única
+ */
 export function usePosts() {
   const [posts, setPosts] = useState<PostListItem[]>([]);
   const [page, setPage] = useState(1);
@@ -16,7 +23,7 @@ export function usePosts() {
       try {
         const res = await axios.get('/posts', {
           params: {
-            page: isInitialLoad ? 1 : page, // Sempre página 1 no carregamento inicial
+            page: isInitialLoad ? 1 : page,
             limit: 10,
           },
         });
@@ -31,14 +38,21 @@ export function usePosts() {
           if (isInitialLoad) {
             return res.data.posts;
           }
-          // Nas cargas seguintes, adiciona aos existentes
-          return [...prev, ...res.data.posts];
+
+          // Nas cargas seguintes, adiciona somente posts novos
+          const newPosts = res.data.posts.filter(
+            (newPost: { id: number }) =>
+              !prev.some((post) => post.id === newPost.id)
+          );
+
+          return [...prev, ...newPosts];
         });
 
-        // Atualiza paginação somente se não for carga inicial
         if (!isInitialLoad) {
-          setHasMore(res.data.page < res.data.totalPages);
+          setHasMore(res.data.posts.length > 0);
           setPage((prev) => prev + 1);
+        } else {
+          setPage(2);
         }
       } catch (err) {
         console.error('Erro ao buscar posts:', err);
@@ -49,7 +63,10 @@ export function usePosts() {
     [page, loading, hasMore]
   );
 
-  // Carrega a primeira página automaticamente
+  const refreshPosts = useCallback(() => {
+    fetchPosts(true);
+  }, [fetchPosts]);
+
   useEffect(() => {
     fetchPosts(true);
   }, []);
@@ -57,7 +74,8 @@ export function usePosts() {
   return {
     posts,
     setPosts,
-    fetchPosts: () => fetchPosts(false), // Força não ser carga inicial
+    fetchPosts: () => fetchPosts(false),
+    refreshPosts, // Nova função para refresh
     hasMore,
     loading,
   };

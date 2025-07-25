@@ -1,4 +1,7 @@
+import { Key } from 'react';
+
 export interface PostListItem {
+  uniqueKey: Key | null | undefined; //Identificador único universal para renderização de listas
   id: number;
   content: string;
   categoria_idcategoria: number;
