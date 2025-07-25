@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CgProfile } from 'react-icons/cg';
-import { BsThreeDots } from 'react-icons/bs';
+import { BsShare, BsThreeDots } from 'react-icons/bs';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import { Link } from 'react-router-dom';
 import Typography from './ui/Typography';
 import { resolveImageUrl } from '../utils/resolveImageUrl';
 import PostActions from './ui/PostActions';
+import CommentSection from './comments/CommentSection';
+import { formatTimeAgo } from '../utils/formatTimeAgo';
 
 interface PostCardProps {
   id: number;
@@ -25,6 +27,12 @@ interface PostCardProps {
   onShare?: () => void;
   onAttend?: () => void;
   isLiked?: boolean;
+  sharedBy?: {
+    name: string;
+    avatarUrl?: string;
+    message?: string;
+    sharedAt: string;
+  };
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -36,13 +44,23 @@ const PostCard: React.FC<PostCardProps> = ({
   createdAt,
   categoryId,
   onLike,
-  onComment,
   onShare,
   onAttend,
   isLiked,
+  sharedBy,
 }) => {
+  const [showComments, setShowComments] = useState(false);
   return (
     <div className="bg-white shadow-md rounded-2xl p-4 space-y-3 max-w-[600px] mx-auto w-full">
+      {sharedBy && (
+        <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+          <BsShare className="text-gray-400" />
+          <span>
+            Compartilhado por {sharedBy.name} •{' '}
+            {formatTimeAgo(sharedBy.sharedAt)}
+          </span>
+        </div>
+      )}
       {/* Cabeçalho com avatar, nome e menu */}
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-2">
@@ -62,7 +80,7 @@ const PostCard: React.FC<PostCardProps> = ({
               {author.name}
             </Typography>
             <Typography variant="p" className="text-xs text-gray-500">
-              {new Date(createdAt).toLocaleDateString()}
+              {formatTimeAgo(createdAt)}
             </Typography>
           </div>
         </div>
@@ -102,15 +120,22 @@ const PostCard: React.FC<PostCardProps> = ({
           Ver mais
         </Link>
       </div>
-      {/* Ações (Curtir, comentar, compartilhar, participar) */}
+      {/* Ações */}
       <PostActions
         isLiked={isLiked}
         onLike={onLike}
-        onComment={onComment}
+        onComment={() => setShowComments((prev) => !prev)} // aqui
         onShare={onShare}
         onAttend={categoryId === 8 ? onAttend : undefined}
-        isEvent={categoryId === 8} // Nome mais semântico que showAttend
+        isEvent={categoryId === 8}
       />
+
+      {/* Comentários */}
+      {showComments && (
+        <div className="pt-4 border-t">
+          <CommentSection postId={id} />
+        </div>
+      )}
     </div>
   );
 };

@@ -19,4 +19,11 @@ export interface PostListItem {
     avatarUrl?: string;
     profileType?: string;
   };
+  sharedBy?: {
+    id: number;
+    name: string;
+    avatarUrl?: string;
+    message?: string;
+    sharedAt: string;
+  };
 }

@@ -64,7 +64,11 @@ const ProfileView: React.FC = () => {
   }, [token]);
 
   if (isLoading) {
-    return <div className="text-center mt-12">Carregando perfil...</div>;
+    return (
+      <div className="text-primary text-center hover:underline">
+        Carregando perfil...
+      </div>
+    );
   }
 
   if (!profile || !user) {
