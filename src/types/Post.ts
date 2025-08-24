@@ -16,14 +16,15 @@ export interface PostListItem {
   images: string[];
   createdAt: string;
   liked?: boolean;
-  user_iduser: {
+  user: {
     id: number;
     name: string;
     avatarUrl?: string;
     profileType?: string;
   };
   sharedBy?: {
-    id: number;
+    shareId: number;
+    postId: number;
     name: string;
     avatarUrl?: string;
     message?: string;

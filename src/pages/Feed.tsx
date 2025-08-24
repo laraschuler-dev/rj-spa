@@ -1,30 +1,53 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Layout from '../components/layout/Layout';
 import PostCard from '../components/PostCard';
+import ShareModal from '../components/ShareModal';
 import { usePosts } from '../hooks/usePosts';
-import api from '../services/api';
 import { useSharePost } from '../hooks/useSharePost';
+import { likePost } from '../hooks/useLikePost';
 
 const Feed: React.FC = () => {
   const { posts, setPosts, fetchPosts, hasMore, loading } = usePosts();
   const { sharePost } = useSharePost();
 
-  React.useEffect(() => {
-    const keys = posts.map((p) => p.uniqueKey || p.id);
-    const duplicateKeys = keys.filter(
-      (key, index) => keys.indexOf(key) !== index
-    );
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [postToShare, setPostToShare] = useState<any>(null);
 
-    if (duplicateKeys.length > 0) {
-      console.error('Posts com chaves duplicadas:', duplicateKeys);
-      console.log(
-        'Posts duplicados:',
-        posts.filter((p) =>
-          duplicateKeys.includes(p.uniqueKey || p.id.toString())
-        )
-      );
+  const openShareModal = (post: any) => {
+    setPostToShare(post);
+    setShareModalOpen(true);
+  };
+
+  const closeShareModal = () => {
+    setPostToShare(null);
+    setShareModalOpen(false);
+  };
+
+  const handleShare = async (message?: string) => {
+    if (!postToShare) return;
+    try {
+      const data = await sharePost(postToShare.id, message);
+
+      // Atualiza o feed
+      const updatedPost = {
+        ...postToShare,
+        sharedBy: {
+          shareId: data.id,
+          postId: postToShare.id,
+          id: data.user.id,
+          name: data.user.name,
+          avatarUrl: data.user.avatarUrl,
+          message: message || undefined,
+          sharedAt: data.sharedAt,
+        },
+      };
+      setPosts((prev) => [updatedPost, ...prev]);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      closeShareModal();
     }
-  }, [posts]);
+  };
 
   return (
     <Layout variant="feed">
@@ -32,7 +55,7 @@ const Feed: React.FC = () => {
         {posts
           .filter(
             (post, index, self) =>
-              index === self.findIndex((p) => p.id === post.id)
+              index === self.findIndex((p) => p.uniqueKey === post.uniqueKey)
           )
           .map((post) => (
             <PostCard
@@ -44,23 +67,31 @@ const Feed: React.FC = () => {
               createdAt={post.createdAt}
               categoryId={post.categoria_idcategoria}
               author={{
-                name: post.user_iduser.name,
-                avatarUrl: post.user_iduser.avatarUrl,
+                name: post.user?.name || 'Usuário desconhecido',
+                avatarUrl: post.user?.avatarUrl,
               }}
               isLiked={post.liked}
+              sharedBy={post.sharedBy}
               onLike={async () => {
-                try {
-                  const res = await api.post(`/posts/${post.id}/like`);
-                  setPosts((prev) =>
-                    prev.map((p) =>
-                      p.id === post.id ? { ...p, liked: res.data.liked } : p
-                    )
-                  );
-                } catch (error) {
-                  console.error('Erro ao curtir o post:', error);
+                let postIdToSend: number;
+                let shareIdToSend: number | undefined;
+
+                if (post.sharedBy) {
+                  postIdToSend = post.sharedBy.postId;
+                  shareIdToSend = post.sharedBy.shareId;
+                } else {
+                  postIdToSend = post.id;
+                  shareIdToSend = undefined;
                 }
+
+                const liked = await likePost(postIdToSend, shareIdToSend);
+                setPosts((prev) =>
+                  prev.map((p) =>
+                    p.uniqueKey === post.uniqueKey ? { ...p, liked } : p
+                  )
+                );
               }}
-              onShare={() => sharePost(post.id)}
+              onShare={() => openShareModal(post)}
             />
           ))}
 
@@ -69,13 +100,26 @@ const Feed: React.FC = () => {
             <button
               onClick={fetchPosts}
               disabled={loading}
-              className="text-primary hover:underline" // Estilo original
+              className="text-primary hover:underline"
             >
               {loading ? 'Carregando...' : 'Carregar mais'}
             </button>
           </div>
         )}
       </div>
+
+      {postToShare && (
+        <ShareModal
+          isOpen={shareModalOpen}
+          onClose={closeShareModal}
+          postSummary={{
+            title: postToShare.metadata?.title || '',
+            content: postToShare.content,
+            author: postToShare.user?.name || 'Usuário desconhecido',
+          }}
+          onShare={handleShare}
+        />
+      )}
     </Layout>
   );
 };
