@@ -71,7 +71,7 @@ const Feed: React.FC = () => {
                 avatarUrl: post.user?.avatarUrl,
               }}
               isLiked={post.liked}
-              sharedBy={post.sharedBy}
+              sharedBy={post.sharedBy} // mantém se tiver compartilhamento
               onLike={async () => {
                 let postIdToSend: number;
                 let shareIdToSend: number | undefined;

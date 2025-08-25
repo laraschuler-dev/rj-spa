@@ -9,6 +9,7 @@ import PostActions from './ui/PostActions';
 import CommentSection from './comments/CommentSection';
 import { formatTimeAgo } from '../utils/formatTimeAgo';
 import PostMenuButton from './ui/PostMenuButton';
+import { useEventAttendance } from '../hooks/useEventAttendance';
 
 interface PostCardProps {
   id: number;
@@ -27,6 +28,7 @@ interface PostCardProps {
   onShare?: () => void;
   onAttend?: () => void;
   isLiked?: boolean;
+  isAttending?: boolean;
   sharedBy?: {
     name: string;
     shareId?: number;
@@ -47,11 +49,23 @@ const PostCard: React.FC<PostCardProps> = ({
   categoryId,
   onLike,
   onShare,
-  onAttend,
   isLiked,
   sharedBy,
 }) => {
   const [showComments, setShowComments] = useState(false);
+  const postIdForAttendance = sharedBy?.postId ?? id;
+  const postShareIdForAttendance = sharedBy?.shareId;
+  console.log('[PostCard] IDs para attendance hook:', {
+    postIdForAttendance,
+    postShareIdForAttendance,
+  });
+
+  const { status } = useEventAttendance(
+    postIdForAttendance,
+    postShareIdForAttendance
+  );
+
+  console.log('[PostCard] status inicial do hook:', status);
 
   return (
     <div className="bg-white shadow-md rounded-2xl p-4 space-y-3 max-w-[600px] mx-auto w-full">
@@ -173,12 +187,17 @@ const PostCard: React.FC<PostCardProps> = ({
 
       {/* Ações */}
       <PostActions
+        post={{
+          id,
+          categoryId,
+          sharedBy: sharedBy ? { id: sharedBy.postId } : undefined,
+        }}
         isLiked={isLiked}
         onLike={onLike}
         onComment={() => setShowComments((prev) => !prev)}
         onShare={onShare}
-        onAttend={categoryId === 8 ? onAttend : undefined}
-        isEvent={categoryId === 8}
+        postIdForAttendance={postIdForAttendance}
+        postShareIdForAttendance={postShareIdForAttendance}
       />
 
       {/* Comentários */}
