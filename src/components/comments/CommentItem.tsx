@@ -4,22 +4,14 @@ import Typography from '../ui/Typography';
 import { resolveImageUrl } from '../../utils/resolveImageUrl';
 import { useAuth } from '../../hooks/useAuth';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
+import { Comment } from '../../types/Comment';
 
 interface CommentItemProps {
-  comment: {
-    id: number;
-    content: string;
-    createdAt: string;
-    author: {
-      id: number;
-      name: string;
-      avatarUrl?: string | null;
-    };
-  };
+  comment: Comment;
   // eslint-disable-next-line no-unused-vars
-  onUpdate: (_commentId: number, _newContent: string) => Promise<void>;
+  onUpdate: (commentId: number, newContent: string) => Promise<void>;
   // eslint-disable-next-line no-unused-vars
-  onDelete: (_commentId: number) => Promise<void>;
+  onDelete: (commentId: number) => Promise<void>;
   isDeleting?: boolean;
 }
 

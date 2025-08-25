@@ -5,9 +5,10 @@ import { toast } from 'react-toastify';
 
 interface CommentSectionProps {
   postId: number;
+  shareId?: number;
 }
 
-const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
+const CommentSection: React.FC<CommentSectionProps> = ({ postId, shareId }) => {
   const {
     comments,
     loading,
@@ -15,7 +16,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
     createComment,
     editComment,
     deleteComment,
-  } = useComments(postId);
+  } = useComments(postId, shareId);
 
   const [newComment, setNewComment] = useState('');
   const [isCreating, setIsCreating] = useState(false);
@@ -23,8 +24,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
 
   useEffect(() => {
     fetchComments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postId]);
+  }, [postId, shareId]);
 
   async function handleCreate() {
     if (!newComment.trim() || isCreating) return;
@@ -42,7 +42,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
 
   const handleEdit = async (commentId: number, content: string) => {
     try {
-      await editComment(commentId, content);
+      await editComment(commentId, content); // o hook já usa o shareId passado ao useComments
       toast.success('Comentário atualizado!');
     } catch {
       toast.error('Erro ao atualizar comentário');
@@ -52,7 +52,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
   const handleDelete = async (commentId: number) => {
     setIsDeleting(commentId);
     try {
-      await deleteComment(commentId);
+      await deleteComment(commentId); // idem
       toast.success('Comentário excluído!');
     } catch {
       toast.error('Erro ao excluir comentário');
@@ -71,7 +71,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="Escreva um comentário..."
           className="flex-1 p-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-          onKeyPress={(e) => e.key === 'Enter' && handleCreate()}
+          onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
         />
         <button
           onClick={handleCreate}

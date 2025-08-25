@@ -60,6 +60,9 @@ const PostCard: React.FC<PostCardProps> = ({
     postShareIdForAttendance,
   });
 
+  const postIdForComments = sharedBy ? sharedBy.postId : id; // sempre o post ORIGINAL
+  const shareIdForComments = sharedBy?.shareId ?? undefined;
+
   const { status } = useEventAttendance(
     postIdForAttendance,
     postShareIdForAttendance
@@ -203,7 +206,10 @@ const PostCard: React.FC<PostCardProps> = ({
       {/* Comentários */}
       {showComments && (
         <div className="pt-4 border-t">
-          <CommentSection postId={id} />
+          <CommentSection
+            postId={postIdForComments}
+            shareId={shareIdForComments}
+          />
         </div>
       )}
     </div>

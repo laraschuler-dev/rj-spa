@@ -1,16 +1,20 @@
+// useComments.ts
 import { useState } from 'react';
 import api from '../services/api';
 import { Comment } from '../types/Comment';
 
-export function useComments(postId: number) {
+export function useComments(postId: number, shareId?: number) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(false);
   const [commentCount, setCommentCount] = useState<number | null>(null);
 
+  // Alteração importante: enviar query param correto
+  const params = shareId ? { postShareId: shareId } : undefined;
+
   const fetchComments = async () => {
     try {
       setLoading(true);
-      const res = await api.get(`/posts/${postId}/comments`);
+      const res = await api.get(`/posts/${postId}/comments`, { params });
       setComments(res.data.data);
     } catch (err) {
       console.error('Erro ao buscar comentários:', err);
@@ -22,7 +26,7 @@ export function useComments(postId: number) {
 
   const fetchCommentCount = async () => {
     try {
-      const res = await api.get(`/posts/${postId}/comments/count`);
+      const res = await api.get(`/posts/${postId}/comments/count`, { params });
       setCommentCount(res.data.count);
     } catch (err) {
       console.error('Erro ao contar comentários:', err);
@@ -32,9 +36,12 @@ export function useComments(postId: number) {
 
   const createComment = async (content: string) => {
     try {
-      const res = await api.post(`/posts/${postId}/comment`, {
-        comment: content,
-      });
+      const res = await api.post(
+        `/posts/${postId}/comment`,
+        { comment: content }, // body
+        { params: shareId ? { shareId } : {} } // query
+      );
+
       await fetchComments();
       await fetchCommentCount();
       return res.data;
@@ -46,9 +53,11 @@ export function useComments(postId: number) {
 
   const editComment = async (commentId: number, content: string) => {
     try {
-      const res = await api.put(`/posts/${postId}/comments/${commentId}`, {
-        content,
-      });
+      const res = await api.put(
+        `/posts/${postId}/comments/${commentId}`,
+        { content },
+        { params }
+      );
       await fetchComments();
       return res.data;
     } catch (err) {
@@ -59,7 +68,9 @@ export function useComments(postId: number) {
 
   const deleteComment = async (commentId: number) => {
     try {
-      const res = await api.delete(`/posts/${postId}/comments/${commentId}`);
+      const res = await api.delete(`/posts/${postId}/comments/${commentId}`, {
+        params,
+      });
       await fetchComments();
       await fetchCommentCount();
       return res.data;
