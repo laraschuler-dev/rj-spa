@@ -25,6 +25,7 @@ export interface PostListItem {
   sharedBy?: {
     shareId: number;
     postId: number;
+    id: number;
     name: string;
     avatarUrl?: string;
     message?: string;

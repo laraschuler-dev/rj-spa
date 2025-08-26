@@ -5,6 +5,8 @@ import ShareModal from '../components/ShareModal';
 import { usePosts } from '../hooks/usePosts';
 import { useSharePost } from '../hooks/useSharePost';
 import { likePost } from '../hooks/useLikePost';
+import { useDeletePost } from '../hooks/useDeletePost';
+import { toast } from 'react-toastify';
 
 const Feed: React.FC = () => {
   const { posts, setPosts, fetchPosts, hasMore, loading } = usePosts();
@@ -49,6 +51,31 @@ const Feed: React.FC = () => {
     }
   };
 
+  const { deletePost } = useDeletePost();
+
+  const handleDelete = async (postId: number, shareId?: number) => {
+    console.log('Tentando excluir:', { postId, shareId });
+    try {
+      await deletePost(postId, shareId);
+      setPosts((prev) =>
+        prev.filter(
+          (p) =>
+            !(
+              p.id === postId &&
+              (shareId ? p.sharedBy?.shareId === shareId : !p.sharedBy)
+            )
+        )
+      );
+      toast.success('Post excluído com sucesso!');
+    } catch (err) {
+      toast.error('Erro ao excluir o post!');
+      console.error('Erro ao excluir:', err);
+      if (err instanceof Error) {
+        console.error('Mensagem:', err.message);
+      }
+    }
+  };
+
   return (
     <Layout variant="feed">
       <div className="space-y-6">
@@ -67,6 +94,7 @@ const Feed: React.FC = () => {
               createdAt={post.createdAt}
               categoryId={post.categoria_idcategoria}
               author={{
+                id: post.user?.id,
                 name: post.user?.name || 'Usuário desconhecido',
                 avatarUrl: post.user?.avatarUrl,
               }}
@@ -92,6 +120,7 @@ const Feed: React.FC = () => {
                 );
               }}
               onShare={() => openShareModal(post)}
+              onDelete={handleDelete}
             />
           ))}
 

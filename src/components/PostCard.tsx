@@ -10,12 +10,14 @@ import CommentSection from './comments/CommentSection';
 import { formatTimeAgo } from '../utils/formatTimeAgo';
 import PostMenuButton from './ui/PostMenuButton';
 import { useEventAttendance } from '../hooks/useEventAttendance';
+import { useAuth } from '../hooks/useAuth';
 
 interface PostCardProps {
   id: number;
   title: string;
   content: string;
   author: {
+    id: number;
     name: string;
     avatarUrl?: string;
     profileType?: string;
@@ -30,6 +32,7 @@ interface PostCardProps {
   isLiked?: boolean;
   isAttending?: boolean;
   sharedBy?: {
+    id: number;
     name: string;
     shareId?: number;
     postId: number;
@@ -37,6 +40,8 @@ interface PostCardProps {
     message?: string;
     sharedAt: string;
   };
+  // eslint-disable-next-line no-unused-vars
+  onDelete?: (postId: number, shareId?: number) => void;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -51,24 +56,22 @@ const PostCard: React.FC<PostCardProps> = ({
   onShare,
   isLiked,
   sharedBy,
+  onDelete,
 }) => {
   const [showComments, setShowComments] = useState(false);
   const postIdForAttendance = sharedBy?.postId ?? id;
   const postShareIdForAttendance = sharedBy?.shareId;
-  console.log('[PostCard] IDs para attendance hook:', {
-    postIdForAttendance,
-    postShareIdForAttendance,
-  });
 
   const postIdForComments = sharedBy ? sharedBy.postId : id; // sempre o post ORIGINAL
   const shareIdForComments = sharedBy?.shareId ?? undefined;
 
+  // eslint-disable-next-line no-unused-vars
   const { status } = useEventAttendance(
     postIdForAttendance,
     postShareIdForAttendance
   );
 
-  console.log('[PostCard] status inicial do hook:', status);
+  const { user } = useAuth();
 
   return (
     <div className="bg-white shadow-md rounded-2xl p-4 space-y-3 max-w-[600px] mx-auto w-full">
@@ -95,13 +98,15 @@ const PostCard: React.FC<PostCardProps> = ({
             </span>
 
             {/* Botão do menu agora dentro do mesmo flex */}
-            <PostMenuButton
-              postId={id}
-              shareId={sharedBy.shareId}
-              className="absolute top-0 right-0"
-              onEdit={(p, s) => console.log('Editar', p, s)}
-              onDelete={(p, s) => console.log('Excluir', p, s)}
-            />
+            {sharedBy && sharedBy.id === user?.id && (
+              <PostMenuButton
+                postId={sharedBy.postId}
+                shareId={sharedBy.shareId}
+                className="absolute top-0 right-0"
+                onEdit={(p, s) => console.log('Editar', p, s)}
+                onDelete={onDelete}
+              />
+            )}
           </div>
 
           {sharedBy.message && (
@@ -143,12 +148,12 @@ const PostCard: React.FC<PostCardProps> = ({
         </div>
 
         {/* Botão do menu para post original */}
-        {!sharedBy && (
+        {!sharedBy && author.id === user?.id && (
           <PostMenuButton
             postId={id}
             className="absolute top-0 right-0"
             onEdit={(p) => console.log('Editar', p)}
-            onDelete={(p) => console.log('Excluir', p)}
+            onDelete={onDelete}
           />
         )}
       </div>
