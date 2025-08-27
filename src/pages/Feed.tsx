@@ -27,23 +27,13 @@ const Feed: React.FC = () => {
 
   const handleShare = async (message?: string) => {
     if (!postToShare) return;
-    try {
-      const data = await sharePost(postToShare.id, message);
 
-      // Atualiza o feed
-      const updatedPost = {
-        ...postToShare,
-        sharedBy: {
-          shareId: data.id,
-          postId: postToShare.id,
-          id: data.user.id,
-          name: data.user.name,
-          avatarUrl: data.user.avatarUrl,
-          message: message || undefined,
-          sharedAt: data.sharedAt,
-        },
-      };
-      setPosts((prev) => [updatedPost, ...prev]);
+    try {
+      // sharePost já retorna o DTO completo
+      const sharedPostDTO = await sharePost(postToShare.id, message);
+
+      // Atualiza o feed diretamente com o DTO retornado
+      setPosts((prev) => [sharedPostDTO, ...prev]);
     } catch (err) {
       console.error(err);
     } finally {
@@ -57,15 +47,19 @@ const Feed: React.FC = () => {
     console.log('Tentando excluir:', { postId, shareId });
     try {
       await deletePost(postId, shareId);
+
       setPosts((prev) =>
-        prev.filter(
-          (p) =>
-            !(
-              p.id === postId &&
-              (shareId ? p.sharedBy?.shareId === shareId : !p.sharedBy)
-            )
-        )
+        prev.filter((p) => {
+          if (shareId) {
+            // excluir compartilhamento específico
+            return p.sharedBy?.shareId !== shareId;
+          } else {
+            // excluir post original
+            return p.id !== postId && !p.sharedBy;
+          }
+        })
       );
+
       toast.success('Post excluído com sucesso!');
     } catch (err) {
       toast.error('Erro ao excluir o post!');
@@ -93,6 +87,7 @@ const Feed: React.FC = () => {
               images={post.images}
               createdAt={post.createdAt}
               categoryId={post.categoria_idcategoria}
+              metadata={post.metadata}
               author={{
                 id: post.user?.id,
                 name: post.user?.name || 'Usuário desconhecido',

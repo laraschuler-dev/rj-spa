@@ -25,6 +25,9 @@ interface PostCardProps {
   images: string[];
   createdAt: string;
   categoryId: number;
+  metadata?: {
+    [key: string]: any;
+  };
   onLike?: () => void;
   onComment?: () => void;
   onShare?: () => void;
@@ -40,7 +43,6 @@ interface PostCardProps {
     message?: string;
     sharedAt: string;
   };
-  // eslint-disable-next-line no-unused-vars
   onDelete?: (postId: number, shareId?: number) => void;
 }
 
@@ -52,6 +54,7 @@ const PostCard: React.FC<PostCardProps> = ({
   images,
   createdAt,
   categoryId,
+  metadata,
   onLike,
   onShare,
   isLiked,
@@ -62,16 +65,18 @@ const PostCard: React.FC<PostCardProps> = ({
   const postIdForAttendance = sharedBy?.postId ?? id;
   const postShareIdForAttendance = sharedBy?.shareId;
 
-  const postIdForComments = sharedBy ? sharedBy.postId : id; // sempre o post ORIGINAL
+  const postIdForComments = sharedBy ? sharedBy.postId : id;
   const shareIdForComments = sharedBy?.shareId ?? undefined;
 
-  // eslint-disable-next-line no-unused-vars
   const { status } = useEventAttendance(
     postIdForAttendance,
     postShareIdForAttendance
   );
 
   const { user } = useAuth();
+
+  // ✅ Corrigido: pegar isDeletedOriginal do metadata do post
+  const isOriginalDeleted = metadata?.isDeletedOriginal ?? false;
 
   return (
     <div className="bg-white shadow-md rounded-2xl p-4 space-y-3 max-w-[600px] mx-auto w-full">
@@ -97,8 +102,7 @@ const PostCard: React.FC<PostCardProps> = ({
               </span>
             </span>
 
-            {/* Botão do menu agora dentro do mesmo flex */}
-            {sharedBy && sharedBy.id === user?.id && (
+            {sharedBy.id === user?.id && (
               <PostMenuButton
                 postId={sharedBy.postId}
                 shareId={sharedBy.shareId}
@@ -147,7 +151,6 @@ const PostCard: React.FC<PostCardProps> = ({
           </div>
         </div>
 
-        {/* Botão do menu para post original */}
         {!sharedBy && author.id === user?.id && (
           <PostMenuButton
             postId={id}
@@ -158,18 +161,33 @@ const PostCard: React.FC<PostCardProps> = ({
         )}
       </div>
 
-      {/* Título */}
-      <Typography variant="h2" className="text-sm font-semibold text-gray-700">
-        {title}
-      </Typography>
-
-      {/* Conteúdo resumido */}
-      <Typography variant="p" className="text-sm text-gray-700 line-clamp-3">
-        {content}
-      </Typography>
+      {/* Título e conteúdo */}
+      {isOriginalDeleted ? (
+        <Typography
+          variant="p"
+          className="text-sm text-gray-500 italic bg-gray-50 p-2 rounded-md"
+        >
+          Este post original foi removido pelo autor.
+        </Typography>
+      ) : (
+        <>
+          <Typography
+            variant="h2"
+            className="text-sm font-semibold text-gray-700"
+          >
+            {title}
+          </Typography>
+          <Typography
+            variant="p"
+            className="text-sm text-gray-700 line-clamp-3"
+          >
+            {content}
+          </Typography>
+        </>
+      )}
 
       {/* Carrossel de imagens */}
-      {images.length > 0 && (
+      {!isOriginalDeleted && images.length > 0 && (
         <Swiper spaceBetween={8} slidesPerView={1} className="rounded-xl">
           {images.map((url, index) => (
             <SwiperSlide key={`${id}-img-${index}`}>
@@ -184,32 +202,36 @@ const PostCard: React.FC<PostCardProps> = ({
       )}
 
       {/* Ver mais */}
-      <div className="text-right">
-        <Link
-          to={`/posts/${id}`}
-          className="text-primary text-sm font-medium hover:text-blue-500 underline"
-        >
-          Ver mais
-        </Link>
-      </div>
+      {!isOriginalDeleted && (
+        <div className="text-right">
+          <Link
+            to={`/posts/${id}`}
+            className="text-primary text-sm font-medium hover:text-blue-500 underline"
+          >
+            Ver mais
+          </Link>
+        </div>
+      )}
 
       {/* Ações */}
-      <PostActions
-        post={{
-          id,
-          categoryId,
-          sharedBy: sharedBy ? { id: sharedBy.postId } : undefined,
-        }}
-        isLiked={isLiked}
-        onLike={onLike}
-        onComment={() => setShowComments((prev) => !prev)}
-        onShare={onShare}
-        postIdForAttendance={postIdForAttendance}
-        postShareIdForAttendance={postShareIdForAttendance}
-      />
+      {!isOriginalDeleted && (
+        <PostActions
+          post={{
+            id,
+            categoryId,
+            sharedBy: sharedBy ? { id: sharedBy.postId } : undefined,
+          }}
+          isLiked={isLiked}
+          onLike={onLike}
+          onComment={() => setShowComments((prev) => !prev)}
+          onShare={onShare}
+          postIdForAttendance={postIdForAttendance}
+          postShareIdForAttendance={postShareIdForAttendance}
+        />
+      )}
 
       {/* Comentários */}
-      {showComments && (
+      {showComments && !isOriginalDeleted && (
         <div className="pt-4 border-t">
           <CommentSection
             postId={postIdForComments}
