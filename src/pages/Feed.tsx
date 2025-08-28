@@ -29,10 +29,12 @@ const Feed: React.FC = () => {
     if (!postToShare) return;
 
     try {
-      // sharePost já retorna o DTO completo
-      const sharedPostDTO = await sharePost(postToShare.id, message);
+      // sempre pegar o postId original
+      const originalPostId = postToShare.sharedBy
+        ? postToShare.sharedBy.postId // Post compartilhado: pega o id do post original
+        : postToShare.id; // Post original: usa próprio ID
 
-      // Atualiza o feed diretamente com o DTO retornado
+      const sharedPostDTO = await sharePost(originalPostId, message);
       setPosts((prev) => [sharedPostDTO, ...prev]);
     } catch (err) {
       console.error(err);

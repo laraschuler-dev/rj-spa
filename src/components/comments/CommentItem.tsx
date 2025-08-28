@@ -57,7 +57,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
       <div className="flex-1">
         <div className="flex items-center gap-2">
           <Typography variant="h3" className="text-sm font-medium">
-            {comment.author.name}
+            <strong>{comment.author.name}</strong>
           </Typography>
           <Typography variant="p" className="text-xs text-gray-500">
             {formatTimeAgo(comment.createdAt)}

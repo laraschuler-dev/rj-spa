@@ -43,7 +43,9 @@ interface PostCardProps {
     message?: string;
     sharedAt: string;
   };
+  // eslint-disable-next-line no-unused-vars
   onDelete?: (postId: number, shareId?: number) => void;
+  expanded?: boolean;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -60,6 +62,7 @@ const PostCard: React.FC<PostCardProps> = ({
   isLiked,
   sharedBy,
   onDelete,
+  expanded = false,
 }) => {
   const [showComments, setShowComments] = useState(false);
   const postIdForAttendance = sharedBy?.postId ?? id;
@@ -75,8 +78,10 @@ const PostCard: React.FC<PostCardProps> = ({
 
   const { user } = useAuth();
 
-  // ✅ Corrigido: pegar isDeletedOriginal do metadata do post
   const isOriginalDeleted = metadata?.isDeletedOriginal ?? false;
+
+  const displayedAuthor =
+    expanded && sharedBy ? sharedBy.originalAuthor || author : author;
 
   return (
     <div className="bg-white shadow-md rounded-2xl p-4 space-y-3 max-w-[600px] mx-auto w-full">
@@ -127,10 +132,12 @@ const PostCard: React.FC<PostCardProps> = ({
       {/* Cabeçalho do post original */}
       <div className="relative flex justify-between items-start">
         <div className="flex items-center gap-2">
-          {author.avatarUrl ? (
+          {(expanded && sharedBy ? author : author).avatarUrl ? (
             <img
-              src={resolveImageUrl(author.avatarUrl)}
-              alt="Avatar"
+              src={resolveImageUrl(
+                expanded && sharedBy ? author.avatarUrl : author.avatarUrl
+              )}
+              alt={expanded && sharedBy ? author.name : author.name}
               className="w-10 h-10 rounded-full object-cover border"
             />
           ) : (
@@ -143,7 +150,9 @@ const PostCard: React.FC<PostCardProps> = ({
               variant="h3"
               className="font-medium text-gray-800 text-sm"
             >
-              <strong>{author.name}</strong>
+              <strong>
+                {expanded && sharedBy ? author.name : author.name}
+              </strong>
             </Typography>
             <Typography variant="p" className="text-xs text-gray-500">
               {formatTimeAgo(createdAt)}
@@ -177,12 +186,105 @@ const PostCard: React.FC<PostCardProps> = ({
           >
             {title}
           </Typography>
-          <Typography
-            variant="p"
-            className="text-sm text-gray-700 line-clamp-3"
-          >
-            {content}
-          </Typography>
+          {expanded ? (
+            <div className="text-sm text-gray-700 space-y-1">
+              {content && <p>{content}</p>}
+
+              {metadata?.itemType && (
+                <p>
+                  <strong>Tipo:</strong> {metadata.itemType}
+                </p>
+              )}
+              {metadata?.condition && (
+                <p>
+                  <strong>Condição:</strong> {metadata.condition}
+                </p>
+              )}
+              {metadata?.location && (
+                <p>
+                  <strong>Local:</strong> {metadata.location}
+                </p>
+              )}
+              {metadata?.date && (
+                <p>
+                  <strong>Data:</strong> {metadata.date}
+                </p>
+              )}
+              {metadata?.availability && (
+                <p>
+                  <strong>Disponibilidade:</strong> {metadata.availability}
+                </p>
+              )}
+              {metadata?.description && (
+                <p>
+                  <strong>Descrição:</strong> {metadata.description}
+                </p>
+              )}
+              {metadata?.isAnonymous !== undefined && (
+                <p>
+                  <strong>Anonimato:</strong>{' '}
+                  {metadata.isAnonymous ? 'Sim' : 'Não'}
+                </p>
+              )}
+              {metadata?.goal && (
+                <p>
+                  <strong>Objetivo:</strong> {metadata.goal}
+                </p>
+              )}
+              {metadata?.deadline && (
+                <p>
+                  <strong>Prazo:</strong> {metadata.deadline}
+                </p>
+              )}
+              {metadata?.organizer && (
+                <p>
+                  <strong>Organizador:</strong> {metadata.organizer}
+                </p>
+              )}
+              {metadata?.type && (
+                <p>
+                  <strong>Tipo:</strong> {metadata.type}
+                </p>
+              )}
+              {metadata?.urgency && (
+                <p>
+                  <strong>Urgência:</strong> {metadata.urgency}
+                </p>
+              )}
+              {metadata?.serviceType && (
+                <p>
+                  <strong>Tipo de Serviço:</strong> {metadata.serviceType}
+                </p>
+              )}
+              {metadata?.qualifications && (
+                <p>
+                  <strong>Qualificações:</strong> {metadata.qualifications}
+                </p>
+              )}
+              {metadata?.format && (
+                <p>
+                  <strong>Formato:</strong> {metadata.format}
+                </p>
+              )}
+              {metadata?.duration && (
+                <p>
+                  <strong>Duração:</strong> {metadata.duration}
+                </p>
+              )}
+              {metadata?.requirements && (
+                <p>
+                  <strong>Requisitos:</strong> {metadata.requirements}
+                </p>
+              )}
+            </div>
+          ) : (
+            <Typography
+              variant="p"
+              className="text-sm text-gray-700 line-clamp-3"
+            >
+              {content}
+            </Typography>
+          )}
         </>
       )}
 
@@ -205,7 +307,9 @@ const PostCard: React.FC<PostCardProps> = ({
       {!isOriginalDeleted && (
         <div className="text-right">
           <Link
-            to={`/posts/${id}`}
+            to={`/posts/${sharedBy?.postId ?? id}${
+              sharedBy?.shareId ? `?shareId=${sharedBy.shareId}` : ''
+            }`}
             className="text-primary text-sm font-medium hover:text-blue-500 underline"
           >
             Ver mais
