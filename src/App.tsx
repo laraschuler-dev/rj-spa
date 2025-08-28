@@ -56,7 +56,6 @@ const App = () => {
               <Route path="/posts/job" element={<CreateJobPost />} />
               <Route path="/posts/event" element={<CreateEventPost />} />
               <Route path="/posts/general" element={<CreateGeneralPost />} />
-              <Route path="/posts/:id" element={<PostDetailsPage />} />
               <Route path="/profile" element={<ProfileView />} />
               <Route path="/profile/edit" element={<ProfileEdit />} />
               <Route path="/profile/edit" element={<ProfileEdit />} />

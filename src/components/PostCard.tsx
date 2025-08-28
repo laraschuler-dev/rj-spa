@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { CgProfile } from 'react-icons/cg';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
-import { Link } from 'react-router-dom';
 import Typography from './ui/Typography';
 import { resolveImageUrl } from '../utils/resolveImageUrl';
 import PostActions from './ui/PostActions';
@@ -46,6 +45,8 @@ interface PostCardProps {
   // eslint-disable-next-line no-unused-vars
   onDelete?: (postId: number, shareId?: number) => void;
   expanded?: boolean;
+  isInModal?: boolean;
+  onOpenDetails?: (postId: number, shareId?: number) => void;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -63,6 +64,8 @@ const PostCard: React.FC<PostCardProps> = ({
   sharedBy,
   onDelete,
   expanded = false,
+  isInModal = false,
+  onOpenDetails,
 }) => {
   const [showComments, setShowComments] = useState(false);
   const postIdForAttendance = sharedBy?.postId ?? id;
@@ -82,6 +85,8 @@ const PostCard: React.FC<PostCardProps> = ({
 
   const displayedAuthor =
     expanded && sharedBy ? sharedBy.originalAuthor || author : author;
+
+  console.log('onOpenDetails recebido?', onOpenDetails);
 
   return (
     <div className="bg-white shadow-md rounded-2xl p-4 space-y-3 max-w-[600px] mx-auto w-full">
@@ -306,14 +311,14 @@ const PostCard: React.FC<PostCardProps> = ({
       {/* Ver mais */}
       {!isOriginalDeleted && (
         <div className="text-right">
-          <Link
-            to={`/posts/${sharedBy?.postId ?? id}${
-              sharedBy?.shareId ? `?shareId=${sharedBy.shareId}` : ''
-            }`}
-            className="text-primary text-sm font-medium hover:text-blue-500 underline"
-          >
-            Ver mais
-          </Link>
+          {!expanded && !isInModal && (
+            <button
+              className="text-blue-500 text-sm font-medium hover:underline"
+              onClick={onOpenDetails}
+            >
+              Ver mais
+            </button>
+          )}
         </div>
       )}
 

@@ -1,3 +1,4 @@
+// Feed.tsx
 import React, { useState } from 'react';
 import Layout from '../components/layout/Layout';
 import PostCard from '../components/PostCard';
@@ -7,6 +8,7 @@ import { useSharePost } from '../hooks/useSharePost';
 import { likePost } from '../hooks/useLikePost';
 import { useDeletePost } from '../hooks/useDeletePost';
 import { toast } from 'react-toastify';
+import PostModal from '../components/PostModal';
 
 const Feed: React.FC = () => {
   const { posts, setPosts, fetchPosts, hasMore, loading } = usePosts();
@@ -14,6 +16,7 @@ const Feed: React.FC = () => {
 
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [postToShare, setPostToShare] = useState<any>(null);
+  const [selectedPost, setSelectedPost] = useState<any | null>(null); // Agora guardamos o post completo
 
   const openShareModal = (post: any) => {
     setPostToShare(post);
@@ -29,10 +32,9 @@ const Feed: React.FC = () => {
     if (!postToShare) return;
 
     try {
-      // sempre pegar o postId original
       const originalPostId = postToShare.sharedBy
-        ? postToShare.sharedBy.postId // Post compartilhado: pega o id do post original
-        : postToShare.id; // Post original: usa próprio ID
+        ? postToShare.sharedBy.postId
+        : postToShare.id;
 
       const sharedPostDTO = await sharePost(originalPostId, message);
       setPosts((prev) => [sharedPostDTO, ...prev]);
@@ -46,19 +48,13 @@ const Feed: React.FC = () => {
   const { deletePost } = useDeletePost();
 
   const handleDelete = async (postId: number, shareId?: number) => {
-    console.log('Tentando excluir:', { postId, shareId });
     try {
       await deletePost(postId, shareId);
 
       setPosts((prev) =>
         prev.filter((p) => {
-          if (shareId) {
-            // excluir compartilhamento específico
-            return p.sharedBy?.shareId !== shareId;
-          } else {
-            // excluir post original
-            return p.id !== postId && !p.sharedBy;
-          }
+          if (shareId) return p.sharedBy?.shareId !== shareId;
+          return p.id !== postId && !p.sharedBy;
         })
       );
 
@@ -66,9 +62,6 @@ const Feed: React.FC = () => {
     } catch (err) {
       toast.error('Erro ao excluir o post!');
       console.error('Erro ao excluir:', err);
-      if (err instanceof Error) {
-        console.error('Mensagem:', err.message);
-      }
     }
   };
 
@@ -96,18 +89,12 @@ const Feed: React.FC = () => {
                 avatarUrl: post.user?.avatarUrl,
               }}
               isLiked={post.liked}
-              sharedBy={post.sharedBy} // mantém se tiver compartilhamento
+              sharedBy={post.sharedBy}
               onLike={async () => {
-                let postIdToSend: number;
-                let shareIdToSend: number | undefined;
-
-                if (post.sharedBy) {
-                  postIdToSend = post.sharedBy.postId;
-                  shareIdToSend = post.sharedBy.shareId;
-                } else {
-                  postIdToSend = post.id;
-                  shareIdToSend = undefined;
-                }
+                const postIdToSend = post.sharedBy
+                  ? post.sharedBy.postId
+                  : post.id;
+                const shareIdToSend = post.sharedBy?.shareId;
 
                 const liked = await likePost(postIdToSend, shareIdToSend);
                 setPosts((prev) =>
@@ -118,6 +105,7 @@ const Feed: React.FC = () => {
               }}
               onShare={() => openShareModal(post)}
               onDelete={handleDelete}
+              onOpenDetails={() => setSelectedPost(post)} // 🔹 Passa o post completo
             />
           ))}
 
@@ -133,6 +121,39 @@ const Feed: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* 🔹 Modal de Detalhes */}
+      {selectedPost && (
+        <PostModal
+          post={selectedPost}
+          onClose={() => setSelectedPost(null)}
+          onLike={async () => {
+            const postIdToSend = selectedPost.sharedBy
+              ? selectedPost.sharedBy.postId
+              : selectedPost.id;
+            const shareIdToSend = selectedPost.sharedBy?.shareId;
+
+            const liked = await likePost(postIdToSend, shareIdToSend);
+            // Atualiza o post no feed corretamente
+            setPosts((prev) =>
+              prev.map((p) =>
+                p.id === selectedPost.id ||
+                p.sharedBy?.shareId === selectedPost.sharedBy?.shareId
+                  ? { ...p, liked }
+                  : p
+              )
+            );
+
+            // Também atualiza o selectedPost para refletir o like no modal
+            setSelectedPost((prev: any) => prev && { ...prev, liked });
+          }}
+          onShare={() => {
+            // Abre o mesmo ShareModal do feed
+            if (selectedPost) openShareModal(selectedPost);
+          }}
+          onDelete={handleDelete}
+        />
+      )}
 
       {postToShare && (
         <ShareModal
