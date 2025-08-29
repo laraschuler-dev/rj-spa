@@ -40,7 +40,7 @@ const CreateGeneralPost: React.FC = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       toast.success('Informação publicada com sucesso!');
-      navigate('/dashboard');
+      navigate('/feed');
     } catch (error: any) {
       toast.error('Erro ao publicar informação.');
       console.error(error);

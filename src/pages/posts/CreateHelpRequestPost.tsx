@@ -49,7 +49,7 @@ const CreateHelpRequestPost: React.FC = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       toast.success('Pedido de ajuda criado com sucesso!');
-      navigate('/dashboard');
+      navigate('/feed');
     } catch (error: any) {
       toast.error('Erro ao criar pedido.');
       console.error(error);

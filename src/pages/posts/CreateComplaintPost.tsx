@@ -47,7 +47,7 @@ const CreateComplaintPost: React.FC = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       toast.success('Denúncia enviada com sucesso!');
-      navigate('/dashboard');
+      navigate('/feed');
     } catch {
       toast.error('Erro ao enviar denúncia.');
     }

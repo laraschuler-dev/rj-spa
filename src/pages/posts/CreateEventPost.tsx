@@ -44,7 +44,7 @@ const CreateEventPost: React.FC = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       toast.success('Evento publicado com sucesso!');
-      navigate('/dashboard');
+      navigate('/feed');
     } catch (error: any) {
       toast.error('Erro ao publicar evento.');
       console.error(error);

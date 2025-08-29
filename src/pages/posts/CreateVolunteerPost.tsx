@@ -46,7 +46,7 @@ const CreateVolunteerPost: React.FC = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       toast.success('Voluntariado publicado com sucesso!');
-      navigate('/dashboard');
+      navigate('/feed');
     } catch (error: any) {
       toast.error('Erro ao criar voluntariado.');
       console.error(error);

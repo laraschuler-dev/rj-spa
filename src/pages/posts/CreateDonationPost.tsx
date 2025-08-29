@@ -55,7 +55,7 @@ const CreateDonationPost: React.FC = () => {
         },
       });
       toast.success('Post criado com sucesso!');
-      navigate('/dashboard');
+      navigate('/feed');
     } catch (error: any) {
       toast.error('Erro ao criar post.');
 

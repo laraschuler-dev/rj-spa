@@ -61,10 +61,6 @@ button {
     border-color 0.25s ease;
 }
 
-button:hover {
-  background-color: var(--color-secondary);
-  border-color: var(--color-secondary);
-}
 
 button:focus,
 button:focus-visible {
