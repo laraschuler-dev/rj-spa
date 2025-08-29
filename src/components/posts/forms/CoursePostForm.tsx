@@ -1,20 +1,34 @@
+// src/components/posts/forms/CoursePostForm.tsx
 import React, { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from '../../services/api';
-import { toast } from 'react-toastify';
-import Typography from '../../components/ui/Typography';
-import SubmitButton from '../../components/ui/SubmitButton';
-import ImageUpload from '../../components/ui/ImageUpload';
+import Typography from '../../ui/Typography';
+import SubmitButton from '../../ui/SubmitButton';
+import ImageUpload from '../../ui/ImageUpload';
 
-const CreateVolunteerPost: React.FC = () => {
-  const navigate = useNavigate();
+interface CoursePostFormProps {
+  onSubmit: (data: FormData) => Promise<void>;
+  mode: 'create' | 'edit';
+  initialData?: {
+    title?: string;
+    content?: string;
+    format?: string;
+    duration?: string;
+    requirements?: string;
+    images?: File[];
+  };
+}
+
+const CoursePostForm: React.FC<CoursePostFormProps> = ({
+  onSubmit,
+  mode,
+  initialData,
+}) => {
   const [formData, setFormData] = useState({
-    title: '',
-    serviceType: '',
-    availability: '',
-    qualifications: '',
-    content: '',
-    images: [] as File[],
+    title: initialData?.title || '',
+    content: initialData?.content || '',
+    format: initialData?.format || '',
+    duration: initialData?.duration || '',
+    requirements: initialData?.requirements || '',
+    images: initialData?.images || ([] as File[]),
   });
 
   const handleChange = (
@@ -24,47 +38,38 @@ const CreateVolunteerPost: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
     const postData = new FormData();
-    postData.append('categoria_idcategoria', '5'); // VOLUNTEER
+    postData.append('categoria_idcategoria', '6'); // COURSE
     postData.append('content', formData.content || formData.title);
 
     const metadata = {
       title: formData.title,
-      serviceType: formData.serviceType,
-      availability: formData.availability,
-      qualifications: formData.qualifications,
+      format: formData.format,
+      duration: formData.duration,
+      requirements: formData.requirements,
     };
-
     postData.append('metadata', JSON.stringify(metadata));
+
     formData.images.forEach((img) => postData.append('images', img));
 
-    try {
-      await axios.post('/posts', postData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      toast.success('Voluntariado publicado com sucesso!');
-      navigate('/feed');
-    } catch (error: any) {
-      toast.error('Erro ao criar voluntariado.');
-      console.error(error);
-    }
+    onSubmit(postData);
   };
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
         <Typography variant="h2" className="text-primary text-center mb-6">
-          Novo Voluntariado
+          {mode === 'create' ? 'Novo Curso' : 'Editar Curso'}
         </Typography>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
             name="title"
-            placeholder="Título (ex: Atendimento psicológico solidário)"
+            placeholder="Título (ex: Curso de Informática)"
             value={formData.title}
             onChange={handleChange}
             required
@@ -81,9 +86,9 @@ const CreateVolunteerPost: React.FC = () => {
 
           <input
             type="text"
-            name="serviceType"
-            placeholder="Tipo de serviço (ex: Psicologia, Odontologia...)"
-            value={formData.serviceType}
+            name="format"
+            placeholder="Formato (ex: Presencial, Online)"
+            value={formData.format}
             onChange={handleChange}
             required
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
@@ -91,9 +96,9 @@ const CreateVolunteerPost: React.FC = () => {
 
           <input
             type="text"
-            name="availability"
-            placeholder="Disponibilidade (ex: Fins de semana)"
-            value={formData.availability}
+            name="duration"
+            placeholder="Duração (ex: 4 semanas)"
+            value={formData.duration}
             onChange={handleChange}
             required
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
@@ -101,15 +106,14 @@ const CreateVolunteerPost: React.FC = () => {
 
           <input
             type="text"
-            name="qualifications"
-            placeholder="Requisitos (ex: CRP ativo, experiência com público)"
-            value={formData.qualifications}
+            name="requirements"
+            placeholder="Requisitos (ex: Maior de 16 anos)"
+            value={formData.requirements}
             onChange={handleChange}
             required
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
 
-          {/* Componente de upload de imagens */}
           <ImageUpload
             images={formData.images}
             onChange={(files) =>
@@ -117,11 +121,13 @@ const CreateVolunteerPost: React.FC = () => {
             }
           />
 
-          <SubmitButton>Publicar</SubmitButton>
+          <SubmitButton>
+            {mode === 'create' ? 'Publicar' : 'Salvar Alterações'}
+          </SubmitButton>
         </form>
       </div>
     </main>
   );
 };
 
-export default CreateVolunteerPost;
+export default CoursePostForm;

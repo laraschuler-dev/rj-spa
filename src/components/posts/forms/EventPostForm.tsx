@@ -1,20 +1,32 @@
+// src/components/posts/forms/EventPostForm.tsx
 import React, { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from '../../services/api';
-import { toast } from 'react-toastify';
-import Typography from '../../components/ui/Typography';
-import SubmitButton from '../../components/ui/SubmitButton';
-import ImageUpload from '../../components/ui/ImageUpload';
+import Typography from '../../ui/Typography';
+import SubmitButton from '../../ui/SubmitButton';
+import ImageUpload from '../../ui/ImageUpload';
 
-const CreateCoursePost: React.FC = () => {
-  const navigate = useNavigate();
+interface EventPostFormProps {
+  onSubmit: (data: FormData) => Promise<void>;
+  mode: 'create' | 'edit';
+  initialData?: {
+    title?: string;
+    content?: string;
+    location?: string;
+    date?: string;
+    images?: File[];
+  };
+}
+
+const EventPostForm: React.FC<EventPostFormProps> = ({
+  onSubmit,
+  mode,
+  initialData,
+}) => {
   const [formData, setFormData] = useState({
-    title: '',
-    format: '',
-    duration: '',
-    requirements: '',
-    content: '',
-    images: [] as File[],
+    title: initialData?.title || '',
+    content: initialData?.content || '',
+    location: initialData?.location || '',
+    date: initialData?.date || '',
+    images: initialData?.images || ([] as File[]),
   });
 
   const handleChange = (
@@ -24,47 +36,37 @@ const CreateCoursePost: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
     const postData = new FormData();
-    postData.append('categoria_idcategoria', '6'); // COURSE
+    postData.append('categoria_idcategoria', '8'); // EVENT
     postData.append('content', formData.content || formData.title);
 
     const metadata = {
       title: formData.title,
-      format: formData.format,
-      duration: formData.duration,
-      requirements: formData.requirements,
+      location: formData.location,
+      date: formData.date,
     };
-
     postData.append('metadata', JSON.stringify(metadata));
+
     formData.images.forEach((img) => postData.append('images', img));
 
-    try {
-      await axios.post('/posts', postData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      toast.success('Curso publicado com sucesso!');
-      navigate('/feed');
-    } catch (error: any) {
-      toast.error('Erro ao publicar o curso.');
-      console.error(error);
-    }
+    onSubmit(postData);
   };
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
         <Typography variant="h2" className="text-primary text-center mb-6">
-          Novo Curso
+          {mode === 'create' ? 'Novo Evento' : 'Editar Evento'}
         </Typography>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
             name="title"
-            placeholder="Título (ex: Curso de Informática)"
+            placeholder="Título do evento (ex: Feira de Saúde)"
             value={formData.title}
             onChange={handleChange}
             required
@@ -73,7 +75,7 @@ const CreateCoursePost: React.FC = () => {
 
           <textarea
             name="content"
-            placeholder="Descrição adicional (opcional)"
+            placeholder="Descrição do evento (opcional)"
             value={formData.content}
             onChange={handleChange}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
@@ -81,35 +83,23 @@ const CreateCoursePost: React.FC = () => {
 
           <input
             type="text"
-            name="format"
-            placeholder="Formato (ex: Presencial, Online)"
-            value={formData.format}
+            name="location"
+            placeholder="Local (ex: Praça Central)"
+            value={formData.location}
             onChange={handleChange}
             required
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
 
           <input
-            type="text"
-            name="duration"
-            placeholder="Duração (ex: 4 semanas)"
-            value={formData.duration}
+            type="date"
+            name="date"
+            value={formData.date}
             onChange={handleChange}
             required
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
 
-          <input
-            type="text"
-            name="requirements"
-            placeholder="Requisitos (ex: Maior de 16 anos)"
-            value={formData.requirements}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-
-          {/* Upload de imagens */}
           <ImageUpload
             images={formData.images}
             onChange={(files) =>
@@ -117,11 +107,13 @@ const CreateCoursePost: React.FC = () => {
             }
           />
 
-          <SubmitButton>Publicar</SubmitButton>
+          <SubmitButton>
+            {mode === 'create' ? 'Publicar' : 'Salvar Alterações'}
+          </SubmitButton>
         </form>
       </div>
     </main>
   );
 };
 
-export default CreateCoursePost;
+export default EventPostForm;

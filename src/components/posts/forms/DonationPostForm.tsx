@@ -1,23 +1,39 @@
+// src/components/posts/forms/DonationPostForm.tsx
 import React, { useState, ChangeEvent, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from '../../services/api';
-import { toast } from 'react-toastify';
-import Typography from '../../components/ui/Typography';
-import SubmitButton from '../../components/ui/SubmitButton';
-import CustomSelect from '../../components/ui/CustomSelect';
-import ImageUpload from '../../components/ui/ImageUpload';
+import Typography from '../../ui/Typography';
+import SubmitButton from '../../ui/SubmitButton';
+import CustomSelect from '../../ui/CustomSelect';
+import ImageUpload from '../../ui/ImageUpload';
 
-const CreateDonationPost: React.FC = () => {
-  const navigate = useNavigate();
+interface DonationPostFormProps {
+  onSubmit: (data: FormData) => Promise<void>;
+  mode: 'create' | 'edit';
+  initialData?: {
+    title?: string;
+    content?: string;
+    itemType?: string;
+    condition?: string;
+    customCondition?: string;
+    location?: string;
+    availability?: string;
+    images?: File[];
+  };
+}
+
+const DonationPostForm: React.FC<DonationPostFormProps> = ({
+  onSubmit,
+  mode,
+  initialData,
+}) => {
   const [formData, setFormData] = useState({
-    title: '',
-    itemType: '',
-    condition: '',
-    customCondition: '',
-    location: '',
-    availability: '',
-    content: '',
-    images: [] as File[],
+    title: initialData?.title || '',
+    content: initialData?.content || '',
+    itemType: initialData?.itemType || '',
+    condition: initialData?.condition || '',
+    customCondition: initialData?.customCondition || '',
+    location: initialData?.location || '',
+    availability: initialData?.availability || '',
+    images: initialData?.images || ([] as File[]),
   });
 
   const handleChange = (
@@ -27,7 +43,7 @@ const CreateDonationPost: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
     const postData = new FormData();
@@ -48,35 +64,14 @@ const CreateDonationPost: React.FC = () => {
     postData.append('metadata', JSON.stringify(metadata));
     formData.images.forEach((img) => postData.append('images', img));
 
-    try {
-      await axios.post('/posts', postData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      toast.success('Post criado com sucesso!');
-      navigate('/feed');
-    } catch (error: any) {
-      toast.error('Erro ao criar post.');
-
-      if (error.response && error.response.data) {
-        console.error('Error data:', error.response.data);
-        console.error('Error status:', error.response.status);
-        console.error('Error headers:', error.response.headers);
-      } else if (error.request) {
-        console.error('Error request:', error.request);
-      } else {
-        console.error('Error message:', error.message);
-      }
-      console.error('Error config:', error.config);
-    }
+    onSubmit(postData);
   };
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
         <Typography variant="h2" className="text-primary text-center mb-6">
-          Nova Doação
+          {mode === 'create' ? 'Nova Doação' : 'Editar Doação'}
         </Typography>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -151,7 +146,6 @@ const CreateDonationPost: React.FC = () => {
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
 
-          {/* Image Upload Component */}
           <ImageUpload
             images={formData.images}
             onChange={(files) =>
@@ -159,11 +153,13 @@ const CreateDonationPost: React.FC = () => {
             }
           />
 
-          <SubmitButton>Publicar</SubmitButton>
+          <SubmitButton>
+            {mode === 'create' ? 'Publicar' : 'Salvar Alterações'}
+          </SubmitButton>
         </form>
       </div>
     </main>
   );
 };
 
-export default CreateDonationPost;
+export default DonationPostForm;

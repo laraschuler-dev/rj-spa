@@ -1,18 +1,25 @@
+// src/components/posts/forms/ComplaintPostForm.tsx
 import React, { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from '../../services/api';
-import { toast } from 'react-toastify';
-import Typography from '../../components/ui/Typography';
-import SubmitButton from '../../components/ui/SubmitButton';
-import ImageUpload from '../../components/ui/ImageUpload'; // ✅ import do componente
+import Typography from '../../ui/Typography';
+import SubmitButton from '../../ui/SubmitButton';
+import ImageUpload from '../../ui/ImageUpload';
 
-const CreateComplaintPost: React.FC = () => {
-  const navigate = useNavigate();
+interface ComplaintPostFormProps {
+  onSubmit: (data: FormData) => Promise<void>; // ✅ corrigido Promise<void>
+  mode: 'create' | 'edit';
+  initialData?: any; // opcional para edição futura
+}
+
+const ComplaintPostForm: React.FC<ComplaintPostFormProps> = ({
+  onSubmit,
+  mode,
+  initialData,
+}) => {
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    isAnonymous: false,
-    images: [] as File[],
+    title: initialData?.title || '',
+    description: initialData?.description || '',
+    isAnonymous: initialData?.isAnonymous || false,
+    images: initialData?.images || ([] as File[]),
   });
 
   const handleChange = (
@@ -30,7 +37,7 @@ const CreateComplaintPost: React.FC = () => {
     e.preventDefault();
 
     const postData = new FormData();
-    postData.append('categoria_idcategoria', '2'); // complaint
+    postData.append('categoria_idcategoria', '2'); // ✅ Complaint
     postData.append('content', formData.description);
 
     const metadata = {
@@ -42,22 +49,14 @@ const CreateComplaintPost: React.FC = () => {
 
     formData.images.forEach((img) => postData.append('images', img));
 
-    try {
-      await axios.post('/posts', postData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      toast.success('Denúncia enviada com sucesso!');
-      navigate('/feed');
-    } catch {
-      toast.error('Erro ao enviar denúncia.');
-    }
+    await onSubmit(postData); // ✅ garante retorno compatível com Promise<void>
   };
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
         <Typography variant="h2" className="text-primary text-center mb-6">
-          Nova Denúncia
+          {mode === 'create' ? 'Nova Denúncia' : 'Editar Denúncia'}
         </Typography>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -91,7 +90,6 @@ const CreateComplaintPost: React.FC = () => {
             Enviar como anônimo
           </label>
 
-          {/* ✅ Componente reaproveitado */}
           <ImageUpload
             images={formData.images}
             onChange={(files) =>
@@ -99,11 +97,13 @@ const CreateComplaintPost: React.FC = () => {
             }
           />
 
-          <SubmitButton>Enviar Denúncia</SubmitButton>
+          <SubmitButton>
+            {mode === 'create' ? 'Enviar Denúncia' : 'Salvar Alterações'}
+          </SubmitButton>
         </form>
       </div>
     </main>
   );
 };
 
-export default CreateComplaintPost;
+export default ComplaintPostForm;

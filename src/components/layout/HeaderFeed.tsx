@@ -20,7 +20,7 @@ const HeaderFeed: React.FC = () => {
       {/* Acoes principais - oculto no mobile */}
       <nav className="hidden md:flex items-center gap-6">
         <Link
-          to="/posts/general"
+          to="/posts/create/9"
           className="hover:text-accent transition-colors cursor-pointer"
         >
           Criar Post

@@ -72,63 +72,63 @@ const MobileMenuFeed: React.FC<MobileMenuFeedProps> = ({ isOpen, onClose }) => {
           <CgProfile size={20} /> Meu Perfil
         </Link>
         <Link
-          to="/posts/volunteer"
+          to="/posts/create/5"
           onClick={onClose}
           className="flex items-center gap-2 hover:text-accent"
         >
           <FiHeart /> Quero Voluntariar
         </Link>
         <Link
-          to="/posts/donation"
+          to="/posts/create/1"
           onClick={onClose}
           className="flex items-center gap-2 hover:text-accent"
         >
           <FiGift /> Quero Doar
         </Link>
         <Link
-          to="/posts/help"
+          to="/posts/create/4"
           onClick={onClose}
           className="flex items-center gap-2 hover:text-accent"
         >
           <FiUsers /> Solicitar Ajuda
         </Link>
         <Link
-          to="/posts/job"
+          to="/posts/create/7"
           onClick={onClose}
           className="flex items-center gap-2 hover:text-accent"
         >
           <FiBriefcase /> Anunciar Vaga
         </Link>
         <Link
-          to="/posts/complaint"
+          to="/posts/create/2"
           onClick={onClose}
           className="flex items-center gap-2 hover:text-accent"
         >
           <FiAlertCircle /> Denunciar Violência
         </Link>
         <Link
-          to="/posts/campaign"
+          to="/posts/create/3"
           onClick={onClose}
           className="flex items-center gap-2 hover:text-accent"
         >
           <MdOutlineCampaign /> Criar Campanha
         </Link>
         <Link
-          to="/posts/course"
+          to="/posts/create/6"
           onClick={onClose}
           className="flex items-center gap-2 hover:text-accent"
         >
           <PiStudent /> Oferecer Curso
         </Link>
         <Link
-          to="/posts/event"
+          to="/posts/create/8"
           onClick={onClose}
           className="flex items-center gap-2 hover:text-accent"
         >
           <MdEventAvailable /> Criar Evento
         </Link>
         <Link
-          to="/posts/general"
+          to="/posts/create/9"
           onClick={onClose}
           className="flex items-center gap-2 hover:text-accent"
         >

@@ -129,28 +129,28 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
       {/* Opções adicionais */}
       <nav className="flex flex-col gap-4 mt-4">
         <Link
-          to="/posts/volunteer"
+          to="/posts/create/5"
           className="flex items-center gap-2 hover:text-accent transition-colors"
           onClick={onClose}
         >
           <FiHeart /> Quero Voluntariar
         </Link>
         <Link
-          to="/posts/donation"
+          to="/posts/create/1"
           className="flex items-center gap-2 hover:text-accent transition-colors"
           onClick={onClose}
         >
           <FiGift /> Quero Doar
         </Link>
         <Link
-          to="/posts/help"
+          to="/posts/create/4"
           className="flex items-center gap-2 hover:text-accent transition-colors"
           onClick={onClose}
         >
           <FiUsers /> Solicitar Ajuda
         </Link>
         <Link
-          to="/posts/job"
+          to="/posts/create/7"
           className="flex items-center gap-2 hover:text-accent transition-colors"
           onClick={onClose}
         >
@@ -164,28 +164,28 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           <FiAlertCircle /> Denunciar Violência
         </Link>
         <Link
-          to="/posts/campaign"
+          to="/posts/create/2"
           className="flex items-center gap-2 hover:text-accent transition-colors"
           onClick={onClose}
         >
           <MdOutlineCampaign /> Criar Campanha
         </Link>
         <Link
-          to="/posts/course"
+          to="/posts/create/3"
           className="flex items-center gap-2 hover:text-accent transition-colors"
           onClick={onClose}
         >
           <PiStudent /> Oferecer Curso
         </Link>
         <Link
-          to="/posts/event"
+          to="/posts/create/8"
           className="flex items-center gap-2 hover:text-accent transition-colors"
           onClick={onClose}
         >
           <MdEventAvailable /> Criar Evento
         </Link>
         <Link
-          to="/posts/general"
+          to="/posts/create/9"
           className="flex items-center gap-2 hover:text-accent transition-colors"
           onClick={onClose}
         >

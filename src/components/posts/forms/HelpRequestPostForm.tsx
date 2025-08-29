@@ -1,33 +1,45 @@
-import React, { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from '../../services/api';
-import { toast } from 'react-toastify';
-import Typography from '../../components/ui/Typography';
-import SubmitButton from '../../components/ui/SubmitButton';
-import ImageUpload from '../../components/ui/ImageUpload';
-import CustomSelect from '../../components/ui/CustomSelect';
+// src/components/posts/forms/HelpRequestPostForm.tsx
+import React, { useState, FormEvent, ChangeEvent } from 'react';
+import Typography from '../../ui/Typography';
+import SubmitButton from '../../ui/SubmitButton';
+import ImageUpload from '../../ui/ImageUpload';
+import CustomSelect from '../../ui/CustomSelect';
 
-const CreateHelpRequestPost: React.FC = () => {
-  const navigate = useNavigate();
+interface HelpRequestPostFormProps {
+  onSubmit: (data: FormData) => Promise<void>;
+  mode: 'create' | 'edit';
+  initialData?: {
+    title?: string;
+    type?: string;
+    urgency?: string;
+    deadline?: string;
+    content?: string;
+    images?: File[];
+  };
+}
+
+const HelpRequestPostForm: React.FC<HelpRequestPostFormProps> = ({
+  onSubmit,
+  mode,
+  initialData,
+}) => {
   const [formData, setFormData] = useState({
-    title: '',
-    type: '',
-    urgency: '',
-    deadline: '',
-    content: '',
-    images: [] as File[],
+    title: initialData?.title || '',
+    type: initialData?.type || '',
+    urgency: initialData?.urgency || '',
+    deadline: initialData?.deadline || '',
+    content: initialData?.content || '',
+    images: initialData?.images || ([] as File[]),
   });
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
     const postData = new FormData();
@@ -44,23 +56,16 @@ const CreateHelpRequestPost: React.FC = () => {
     postData.append('metadata', JSON.stringify(metadata));
     formData.images.forEach((img) => postData.append('images', img));
 
-    try {
-      await axios.post('/posts', postData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      toast.success('Pedido de ajuda criado com sucesso!');
-      navigate('/feed');
-    } catch (error: any) {
-      toast.error('Erro ao criar pedido.');
-      console.error(error);
-    }
+    onSubmit(postData);
   };
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
         <Typography variant="h2" className="text-primary text-center mb-6">
-          Novo Pedido de Ajuda
+          {mode === 'create'
+            ? 'Novo Pedido de Ajuda'
+            : 'Editar Pedido de Ajuda'}
         </Typography>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -92,18 +97,16 @@ const CreateHelpRequestPost: React.FC = () => {
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
 
-          <div className="w-full">
-            <CustomSelect
-              value={formData.urgency}
-              onChange={(val) => setFormData({ ...formData, urgency: val })}
-              options={[
-                { label: 'Baixa', value: 'Baixa' },
-                { label: 'Média', value: 'Média' },
-                { label: 'Alta', value: 'Alta' },
-              ]}
-              placeholder="Nível de urgência"
-            />
-          </div>
+          <CustomSelect
+            value={formData.urgency}
+            onChange={(val) => setFormData({ ...formData, urgency: val })}
+            options={[
+              { label: 'Baixa', value: 'Baixa' },
+              { label: 'Média', value: 'Média' },
+              { label: 'Alta', value: 'Alta' },
+            ]}
+            placeholder="Nível de urgência"
+          />
 
           <input
             type="date"
@@ -114,7 +117,6 @@ const CreateHelpRequestPost: React.FC = () => {
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
 
-          {/* Upload de imagens (opcional) */}
           <ImageUpload
             images={formData.images}
             onChange={(files) =>
@@ -122,11 +124,13 @@ const CreateHelpRequestPost: React.FC = () => {
             }
           />
 
-          <SubmitButton>Publicar</SubmitButton>
+          <SubmitButton>
+            {mode === 'create' ? 'Publicar' : 'Salvar Alterações'}
+          </SubmitButton>
         </form>
       </div>
     </main>
   );
 };
 
-export default CreateHelpRequestPost;
+export default HelpRequestPostForm;

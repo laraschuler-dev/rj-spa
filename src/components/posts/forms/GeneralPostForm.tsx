@@ -1,17 +1,28 @@
+// src/components/posts/forms/GeneralPostForm.tsx
 import React, { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from '../../services/api';
-import { toast } from 'react-toastify';
-import Typography from '../../components/ui/Typography';
-import SubmitButton from '../../components/ui/SubmitButton';
-import ImageUpload from '../../components/ui/ImageUpload';
+import Typography from '../../ui/Typography';
+import SubmitButton from '../../ui/SubmitButton';
+import ImageUpload from '../../ui/ImageUpload';
 
-const CreateGeneralPost: React.FC = () => {
-  const navigate = useNavigate();
+interface GeneralPostFormProps {
+  onSubmit: (data: FormData) => Promise<void>;
+  mode: 'create' | 'edit';
+  initialData?: {
+    title?: string;
+    content?: string;
+    images?: File[];
+  };
+}
+
+const GeneralPostForm: React.FC<GeneralPostFormProps> = ({
+  onSubmit,
+  mode,
+  initialData,
+}) => {
   const [formData, setFormData] = useState({
-    title: '',
-    content: '',
-    images: [] as File[],
+    title: initialData?.title || '',
+    content: initialData?.content || '',
+    images: initialData?.images || ([] as File[]),
   });
 
   const handleChange = (
@@ -21,11 +32,11 @@ const CreateGeneralPost: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
     const postData = new FormData();
-    postData.append('categoria_idcategoria', '9'); // ID da categoria GENERAL
+    postData.append('categoria_idcategoria', '9'); // GENERAL
     postData.append('content', formData.content || formData.title);
 
     const metadata = {
@@ -35,23 +46,16 @@ const CreateGeneralPost: React.FC = () => {
     postData.append('metadata', JSON.stringify(metadata));
     formData.images.forEach((img) => postData.append('images', img));
 
-    try {
-      await axios.post('/posts', postData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      toast.success('Informação publicada com sucesso!');
-      navigate('/feed');
-    } catch (error: any) {
-      toast.error('Erro ao publicar informação.');
-      console.error(error);
-    }
+    onSubmit(postData);
   };
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
         <Typography variant="h2" className="text-primary text-center mb-6">
-          Publicar Informação Geral
+          {mode === 'create'
+            ? 'Publicar Informação Geral'
+            : 'Editar Informação Geral'}
         </Typography>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -80,11 +84,13 @@ const CreateGeneralPost: React.FC = () => {
             }
           />
 
-          <SubmitButton>Publicar</SubmitButton>
+          <SubmitButton>
+            {mode === 'create' ? 'Publicar' : 'Salvar Alterações'}
+          </SubmitButton>
         </form>
       </div>
     </main>
   );
 };
 
-export default CreateGeneralPost;
+export default GeneralPostForm;

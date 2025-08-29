@@ -1,21 +1,37 @@
+// src/components/posts/forms/CampaignPostForm.tsx
 import React, { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from '../../services/api';
-import { toast } from 'react-toastify';
-import Typography from '../../components/ui/Typography';
-import SubmitButton from '../../components/ui/SubmitButton';
-import ImageUpload from '../../components/ui/ImageUpload';
+import Typography from '../../../components/ui/Typography';
+import SubmitButton from '../../../components/ui/SubmitButton';
+import ImageUpload from '../../../components/ui/ImageUpload';
 
-const CreateCampaignPost: React.FC = () => {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    title: '',
-    goal: '',
-    deadline: '',
-    organizer: '',
-    content: '',
-    images: [] as File[],
-  });
+interface CampaignPostFormProps {
+  onSubmit: (data: FormData) => Promise<void>;
+  mode: 'create' | 'edit';
+  initialData?: {
+    title: string;
+    goal: string;
+    deadline: string;
+    organizer: string;
+    content: string;
+    images: File[];
+  };
+}
+
+const CampaignPostForm: React.FC<CampaignPostFormProps> = ({
+  onSubmit,
+  mode,
+  initialData,
+}) => {
+  const [formData, setFormData] = useState(
+    initialData || {
+      title: '',
+      goal: '',
+      deadline: '',
+      organizer: '',
+      content: '',
+      images: [] as File[],
+    }
+  );
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -28,7 +44,7 @@ const CreateCampaignPost: React.FC = () => {
     e.preventDefault();
 
     const postData = new FormData();
-    postData.append('categoria_idcategoria', '3'); // CAMPAIGN
+    postData.append('categoria_idcategoria', '3'); // Campaign
     postData.append('content', formData.content);
 
     const metadata = {
@@ -41,23 +57,14 @@ const CreateCampaignPost: React.FC = () => {
     postData.append('metadata', JSON.stringify(metadata));
     formData.images.forEach((img) => postData.append('images', img));
 
-    try {
-      await axios.post('/posts', postData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      toast.success('Campanha criada com sucesso!');
-      navigate('/feed');
-    } catch (error: any) {
-      toast.error('Erro ao criar campanha.');
-      console.error(error);
-    }
+    await onSubmit(postData);
   };
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
         <Typography variant="h2" className="text-primary text-center mb-6">
-          Nova Campanha
+          {mode === 'create' ? 'Nova Campanha' : 'Editar Campanha'}
         </Typography>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -110,19 +117,20 @@ const CreateCampaignPost: React.FC = () => {
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
 
-          {/* Upload de imagens (opcional) */}
           <ImageUpload
             images={formData.images}
-            onChange={(files) =>
+            onChange={(files: any) =>
               setFormData((prev) => ({ ...prev, images: files }))
             }
           />
 
-          <SubmitButton>Publicar</SubmitButton>
+          <SubmitButton>
+            {mode === 'create' ? 'Publicar' : 'Salvar alterações'}
+          </SubmitButton>
         </form>
       </div>
     </main>
   );
 };
 
-export default CreateCampaignPost;
+export default CampaignPostForm;

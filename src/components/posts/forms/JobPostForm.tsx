@@ -1,68 +1,69 @@
-import React, { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from '../../services/api';
-import { toast } from 'react-toastify';
-import Typography from '../../components/ui/Typography';
-import SubmitButton from '../../components/ui/SubmitButton';
-import ImageUpload from '../../components/ui/ImageUpload';
+// src/components/posts/forms/JobPostForm.tsx
+import React, { useState, FormEvent, ChangeEvent } from 'react';
+import Typography from '../../ui/Typography';
+import SubmitButton from '../../ui/SubmitButton';
+import ImageUpload from '../../ui/ImageUpload';
 
-const CreateEventPost: React.FC = () => {
-  const navigate = useNavigate();
+interface JobPostFormProps {
+  onSubmit: (data: FormData) => Promise<void>;
+  mode: 'create' | 'edit';
+  initialData?: {
+    title?: string;
+    requirements?: string;
+    content?: string;
+    images?: File[];
+  };
+}
+
+const JobPostForm: React.FC<JobPostFormProps> = ({
+  onSubmit,
+  mode,
+  initialData,
+}) => {
   const [formData, setFormData] = useState({
-    title: '',
-    location: '',
-    date: '',
-    content: '',
-    images: [] as File[],
+    title: initialData?.title || '',
+    requirements: initialData?.requirements || '',
+    content: initialData?.content || '',
+    images: initialData?.images || ([] as File[]),
   });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
     const postData = new FormData();
-    postData.append('categoria_idcategoria', '8'); // ID da categoria EVENT
+    postData.append('categoria_idcategoria', '7'); // JOB_OFFER
     postData.append('content', formData.content || formData.title);
 
     const metadata = {
       title: formData.title,
-      location: formData.location,
-      date: formData.date,
+      requirements: formData.requirements,
     };
 
     postData.append('metadata', JSON.stringify(metadata));
     formData.images.forEach((img) => postData.append('images', img));
 
-    try {
-      await axios.post('/posts', postData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      toast.success('Evento publicado com sucesso!');
-      navigate('/feed');
-    } catch (error: any) {
-      toast.error('Erro ao publicar evento.');
-      console.error(error);
-    }
+    onSubmit(postData);
   };
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
         <Typography variant="h2" className="text-primary text-center mb-6">
-          Novo Evento
+          {mode === 'create' ? 'Nova Vaga' : 'Editar Vaga'}
         </Typography>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
             name="title"
-            placeholder="Título do evento (ex: Feira de Saúde)"
+            placeholder="Título da vaga (ex: Assistente Social)"
             value={formData.title}
             onChange={handleChange}
             required
@@ -71,32 +72,21 @@ const CreateEventPost: React.FC = () => {
 
           <textarea
             name="content"
-            placeholder="Descrição do evento (opcional)"
+            placeholder="Descrição adicional da vaga (opcional)"
             value={formData.content}
             onChange={handleChange}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
 
-          <input
-            type="text"
-            name="location"
-            placeholder="Local (ex: Praça Central)"
-            value={formData.location}
+          <textarea
+            name="requirements"
+            placeholder="Requisitos da vaga (ex: formação, experiência)"
+            value={formData.requirements}
             onChange={handleChange}
             required
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
 
-          <input
-            type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-
-          {/* Upload de imagens */}
           <ImageUpload
             images={formData.images}
             onChange={(files) =>
@@ -104,11 +94,13 @@ const CreateEventPost: React.FC = () => {
             }
           />
 
-          <SubmitButton>Publicar</SubmitButton>
+          <SubmitButton>
+            {mode === 'create' ? 'Publicar' : 'Salvar Alterações'}
+          </SubmitButton>
         </form>
       </div>
     </main>
   );
 };
 
-export default CreateEventPost;
+export default JobPostForm;
