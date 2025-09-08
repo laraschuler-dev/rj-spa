@@ -10,6 +10,7 @@ import { formatTimeAgo } from '../utils/formatTimeAgo';
 import PostMenuButton from './ui/PostMenuButton';
 import { useEventAttendance } from '../hooks/useEventAttendance';
 import { useAuth } from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 interface PostCardProps {
   id: number;
@@ -68,6 +69,7 @@ const PostCard: React.FC<PostCardProps> = ({
   onOpenDetails,
 }) => {
   const [showComments, setShowComments] = useState(false);
+  const navigate = useNavigate();
   const postIdForAttendance = sharedBy?.postId ?? id;
   const postShareIdForAttendance = sharedBy?.shareId;
 
@@ -85,8 +87,6 @@ const PostCard: React.FC<PostCardProps> = ({
 
   const displayedAuthor =
     expanded && sharedBy ? sharedBy.originalAuthor || author : author;
-
-  console.log('onOpenDetails recebido?', onOpenDetails);
 
   return (
     <div className="bg-white shadow-md rounded-2xl p-4 space-y-3 max-w-[600px] mx-auto w-full">
@@ -169,7 +169,7 @@ const PostCard: React.FC<PostCardProps> = ({
           <PostMenuButton
             postId={id}
             className="absolute top-0 right-0"
-            onEdit={(p) => console.log('Editar', p)}
+            onEdit={(postId) => navigate(`/posts/edit/${postId}`)}
             onDelete={onDelete}
           />
         )}

@@ -1,19 +1,22 @@
-// src/components/posts/forms/CampaignPostForm.tsx
+// CampaignPostForm.tsx
 import React, { useState, FormEvent } from 'react';
 import Typography from '../../../components/ui/Typography';
 import SubmitButton from '../../../components/ui/SubmitButton';
 import ImageUpload from '../../../components/ui/ImageUpload';
+import { UploadImage } from '../../../types/upload';
+import { useDeletePostImage } from '../../../hooks/useDeletePostImage';
 
 interface CampaignPostFormProps {
   onSubmit: (data: FormData) => Promise<void>;
   mode: 'create' | 'edit';
   initialData?: {
+    id: number;
     title: string;
     goal: string;
     deadline: string;
     organizer: string;
     content: string;
-    images: File[];
+    images: UploadImage[];
   };
 }
 
@@ -22,16 +25,19 @@ const CampaignPostForm: React.FC<CampaignPostFormProps> = ({
   mode,
   initialData,
 }) => {
-  const [formData, setFormData] = useState(
-    initialData || {
-      title: '',
-      goal: '',
-      deadline: '',
-      organizer: '',
-      content: '',
-      images: [] as File[],
-    }
-  );
+  const postId = initialData?.id;
+
+  const { deleteImage } = useDeletePostImage(postId ?? 0);
+
+  const [formData, setFormData] = useState({
+    title: initialData?.title ?? '',
+    goal: initialData?.goal ?? '',
+    deadline: initialData?.deadline ?? '',
+    organizer: initialData?.organizer ?? '',
+    content: initialData?.content ?? '',
+    images: initialData?.images ?? [], // já vem do backend como {id, url} ou vazio para criação
+  });
+  console.log('[CampaignPostForm] initial formData.images:', formData.images);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -53,10 +59,22 @@ const CampaignPostForm: React.FC<CampaignPostFormProps> = ({
       deadline: formData.deadline,
       organizer: formData.organizer,
     };
-
     postData.append('metadata', JSON.stringify(metadata));
-    formData.images.forEach((img) => postData.append('images', img));
 
+    // arquivos novos
+    formData.images
+      .filter((img): img is File => img instanceof File)
+      .forEach((file) => postData.append('images', file));
+
+    // IDs das imagens existentes
+    const existingIds = formData.images
+      .filter(
+        (img): img is { id: number; url: string } => !(img instanceof File)
+      )
+      .map((img) => img.id);
+    postData.append('existingImageIds', JSON.stringify(existingIds));
+
+    console.log('Submitting post data:', postData);
     await onSubmit(postData);
   };
 
@@ -119,9 +137,33 @@ const CampaignPostForm: React.FC<CampaignPostFormProps> = ({
 
           <ImageUpload
             images={formData.images}
-            onChange={(files: any) =>
+            onChange={(files: UploadImage[]) =>
               setFormData((prev) => ({ ...prev, images: files }))
             }
+            onRemoveExisting={async (imageId: number) => {
+              console.log(
+                'Clicou em remover imagem:',
+                imageId,
+                'postId:',
+                postId
+              );
+              if (!postId) return;
+
+              await deleteImage(imageId);
+
+              setFormData((prev) => ({
+                ...prev,
+                images: prev.images.filter(
+                  (img) =>
+                    !(
+                      typeof img === 'object' &&
+                      'id' in img &&
+                      img.id === imageId
+                    )
+                ),
+              }));
+              console.log('Imagem removida do estado local:', imageId);
+            }}
           />
 
           <SubmitButton>

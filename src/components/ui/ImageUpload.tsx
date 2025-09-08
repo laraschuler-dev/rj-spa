@@ -1,76 +1,115 @@
-import React from 'react';
+// ImageUpload.tsx
+import React, { useEffect } from 'react';
+import { UploadImage } from '../../types/upload';
+import { X } from 'lucide-react';
+import { resolveImageUrl } from '../../utils/resolveImageUrl';
 
 interface ImageUploadProps {
-  images: File[];
-  onChange: (files: File[]) => void;
+  images: UploadImage[];
+  onChange: (images: UploadImage[]) => void;
+  onRemoveExisting?: (imageId: number) => Promise<void>; // remover no backend
+  maxImages?: number;
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange }) => {
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = e.target.files;
-    if (!selectedFiles || selectedFiles.length === 0) return;
+const ImageUpload: React.FC<ImageUploadProps> = ({
+  images,
+  onChange,
+  onRemoveExisting,
+  maxImages = 5,
+}) => {
+  const handleAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
 
-    const combined = [...images, ...Array.from(selectedFiles)].slice(0, 5);
-    onChange(combined);
+    const files = Array.from(e.target.files);
+    const newImages = [...images, ...files].slice(0, maxImages); // respeita limite
+    console.log('Adicionando novas imagens:', files);
+    onChange(newImages);
   };
 
-  const handleRemoveImage = (index: number) => {
-    const updated = images.filter((_, i) => i !== index);
-    onChange(updated);
+  const handleRemove = async (index: number) => {
+    const img = images[index];
+    console.log('Imagem a ser removida:', img);
+    console.log('Tipo da imagem:', typeof img);
+    console.log('Tem id?', img && typeof img === 'object' && 'id' in img);
+
+    if (img && typeof img === 'object' && 'id' in img && img.id > 0) {
+      console.log('Imagem existente detectada com id:', img.id);
+      if (onRemoveExisting) {
+        try {
+          console.log('Chamando onRemoveExisting para id:', img.id);
+          await onRemoveExisting(img.id);
+          console.log('onRemoveExisting finalizado para id:', img.id);
+          onChange(images.filter((_, i) => i !== index));
+          console.log('Imagem removida do estado local:', img.id);
+        } catch (error) {
+          console.error('Erro ao remover imagem no backend:', error);
+        }
+      }
+    } else if (img instanceof File) {
+      console.log('Imagem nova detectada (File), removendo localmente.');
+      onChange(images.filter((_, i) => i !== index));
+    } else if (typeof img === 'string') {
+      console.log('Imagem como string detectada, removendo localmente.');
+      onChange(images.filter((_, i) => i !== index));
+    } else {
+      console.warn('Tipo de imagem não reconhecido:', img);
+    }
   };
+
+  // previne memory leaks ao usar URL.createObjectURL
+  useEffect(() => {
+    const objectUrls: string[] = [];
+
+    images.forEach((img) => {
+      if (img instanceof File) {
+        const url = URL.createObjectURL(img);
+        objectUrls.push(url);
+      }
+    });
+
+    return () => {
+      objectUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [images]);
 
   return (
-    <>
-      <label
-        htmlFor="imageUpload"
-        className="w-full flex items-center justify-center gap-2 border border-dashed border-gray-400 rounded-lg px-4 py-3 text-sm text-gray-600 cursor-pointer hover:border-primary hover:bg-gray-50 transition"
-      >
-        <svg
-          className="w-5 h-5 text-primary"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M3 16l4-4a2 2 0 012.828 0l2.344 2.344a2 2 0 002.828 0L21 7M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-          />
-        </svg>
-        <span>Selecionar imagens (até 5)</span>
-        <input
-          id="imageUpload"
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={handleFileChange}
-          className="hidden"
-        />
-      </label>
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2">
+        console.log('[ImageUpload] props.images:', images);
+        {images.map((img, index) => {
+          let src = '';
 
-      {images.length > 0 && (
-        <div className="mt-4 grid grid-cols-3 gap-3">
-          {images.map((image, index) => (
-            <div key={index} className="relative group">
+          if (img instanceof File) {
+            src = URL.createObjectURL(img);
+          } else if (typeof img === 'string') {
+            src = resolveImageUrl(img);
+          } else if (typeof img === 'object' && 'url' in img) {
+            src = resolveImageUrl(img.url);
+          }
+
+          return (
+            <div key={index} className="relative w-24 h-24">
               <img
-                src={URL.createObjectURL(image)}
-                alt={`Imagem ${index + 1}`}
-                className="w-full h-24 object-cover rounded-lg shadow"
+                src={src}
+                alt="preview"
+                className="w-full h-full object-cover rounded-lg border"
               />
               <button
                 type="button"
-                onClick={() => handleRemoveImage(index)}
-                className="absolute top-1 right-1 bg-black bg-opacity-50 text-white rounded-full p-1 text-xs opacity-0 group-hover:opacity-100 transition"
-                aria-label="Remover imagem"
+                onClick={() => handleRemove(index)}
+                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
               >
-                ✕
+                <X size={14} />
               </button>
             </div>
-          ))}
-        </div>
+          );
+        })}
+      </div>
+
+      {images.length < maxImages && (
+        <input type="file" multiple accept="image/*" onChange={handleAdd} />
       )}
-    </>
+    </div>
   );
 };
 
