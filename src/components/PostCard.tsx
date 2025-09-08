@@ -48,6 +48,7 @@ interface PostCardProps {
   expanded?: boolean;
   isInModal?: boolean;
   onOpenDetails?: (postId: number, shareId?: number) => void;
+  onEdit?: (postId: number) => void;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -67,6 +68,7 @@ const PostCard: React.FC<PostCardProps> = ({
   expanded = false,
   isInModal = false,
   onOpenDetails,
+  onEdit,
 }) => {
   const [showComments, setShowComments] = useState(false);
   const navigate = useNavigate();
@@ -169,7 +171,7 @@ const PostCard: React.FC<PostCardProps> = ({
           <PostMenuButton
             postId={id}
             className="absolute top-0 right-0"
-            onEdit={(postId) => navigate(`/posts/edit/${postId}`)}
+            onEdit={onEdit}
             onDelete={onDelete}
           />
         )}

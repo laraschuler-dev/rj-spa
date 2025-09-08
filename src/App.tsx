@@ -14,7 +14,6 @@ import ProfileView from './pages/ProfileView';
 import ProfileEdit from './pages/ProfileEdit';
 import AccountSettings from './pages/AccountSettings';
 import CreatePostPage from './pages/posts/CreatePostPage';
-import EditPostPage from './pages/posts/EditPostPage';
 
 const App = () => {
   return (
@@ -37,7 +36,6 @@ const App = () => {
                 path="posts/create/:categoryId"
                 element={<CreatePostPage />}
               />
-              <Route path="/posts/edit/:id" element={<EditPostPage />} />
               <Route path="/profile" element={<ProfileView />} />
               <Route path="/profile/edit" element={<ProfileEdit />} />
               <Route path="/profile/edit" element={<ProfileEdit />} />
