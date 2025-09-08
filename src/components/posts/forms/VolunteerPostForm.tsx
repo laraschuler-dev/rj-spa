@@ -3,17 +3,20 @@ import React, { useState, FormEvent, ChangeEvent } from 'react';
 import Typography from '../../ui/Typography';
 import SubmitButton from '../../ui/SubmitButton';
 import ImageUpload from '../../ui/ImageUpload';
+import { UploadImage } from '../../../types/upload';
+import { useDeletePostImage } from '../../../hooks/useDeletePostImage';
 
 interface VolunteerPostFormProps {
   onSubmit: (data: FormData) => Promise<void>;
   mode: 'create' | 'edit';
   initialData?: {
+    id: number;
     title?: string;
     serviceType?: string;
     availability?: string;
     qualifications?: string;
     content?: string;
-    images?: File[];
+    images?: UploadImage[];
   };
 }
 
@@ -22,13 +25,16 @@ const VolunteerPostForm: React.FC<VolunteerPostFormProps> = ({
   mode,
   initialData,
 }) => {
+  const postId = initialData?.id;
+  const { deleteImage } = useDeletePostImage(postId ?? 0);
+
   const [formData, setFormData] = useState({
-    title: initialData?.title || '',
-    serviceType: initialData?.serviceType || '',
-    availability: initialData?.availability || '',
-    qualifications: initialData?.qualifications || '',
-    content: initialData?.content || '',
-    images: initialData?.images || ([] as File[]),
+    title: initialData?.title ?? '',
+    serviceType: initialData?.serviceType ?? '',
+    availability: initialData?.availability ?? '',
+    qualifications: initialData?.qualifications ?? '',
+    content: initialData?.content ?? '',
+    images: initialData?.images ?? [], // suporta {id, url} ou File
   });
 
   const handleChange = (
@@ -38,7 +44,7 @@ const VolunteerPostForm: React.FC<VolunteerPostFormProps> = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     const postData = new FormData();
@@ -51,11 +57,22 @@ const VolunteerPostForm: React.FC<VolunteerPostFormProps> = ({
       availability: formData.availability,
       qualifications: formData.qualifications,
     };
-
     postData.append('metadata', JSON.stringify(metadata));
-    formData.images.forEach((img) => postData.append('images', img));
 
-    onSubmit(postData);
+    // arquivos novos
+    formData.images
+      .filter((img): img is File => img instanceof File)
+      .forEach((file) => postData.append('images', file));
+
+    // IDs das imagens existentes
+    const existingIds = formData.images
+      .filter(
+        (img): img is { id: number; url: string } => !(img instanceof File)
+      )
+      .map((img) => img.id);
+    postData.append('existingImageIds', JSON.stringify(existingIds));
+
+    await onSubmit(postData);
   };
 
   return (
@@ -116,9 +133,24 @@ const VolunteerPostForm: React.FC<VolunteerPostFormProps> = ({
 
           <ImageUpload
             images={formData.images}
-            onChange={(files) =>
+            onChange={(files: UploadImage[]) =>
               setFormData((prev) => ({ ...prev, images: files }))
             }
+            onRemoveExisting={async (imageId: number) => {
+              if (!postId) return;
+              await deleteImage(imageId);
+              setFormData((prev) => ({
+                ...prev,
+                images: prev.images.filter(
+                  (img) =>
+                    !(
+                      typeof img === 'object' &&
+                      'id' in img &&
+                      img.id === imageId
+                    )
+                ),
+              }));
+            }}
           />
 
           <SubmitButton>

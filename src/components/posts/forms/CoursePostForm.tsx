@@ -3,17 +3,20 @@ import React, { useState, FormEvent } from 'react';
 import Typography from '../../ui/Typography';
 import SubmitButton from '../../ui/SubmitButton';
 import ImageUpload from '../../ui/ImageUpload';
+import { UploadImage } from '../../../types/upload';
+import { useDeletePostImage } from '../../../hooks/useDeletePostImage';
 
 interface CoursePostFormProps {
   onSubmit: (data: FormData) => Promise<void>;
   mode: 'create' | 'edit';
   initialData?: {
+    id: number;
     title?: string;
     content?: string;
     format?: string;
     duration?: string;
     requirements?: string;
-    images?: File[];
+    images?: UploadImage[];
   };
 }
 
@@ -22,13 +25,16 @@ const CoursePostForm: React.FC<CoursePostFormProps> = ({
   mode,
   initialData,
 }) => {
+  const postId = initialData?.id;
+  const { deleteImage } = useDeletePostImage(postId ?? 0);
+
   const [formData, setFormData] = useState({
-    title: initialData?.title || '',
-    content: initialData?.content || '',
-    format: initialData?.format || '',
-    duration: initialData?.duration || '',
-    requirements: initialData?.requirements || '',
-    images: initialData?.images || ([] as File[]),
+    title: initialData?.title ?? '',
+    content: initialData?.content ?? '',
+    format: initialData?.format ?? '',
+    duration: initialData?.duration ?? '',
+    requirements: initialData?.requirements ?? '',
+    images: initialData?.images ?? [], // já suporta {id, url} ou novos arquivos
   });
 
   const handleChange = (
@@ -38,7 +44,7 @@ const CoursePostForm: React.FC<CoursePostFormProps> = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     const postData = new FormData();
@@ -53,9 +59,20 @@ const CoursePostForm: React.FC<CoursePostFormProps> = ({
     };
     postData.append('metadata', JSON.stringify(metadata));
 
-    formData.images.forEach((img) => postData.append('images', img));
+    // arquivos novos
+    formData.images
+      .filter((img): img is File => img instanceof File)
+      .forEach((file) => postData.append('images', file));
 
-    onSubmit(postData);
+    // IDs das imagens existentes
+    const existingIds = formData.images
+      .filter(
+        (img): img is { id: number; url: string } => !(img instanceof File)
+      )
+      .map((img) => img.id);
+    postData.append('existingImageIds', JSON.stringify(existingIds));
+
+    await onSubmit(postData);
   };
 
   return (
@@ -116,9 +133,24 @@ const CoursePostForm: React.FC<CoursePostFormProps> = ({
 
           <ImageUpload
             images={formData.images}
-            onChange={(files) =>
+            onChange={(files: UploadImage[]) =>
               setFormData((prev) => ({ ...prev, images: files }))
             }
+            onRemoveExisting={async (imageId: number) => {
+              if (!postId) return;
+              await deleteImage(imageId);
+              setFormData((prev) => ({
+                ...prev,
+                images: prev.images.filter(
+                  (img) =>
+                    !(
+                      typeof img === 'object' &&
+                      'id' in img &&
+                      img.id === imageId
+                    )
+                ),
+              }));
+            }}
           />
 
           <SubmitButton>

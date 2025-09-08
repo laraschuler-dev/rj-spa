@@ -69,7 +69,7 @@ function Sidebar({ isFeed = false }: SidebarProps) {
           <MdOutlineCampaign size={20} /> Criar Campanha
         </Link>
         <Link
-          to="/posts/create/3"
+          to="/posts/create/6"
           className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
         >
           <PiStudent size={20} /> Oferecer Curso

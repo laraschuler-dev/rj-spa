@@ -3,11 +3,19 @@ import React, { useState, FormEvent } from 'react';
 import Typography from '../../ui/Typography';
 import SubmitButton from '../../ui/SubmitButton';
 import ImageUpload from '../../ui/ImageUpload';
+import { UploadImage } from '../../../types/upload';
+import { useDeletePostImage } from '../../../hooks/useDeletePostImage';
 
 interface ComplaintPostFormProps {
-  onSubmit: (data: FormData) => Promise<void>; // ✅ corrigido Promise<void>
+  onSubmit: (data: FormData) => Promise<void>;
   mode: 'create' | 'edit';
-  initialData?: any; // opcional para edição futura
+  initialData?: {
+    id: number;
+    title: string;
+    description: string;
+    isAnonymous: boolean;
+    images: UploadImage[];
+  };
 }
 
 const ComplaintPostForm: React.FC<ComplaintPostFormProps> = ({
@@ -15,11 +23,14 @@ const ComplaintPostForm: React.FC<ComplaintPostFormProps> = ({
   mode,
   initialData,
 }) => {
+  const postId = initialData?.id;
+  const { deleteImage } = useDeletePostImage(postId ?? 0);
+
   const [formData, setFormData] = useState({
-    title: initialData?.title || '',
-    description: initialData?.description || '',
-    isAnonymous: initialData?.isAnonymous || false,
-    images: initialData?.images || ([] as File[]),
+    title: initialData?.title ?? '',
+    description: initialData?.description ?? '',
+    isAnonymous: initialData?.isAnonymous ?? false,
+    images: initialData?.images ?? [],
   });
 
   const handleChange = (
@@ -37,7 +48,7 @@ const ComplaintPostForm: React.FC<ComplaintPostFormProps> = ({
     e.preventDefault();
 
     const postData = new FormData();
-    postData.append('categoria_idcategoria', '2'); // ✅ Complaint
+    postData.append('categoria_idcategoria', '2'); // Complaint
     postData.append('content', formData.description);
 
     const metadata = {
@@ -47,9 +58,20 @@ const ComplaintPostForm: React.FC<ComplaintPostFormProps> = ({
     };
     postData.append('metadata', JSON.stringify(metadata));
 
-    formData.images.forEach((img) => postData.append('images', img));
+    // arquivos novos
+    formData.images
+      .filter((img): img is File => img instanceof File)
+      .forEach((file) => postData.append('images', file));
 
-    await onSubmit(postData); // ✅ garante retorno compatível com Promise<void>
+    // IDs das imagens existentes
+    const existingIds = formData.images
+      .filter(
+        (img): img is { id: number; url: string } => !(img instanceof File)
+      )
+      .map((img) => img.id);
+    postData.append('existingImageIds', JSON.stringify(existingIds));
+
+    await onSubmit(postData);
   };
 
   return (
@@ -92,9 +114,24 @@ const ComplaintPostForm: React.FC<ComplaintPostFormProps> = ({
 
           <ImageUpload
             images={formData.images}
-            onChange={(files) =>
+            onChange={(files: UploadImage[]) =>
               setFormData((prev) => ({ ...prev, images: files }))
             }
+            onRemoveExisting={async (imageId: number) => {
+              if (!postId) return;
+              await deleteImage(imageId);
+              setFormData((prev) => ({
+                ...prev,
+                images: prev.images.filter(
+                  (img) =>
+                    !(
+                      typeof img === 'object' &&
+                      'id' in img &&
+                      img.id === imageId
+                    )
+                ),
+              }));
+            }}
           />
 
           <SubmitButton>
