@@ -2,6 +2,8 @@
 import Typography from '../ui/Typography';
 import { resolveImageUrl } from '../../utils/resolveImageUrl';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
 
 interface PostPreviewCardProps {
   author: { name: string; avatarUrl?: string };
@@ -55,20 +57,17 @@ const PostPreviewCard: React.FC<PostPreviewCardProps> = ({
 
       {/* Imagens */}
       {images?.length ? (
-        <div
-          className={`grid gap-2 ${
-            images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'
-          }`}
-        >
+        <Swiper spaceBetween={8} slidesPerView={1} className="rounded-xl">
           {images.map((img) => (
-            <img
-              key={img.id}
-              src={resolveImageUrl(img.url)}
-              alt="post image"
-              className="w-full max-h-60 rounded-xl object-cover"
-            />
+            <SwiperSlide key={img.id}>
+              <img
+                src={resolveImageUrl(img.url)}
+                alt="post image"
+                className="w-full aspect-[4/3] md:aspect-[16/9] object-cover rounded-xl"
+              />
+            </SwiperSlide>
           ))}
-        </div>
+        </Swiper>
       ) : null}
     </div>
   );
