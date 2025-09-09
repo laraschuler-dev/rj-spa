@@ -75,7 +75,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap gap-2">
-        console.log('[ImageUpload] props.images:', images);
         {images.map((img, index) => {
           let src = '';
 

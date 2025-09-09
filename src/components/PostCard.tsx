@@ -48,7 +48,7 @@ interface PostCardProps {
   expanded?: boolean;
   isInModal?: boolean;
   onOpenDetails?: (postId: number, shareId?: number) => void;
-  onEdit?: (postId: number) => void;
+  onEdit?: (postId: number, shareId?: number) => void;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -119,7 +119,7 @@ const PostCard: React.FC<PostCardProps> = ({
                 postId={sharedBy.postId}
                 shareId={sharedBy.shareId}
                 className="absolute top-0 right-0"
-                onEdit={(p, s) => console.log('Editar', p, s)}
+                onEdit={onEdit}
                 onDelete={onDelete}
               />
             )}
