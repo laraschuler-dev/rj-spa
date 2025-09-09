@@ -14,6 +14,7 @@ interface PostFormFactoryProps {
   mode: 'create' | 'edit';
   onSubmit: (data: FormData) => Promise<void>;
   initialData?: any;
+  onClose?: () => void;
 }
 
 const formMap: Record<number, React.FC<PostFormFactoryProps>> = {
@@ -33,6 +34,7 @@ const PostFormFactory: React.FC<PostFormFactoryProps> = ({
   mode,
   onSubmit,
   initialData,
+  onClose,
 }) => {
   const FormComponent = formMap[categoryId];
 
@@ -46,6 +48,7 @@ const PostFormFactory: React.FC<PostFormFactoryProps> = ({
       mode={mode}
       onSubmit={onSubmit}
       initialData={initialData}
+      onClose={onClose}
     />
   );
 };

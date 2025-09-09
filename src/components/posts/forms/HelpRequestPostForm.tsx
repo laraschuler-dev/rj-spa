@@ -6,6 +6,7 @@ import ImageUpload from '../../ui/ImageUpload';
 import CustomSelect from '../../ui/CustomSelect';
 import { UploadImage } from '../../../types/upload';
 import { useDeletePostImage } from '../../../hooks/useDeletePostImage';
+import CancelButton from '../../ui/CancelButton';
 
 interface HelpRequestPostFormProps {
   onSubmit: (data: FormData) => Promise<void>;
@@ -19,12 +20,14 @@ interface HelpRequestPostFormProps {
     content?: string;
     images?: UploadImage[];
   };
+  onClose?: () => void;
 }
 
 const HelpRequestPostForm: React.FC<HelpRequestPostFormProps> = ({
   onSubmit,
   mode,
   initialData,
+  onClose,
 }) => {
   const postId = initialData?.id;
   const { deleteImage } = useDeletePostImage(postId ?? 0);
@@ -159,6 +162,7 @@ const HelpRequestPostForm: React.FC<HelpRequestPostFormProps> = ({
           <SubmitButton>
             {mode === 'create' ? 'Publicar' : 'Salvar Alterações'}
           </SubmitButton>
+          <CancelButton mode={mode} onCloseModal={onClose} />
         </form>
       </div>
     </main>

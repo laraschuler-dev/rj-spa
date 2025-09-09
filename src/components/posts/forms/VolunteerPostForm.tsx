@@ -5,6 +5,7 @@ import SubmitButton from '../../ui/SubmitButton';
 import ImageUpload from '../../ui/ImageUpload';
 import { UploadImage } from '../../../types/upload';
 import { useDeletePostImage } from '../../../hooks/useDeletePostImage';
+import CancelButton from '../../ui/CancelButton';
 
 interface VolunteerPostFormProps {
   onSubmit: (data: FormData) => Promise<void>;
@@ -18,12 +19,14 @@ interface VolunteerPostFormProps {
     content?: string;
     images?: UploadImage[];
   };
+  onClose?: () => void;
 }
 
 const VolunteerPostForm: React.FC<VolunteerPostFormProps> = ({
   onSubmit,
   mode,
   initialData,
+  onClose,
 }) => {
   const postId = initialData?.id;
   const { deleteImage } = useDeletePostImage(postId ?? 0);
@@ -156,6 +159,7 @@ const VolunteerPostForm: React.FC<VolunteerPostFormProps> = ({
           <SubmitButton>
             {mode === 'create' ? 'Publicar' : 'Salvar Alterações'}
           </SubmitButton>
+          <CancelButton mode={mode} onCloseModal={onClose} />
         </form>
       </div>
     </main>

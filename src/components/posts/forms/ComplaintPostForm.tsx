@@ -5,6 +5,7 @@ import SubmitButton from '../../ui/SubmitButton';
 import ImageUpload from '../../ui/ImageUpload';
 import { UploadImage } from '../../../types/upload';
 import { useDeletePostImage } from '../../../hooks/useDeletePostImage';
+import CancelButton from '../../ui/CancelButton';
 
 interface ComplaintPostFormProps {
   onSubmit: (data: FormData) => Promise<void>;
@@ -16,12 +17,14 @@ interface ComplaintPostFormProps {
     isAnonymous: boolean;
     images: UploadImage[];
   };
+  onClose?: () => void;
 }
 
 const ComplaintPostForm: React.FC<ComplaintPostFormProps> = ({
   onSubmit,
   mode,
   initialData,
+  onClose,
 }) => {
   const postId = initialData?.id;
   const { deleteImage } = useDeletePostImage(postId ?? 0);
@@ -137,6 +140,8 @@ const ComplaintPostForm: React.FC<ComplaintPostFormProps> = ({
           <SubmitButton>
             {mode === 'create' ? 'Enviar Denúncia' : 'Salvar Alterações'}
           </SubmitButton>
+
+          <CancelButton mode={mode} onCloseModal={onClose} />
         </form>
       </div>
     </main>

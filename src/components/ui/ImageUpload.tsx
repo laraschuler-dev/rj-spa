@@ -28,35 +28,26 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
   const handleRemove = async (index: number) => {
     const img = images[index];
-    console.log('Imagem a ser removida:', img);
-    console.log('Tipo da imagem:', typeof img);
-    console.log('Tem id?', img && typeof img === 'object' && 'id' in img);
 
     if (img && typeof img === 'object' && 'id' in img && img.id > 0) {
       console.log('Imagem existente detectada com id:', img.id);
       if (onRemoveExisting) {
         try {
-          console.log('Chamando onRemoveExisting para id:', img.id);
           await onRemoveExisting(img.id);
-          console.log('onRemoveExisting finalizado para id:', img.id);
           onChange(images.filter((_, i) => i !== index));
-          console.log('Imagem removida do estado local:', img.id);
         } catch (error) {
           console.error('Erro ao remover imagem no backend:', error);
         }
       }
     } else if (img instanceof File) {
-      console.log('Imagem nova detectada (File), removendo localmente.');
       onChange(images.filter((_, i) => i !== index));
     } else if (typeof img === 'string') {
-      console.log('Imagem como string detectada, removendo localmente.');
       onChange(images.filter((_, i) => i !== index));
     } else {
       console.warn('Tipo de imagem não reconhecido:', img);
     }
   };
 
-  // previne memory leaks ao usar URL.createObjectURL
   useEffect(() => {
     const objectUrls: string[] = [];
 
@@ -106,7 +97,33 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       </div>
 
       {images.length < maxImages && (
-        <input type="file" multiple accept="image/*" onChange={handleAdd} />
+        <label
+          htmlFor="imageUpload"
+          className="w-full flex items-center justify-center gap-2 border border-dashed border-gray-400 rounded-lg px-4 py-3 text-sm text-gray-600 cursor-pointer hover:border-primary hover:bg-gray-50 transition"
+        >
+          <svg
+            className="w-5 h-5 text-primary"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M3 16l4-4a2 2 0 012.828 0l2.344 2.344a2 2 0 002.828 0L21 7M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+            />
+          </svg>
+          <span>Selecionar imagens (até {maxImages})</span>
+          <input
+            id="imageUpload"
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleAdd}
+            className="hidden"
+          />
+        </label>
       )}
     </div>
   );

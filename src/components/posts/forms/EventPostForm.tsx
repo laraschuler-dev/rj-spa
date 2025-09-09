@@ -5,6 +5,7 @@ import SubmitButton from '../../ui/SubmitButton';
 import ImageUpload from '../../ui/ImageUpload';
 import { UploadImage } from '../../../types/upload';
 import { useDeletePostImage } from '../../../hooks/useDeletePostImage';
+import CancelButton from '../../ui/CancelButton';
 
 interface EventPostFormProps {
   onSubmit: (data: FormData) => Promise<void>;
@@ -17,12 +18,14 @@ interface EventPostFormProps {
     date?: string;
     images?: UploadImage[];
   };
+  onClose?: () => void;
 }
 
 const EventPostForm: React.FC<EventPostFormProps> = ({
   onSubmit,
   mode,
   initialData,
+  onClose,
 }) => {
   const postId = initialData?.id;
   const { deleteImage } = useDeletePostImage(postId ?? 0);
@@ -142,6 +145,8 @@ const EventPostForm: React.FC<EventPostFormProps> = ({
           <SubmitButton>
             {mode === 'create' ? 'Publicar' : 'Salvar Alterações'}
           </SubmitButton>
+
+          <CancelButton mode={mode} onCloseModal={onClose} />
         </form>
       </div>
     </main>

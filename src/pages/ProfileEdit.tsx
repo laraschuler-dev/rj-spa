@@ -8,6 +8,7 @@ import { CgProfile } from 'react-icons/cg';
 import SubmitButton from '../components/ui/SubmitButton';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import CancelButton from '../components/ui/CancelButton';
 
 const profileOptions = [
   { value: '', label: 'Perfil' },
@@ -178,12 +179,7 @@ const ProfileEdit: React.FC = () => {
 
         <div className="flex flex-col items-center gap-2">
           <SubmitButton>Salvar</SubmitButton>
-          <Link
-            to="/profile"
-            className="text-sm text-red-500 hover:text-red-600 hover:underline transition"
-          >
-            Cancelar
-          </Link>
+          <CancelButton className="mx-auto block" />
         </div>
       </form>
     </main>

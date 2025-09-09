@@ -6,6 +6,7 @@ import CustomSelect from '../../ui/CustomSelect';
 import ImageUpload from '../../ui/ImageUpload';
 import { UploadImage } from '../../../types/upload';
 import { useDeletePostImage } from '../../../hooks/useDeletePostImage';
+import CancelButton from '../../ui/CancelButton';
 
 interface DonationPostFormProps {
   onSubmit: (data: FormData) => Promise<void>;
@@ -21,12 +22,14 @@ interface DonationPostFormProps {
     availability?: string;
     images?: UploadImage[];
   };
+  onClose?: () => void;
 }
 
 const DonationPostForm: React.FC<DonationPostFormProps> = ({
   onSubmit,
   mode,
   initialData,
+  onClose,
 }) => {
   const postId = initialData?.id;
   const { deleteImage } = useDeletePostImage(postId ?? 0);
@@ -189,6 +192,8 @@ const DonationPostForm: React.FC<DonationPostFormProps> = ({
           <SubmitButton>
             {mode === 'create' ? 'Publicar' : 'Salvar Alterações'}
           </SubmitButton>
+
+          <CancelButton mode={mode} onCloseModal={onClose} />
         </form>
       </div>
     </main>

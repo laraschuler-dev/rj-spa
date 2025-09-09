@@ -74,6 +74,7 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
             onClose();
             onSuccess?.();
           }}
+          onClose={onClose}
         />
       </div>
     </div>

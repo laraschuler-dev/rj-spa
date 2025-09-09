@@ -5,6 +5,7 @@ import SubmitButton from '../../../components/ui/SubmitButton';
 import ImageUpload from '../../../components/ui/ImageUpload';
 import { UploadImage } from '../../../types/upload';
 import { useDeletePostImage } from '../../../hooks/useDeletePostImage';
+import CancelButton from '../../ui/CancelButton';
 
 interface CampaignPostFormProps {
   onSubmit: (data: FormData) => Promise<void>;
@@ -18,12 +19,14 @@ interface CampaignPostFormProps {
     content: string;
     images: UploadImage[];
   };
+  onClose?: () => void;
 }
 
 const CampaignPostForm: React.FC<CampaignPostFormProps> = ({
   onSubmit,
   mode,
   initialData,
+  onClose,
 }) => {
   const postId = initialData?.id;
 
@@ -169,6 +172,8 @@ const CampaignPostForm: React.FC<CampaignPostFormProps> = ({
           <SubmitButton>
             {mode === 'create' ? 'Publicar' : 'Salvar alterações'}
           </SubmitButton>
+
+          <CancelButton mode={mode} onCloseModal={onClose} />
         </form>
       </div>
     </main>

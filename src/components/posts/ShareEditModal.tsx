@@ -85,7 +85,10 @@ const ShareEditModal: React.FC<ShareEditModalProps> = ({
                 <X size={20} />
               </button>
 
-              <Typography variant="h2" className="text-lg font-semibold mb-3">
+              <Typography
+                variant="h2"
+                className="text-primary text-center mb-6"
+              >
                 Editar Compartilhamento
               </Typography>
 
