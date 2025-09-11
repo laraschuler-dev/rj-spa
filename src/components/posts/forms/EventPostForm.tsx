@@ -1,19 +1,41 @@
+// src/components/posts/forms/EventPostForm.tsx
 import React, { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from '../../services/api';
-import { toast } from 'react-toastify';
-import Typography from '../../components/ui/Typography';
-import SubmitButton from '../../components/ui/SubmitButton';
-import ImageUpload from '../../components/ui/ImageUpload';
+import Typography from '../../ui/Typography';
+import SubmitButton from '../../ui/SubmitButton';
+import ImageUpload from '../../ui/ImageUpload';
+import { UploadImage } from '../../../types/upload';
+import { useDeletePostImage } from '../../../hooks/useDeletePostImage';
+import CancelButton from '../../ui/CancelButton';
 
-const CreateEventPost: React.FC = () => {
-  const navigate = useNavigate();
+interface EventPostFormProps {
+  onSubmit: (data: FormData) => Promise<void>;
+  mode: 'create' | 'edit';
+  initialData?: {
+    id: number;
+    title?: string;
+    content?: string;
+    location?: string;
+    date?: string;
+    images?: UploadImage[];
+  };
+  onClose?: () => void;
+}
+
+const EventPostForm: React.FC<EventPostFormProps> = ({
+  onSubmit,
+  mode,
+  initialData,
+  onClose,
+}) => {
+  const postId = initialData?.id;
+  const { deleteImage } = useDeletePostImage(postId ?? 0);
+
   const [formData, setFormData] = useState({
-    title: '',
-    location: '',
-    date: '',
-    content: '',
-    images: [] as File[],
+    title: initialData?.title ?? '',
+    content: initialData?.content ?? '',
+    location: initialData?.location ?? '',
+    date: initialData?.date ?? '',
+    images: initialData?.images ?? [], // suporta {id, url} ou File
   });
 
   const handleChange = (
@@ -27,7 +49,7 @@ const CreateEventPost: React.FC = () => {
     e.preventDefault();
 
     const postData = new FormData();
-    postData.append('categoria_idcategoria', '8'); // ID da categoria EVENT
+    postData.append('categoria_idcategoria', '8'); // EVENT
     postData.append('content', formData.content || formData.title);
 
     const metadata = {
@@ -35,27 +57,29 @@ const CreateEventPost: React.FC = () => {
       location: formData.location,
       date: formData.date,
     };
-
     postData.append('metadata', JSON.stringify(metadata));
-    formData.images.forEach((img) => postData.append('images', img));
 
-    try {
-      await axios.post('/posts', postData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      toast.success('Evento publicado com sucesso!');
-      navigate('/feed');
-    } catch (error: any) {
-      toast.error('Erro ao publicar evento.');
-      console.error(error);
-    }
+    // arquivos novos
+    formData.images
+      .filter((img): img is File => img instanceof File)
+      .forEach((file) => postData.append('images', file));
+
+    // IDs das imagens existentes
+    const existingIds = formData.images
+      .filter(
+        (img): img is { id: number; url: string } => !(img instanceof File)
+      )
+      .map((img) => img.id);
+    postData.append('existingImageIds', JSON.stringify(existingIds));
+
+    await onSubmit(postData);
   };
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
         <Typography variant="h2" className="text-primary text-center mb-6">
-          Novo Evento
+          {mode === 'create' ? 'Novo Evento' : 'Editar Evento'}
         </Typography>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -96,19 +120,37 @@ const CreateEventPost: React.FC = () => {
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
 
-          {/* Upload de imagens */}
           <ImageUpload
             images={formData.images}
-            onChange={(files) =>
+            onChange={(files: UploadImage[]) =>
               setFormData((prev) => ({ ...prev, images: files }))
             }
+            onRemoveExisting={async (imageId: number) => {
+              if (!postId) return;
+              await deleteImage(imageId);
+              setFormData((prev) => ({
+                ...prev,
+                images: prev.images.filter(
+                  (img) =>
+                    !(
+                      typeof img === 'object' &&
+                      'id' in img &&
+                      img.id === imageId
+                    )
+                ),
+              }));
+            }}
           />
 
-          <SubmitButton>Publicar</SubmitButton>
+          <SubmitButton>
+            {mode === 'create' ? 'Publicar' : 'Salvar Alterações'}
+          </SubmitButton>
+
+          <CancelButton mode={mode} onCloseModal={onClose} />
         </form>
       </div>
     </main>
   );
 };
 
-export default CreateEventPost;
+export default EventPostForm;

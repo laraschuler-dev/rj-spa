@@ -10,6 +10,7 @@ import { formatTimeAgo } from '../utils/formatTimeAgo';
 import PostMenuButton from './ui/PostMenuButton';
 import { useEventAttendance } from '../hooks/useEventAttendance';
 import { useAuth } from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 interface PostCardProps {
   id: number;
@@ -47,6 +48,7 @@ interface PostCardProps {
   expanded?: boolean;
   isInModal?: boolean;
   onOpenDetails?: (postId: number, shareId?: number) => void;
+  onEdit?: (postId: number, shareId?: number) => void;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -66,8 +68,10 @@ const PostCard: React.FC<PostCardProps> = ({
   expanded = false,
   isInModal = false,
   onOpenDetails,
+  onEdit,
 }) => {
   const [showComments, setShowComments] = useState(false);
+  const navigate = useNavigate();
   const postIdForAttendance = sharedBy?.postId ?? id;
   const postShareIdForAttendance = sharedBy?.shareId;
 
@@ -85,8 +89,6 @@ const PostCard: React.FC<PostCardProps> = ({
 
   const displayedAuthor =
     expanded && sharedBy ? sharedBy.originalAuthor || author : author;
-
-  console.log('onOpenDetails recebido?', onOpenDetails);
 
   return (
     <div className="bg-white shadow-md rounded-2xl p-4 space-y-3 max-w-[600px] mx-auto w-full">
@@ -117,7 +119,7 @@ const PostCard: React.FC<PostCardProps> = ({
                 postId={sharedBy.postId}
                 shareId={sharedBy.shareId}
                 className="absolute top-0 right-0"
-                onEdit={(p, s) => console.log('Editar', p, s)}
+                onEdit={onEdit}
                 onDelete={onDelete}
               />
             )}
@@ -169,7 +171,7 @@ const PostCard: React.FC<PostCardProps> = ({
           <PostMenuButton
             postId={id}
             className="absolute top-0 right-0"
-            onEdit={(p) => console.log('Editar', p)}
+            onEdit={onEdit}
             onDelete={onDelete}
           />
         )}

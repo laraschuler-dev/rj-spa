@@ -3,7 +3,7 @@ import axios from '../services/api';
 import Typography from '../components/ui/Typography';
 import { toast } from 'react-toastify';
 import SubmitButton from '../components/ui/SubmitButton';
-import { Link } from 'react-router-dom';
+import BackButton from '../components/ui/BackButton';
 
 const AccountSettings: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -66,7 +66,8 @@ const AccountSettings: React.FC = () => {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
+    <main className="relative min-h-screen flex items-center justify-center bg-background px-4 py-12">
+      <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
       <div className="w-full max-w-xl bg-white p-8 rounded-2xl shadow-md space-y-8">
         <Typography variant="h2" className="text-primary text-center mb-6">
           Configurações da Conta
@@ -153,15 +154,6 @@ const AccountSettings: React.FC = () => {
           </form>
           <div className="text-right">
             <SubmitButton onClick={updatePassword}>Alterar Senha</SubmitButton>
-          </div>
-          {/* Cancelar link geral */}
-          <div className="text-center mt-6">
-            <Link
-              to="/feed"
-              className="text-sm text-red-500 hover:text-red-600 hover:underline transition"
-            >
-              Cancelar
-            </Link>
           </div>
         </div>
       </div>

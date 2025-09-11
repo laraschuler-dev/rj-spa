@@ -1,20 +1,43 @@
+// src/components/posts/forms/CoursePostForm.tsx
 import React, { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from '../../services/api';
-import { toast } from 'react-toastify';
-import Typography from '../../components/ui/Typography';
-import SubmitButton from '../../components/ui/SubmitButton';
-import ImageUpload from '../../components/ui/ImageUpload';
+import Typography from '../../ui/Typography';
+import SubmitButton from '../../ui/SubmitButton';
+import ImageUpload from '../../ui/ImageUpload';
+import { UploadImage } from '../../../types/upload';
+import { useDeletePostImage } from '../../../hooks/useDeletePostImage';
+import CancelButton from '../../ui/CancelButton';
 
-const CreateCoursePost: React.FC = () => {
-  const navigate = useNavigate();
+interface CoursePostFormProps {
+  onSubmit: (data: FormData) => Promise<void>;
+  mode: 'create' | 'edit';
+  initialData?: {
+    id: number;
+    title?: string;
+    content?: string;
+    format?: string;
+    duration?: string;
+    requirements?: string;
+    images?: UploadImage[];
+  };
+  onClose?: () => void;
+}
+
+const CoursePostForm: React.FC<CoursePostFormProps> = ({
+  onSubmit,
+  mode,
+  initialData,
+  onClose,
+}) => {
+  const postId = initialData?.id;
+  const { deleteImage } = useDeletePostImage(postId ?? 0);
+
   const [formData, setFormData] = useState({
-    title: '',
-    format: '',
-    duration: '',
-    requirements: '',
-    content: '',
-    images: [] as File[],
+    title: initialData?.title ?? '',
+    content: initialData?.content ?? '',
+    format: initialData?.format ?? '',
+    duration: initialData?.duration ?? '',
+    requirements: initialData?.requirements ?? '',
+    images: initialData?.images ?? [], // já suporta {id, url} ou novos arquivos
   });
 
   const handleChange = (
@@ -37,27 +60,29 @@ const CreateCoursePost: React.FC = () => {
       duration: formData.duration,
       requirements: formData.requirements,
     };
-
     postData.append('metadata', JSON.stringify(metadata));
-    formData.images.forEach((img) => postData.append('images', img));
 
-    try {
-      await axios.post('/posts', postData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      toast.success('Curso publicado com sucesso!');
-      navigate('/feed');
-    } catch (error: any) {
-      toast.error('Erro ao publicar o curso.');
-      console.error(error);
-    }
+    // arquivos novos
+    formData.images
+      .filter((img): img is File => img instanceof File)
+      .forEach((file) => postData.append('images', file));
+
+    // IDs das imagens existentes
+    const existingIds = formData.images
+      .filter(
+        (img): img is { id: number; url: string } => !(img instanceof File)
+      )
+      .map((img) => img.id);
+    postData.append('existingImageIds', JSON.stringify(existingIds));
+
+    await onSubmit(postData);
   };
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
         <Typography variant="h2" className="text-primary text-center mb-6">
-          Novo Curso
+          {mode === 'create' ? 'Novo Curso' : 'Editar Curso'}
         </Typography>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -109,19 +134,37 @@ const CreateCoursePost: React.FC = () => {
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
 
-          {/* Upload de imagens */}
           <ImageUpload
             images={formData.images}
-            onChange={(files) =>
+            onChange={(files: UploadImage[]) =>
               setFormData((prev) => ({ ...prev, images: files }))
             }
+            onRemoveExisting={async (imageId: number) => {
+              if (!postId) return;
+              await deleteImage(imageId);
+              setFormData((prev) => ({
+                ...prev,
+                images: prev.images.filter(
+                  (img) =>
+                    !(
+                      typeof img === 'object' &&
+                      'id' in img &&
+                      img.id === imageId
+                    )
+                ),
+              }));
+            }}
           />
 
-          <SubmitButton>Publicar</SubmitButton>
+          <SubmitButton>
+            {mode === 'create' ? 'Publicar' : 'Salvar Alterações'}
+          </SubmitButton>
+
+          <CancelButton mode={mode} onCloseModal={onClose} />
         </form>
       </div>
     </main>
   );
 };
 
-export default CreateCoursePost;
+export default CoursePostForm;

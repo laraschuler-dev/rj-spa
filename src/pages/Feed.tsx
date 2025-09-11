@@ -9,6 +9,8 @@ import { likePost } from '../hooks/useLikePost';
 import { useDeletePost } from '../hooks/useDeletePost';
 import { toast } from 'react-toastify';
 import PostModal from '../components/PostModal';
+import EditPostModal from '../components/posts/EditPostModal';
+import ShareEditModal from '../components/posts/ShareEditModal';
 
 const Feed: React.FC = () => {
   const { posts, setPosts, fetchPosts, hasMore, loading } = usePosts();
@@ -17,6 +19,10 @@ const Feed: React.FC = () => {
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [postToShare, setPostToShare] = useState<any>(null);
   const [selectedPost, setSelectedPost] = useState<any | null>(null); // Agora guardamos o post completo
+  const [editingPost, setEditingPost] = useState<{
+    id: number;
+    shareId?: number;
+  } | null>(null);
 
   const openShareModal = (post: any) => {
     setPostToShare(post);
@@ -106,6 +112,9 @@ const Feed: React.FC = () => {
               onShare={() => openShareModal(post)}
               onDelete={handleDelete}
               onOpenDetails={() => setSelectedPost(post)} // 🔹 Passa o post completo
+              onEdit={(postId, shareId) =>
+                setEditingPost({ id: postId, shareId })
+              }
             />
           ))}
 
@@ -154,6 +163,24 @@ const Feed: React.FC = () => {
           onDelete={handleDelete}
         />
       )}
+
+      {/* Modal de edição */}
+      {editingPost &&
+        (editingPost.shareId ? (
+          <ShareEditModal
+            isOpen={!!editingPost}
+            onClose={() => setEditingPost(null)}
+            postId={editingPost.id}
+            shareId={editingPost.shareId}
+            onSave={() => fetchPosts()} // 🔹 só atualiza a lista
+          />
+        ) : (
+          <EditPostModal
+            postId={editingPost.id}
+            onClose={() => setEditingPost(null)}
+            onSuccess={fetchPosts}
+          />
+        ))}
 
       {postToShare && (
         <ShareModal
