@@ -1,7 +1,8 @@
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment, useState } from 'react';
-import { X } from 'lucide-react';
 import Typography from './ui/Typography';
+import SubmitButton from './ui/SubmitButton';
+import CancelButton from './ui/CancelButton';
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -28,84 +29,57 @@ const ShareModal: React.FC<ShareModalProps> = ({
     onClose();
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Transition show={isOpen} as={Fragment}>
-      <Dialog
-        as="div"
-        className="fixed z-50 inset-0 overflow-y-auto"
-        onClose={onClose}
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-start pt-20 overflow-auto"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl w-full max-w-[700px] p-6 relative"
+        onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-center min-h-screen p-4">
-          <Transition.Child
-            as={Fragment}
-            enter="transition-opacity duration-200"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="transition-opacity duration-150"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-black bg-opacity-30" />
-          </Transition.Child>
+        {/* Botão fechar */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 font-bold text-xl"
+        >
+          ×
+        </button>
 
-          <Transition.Child
-            as={Fragment}
-            enter="transition-transform duration-200"
-            enterFrom="scale-95 opacity-0"
-            enterTo="scale-100 opacity-100"
-            leave="transition-transform duration-150"
-            leaveFrom="scale-100 opacity-100"
-            leaveTo="scale-95 opacity-0"
-          >
-            <Dialog.Panel className="relative bg-white rounded-2xl shadow-xl p-6 max-w-md w-full z-10">
-              <button
-                onClick={onClose}
-                className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
-              >
-                <X size={20} />
-              </button>
+        {/* Título no padrão dos outros modais */}
+        <Typography variant="h2" className="text-primary text-center mb-6">
+          Compartilhar post
+        </Typography>
 
-              <Typography variant="h2" className="text-lg font-semibold mb-3">
-                Compartilhar post
-              </Typography>
+        {/* Prévia resumida do post */}
+        <Typography variant="p" className="text-sm text-gray-700 mb-1">
+          <strong>{postSummary.author}</strong>: {postSummary.title}
+        </Typography>
+        <Typography
+          variant="p"
+          className="text-sm text-gray-500 mb-4 line-clamp-2"
+        >
+          {postSummary.content}
+        </Typography>
 
-              <Typography variant="p" className="text-sm text-gray-700 mb-1">
-                <strong>{postSummary.author}</strong>: {postSummary.title}
-              </Typography>
-              <Typography
-                variant="p"
-                className="text-sm text-gray-500 mb-4 line-clamp-2"
-              >
-                {postSummary.content}
-              </Typography>
+        {/* Mensagem opcional */}
+        <textarea
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Escreva uma mensagem (opcional)"
+          className="w-full p-3 border rounded-lg text-sm resize-none mb-4 focus:outline-none focus:ring-2 focus:ring-primary"
+          rows={4}
+        />
 
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Escreva uma mensagem (opcional)"
-                className="w-full p-2 border rounded-xl text-sm resize-none mb-4"
-                rows={4}
-              />
-
-              <div className="flex justify-end gap-2">
-                <button
-                  onClick={onClose}
-                  className="px-4 py-1 text-sm text-gray-600 hover:underline"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleShare}
-                  className="px-4 py-1 text-sm bg-blue-600 text-white rounded-xl hover:bg-blue-700"
-                >
-                  Compartilhar
-                </button>
-              </div>
-            </Dialog.Panel>
-          </Transition.Child>
+        {/* Botões no mesmo padrão */}
+        <div className="flex flex-col items-center gap-2 mt-2">
+          <SubmitButton onClick={handleShare}>Compartilhar</SubmitButton>
+          <CancelButton mode="edit" onCloseModal={onClose} />
         </div>
-      </Dialog>
-    </Transition>
+      </div>
+    </div>
   );
 };
 

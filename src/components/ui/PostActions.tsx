@@ -1,4 +1,3 @@
-// PostActions.tsx
 import React, { useState, useEffect } from 'react';
 import {
   FaHeart,
@@ -14,7 +13,7 @@ interface PostActionsProps {
     id: number;
     categoryId: number;
     sharedBy?: { id: number } | null;
-    isAttending?: boolean | null; // estado inicial do post
+    isAttending?: boolean | null;
   };
   postIdForAttendance?: number;
   postShareIdForAttendance?: number;
@@ -34,26 +33,20 @@ const PostActions: React.FC<PostActionsProps> = ({
   onShare,
 }) => {
   const [liked, setLiked] = useState(isLiked);
-
-  // Hook para gerenciar presença
   const { status, toggleAttendance, loading } = useEventAttendance(
     postIdForAttendance,
     postShareIdForAttendance
   );
-
-  // Estado local do botão de presença, sincronizado com o hook
   const [attending, setAttending] = useState(status.userStatus === 'confirmed');
 
-  // Atualiza o estado local sempre que o status do hook mudar
   useEffect(() => {
     setAttending(status.userStatus === 'confirmed');
   }, [status.userStatus]);
 
   const handleAttendance = async () => {
     if (!postIdForAttendance || loading) return;
-
     try {
-      await toggleAttendance(); // Hook já lida com alternar presença
+      await toggleAttendance();
     } catch (error) {
       console.error('[PostActions] Erro ao alternar presença:', error);
     }
@@ -72,40 +65,57 @@ const PostActions: React.FC<PostActionsProps> = ({
   const isEvent = post.categoryId === 8;
 
   return (
-    <div className="flex justify-between text-gray-600 text-sm border-t pt-3">
+    <div
+      className={`flex justify-between items-center border-t pt-3 text-gray-600 ${
+        isEvent ? 'text-[10px] sm:text-sm' : 'text-sm'
+      }`}
+    >
       <button
         onClick={handleLike}
         className="flex items-center gap-1 hover:text-blue-500 transition"
       >
-        {liked ? <FaHeart className="text-red-500" /> : <FaRegHeart />} Curtir
+        {liked ? (
+          <FaHeart className="text-red-500 w-4 h-4 sm:w-5 sm:h-5" />
+        ) : (
+          <FaRegHeart className="w-4 h-4 sm:w-5 sm:h-5" />
+        )}
+        <span className={isEvent ? 'text-[10px] sm:text-sm' : ''}>Curtir</span>
       </button>
 
       <button
         onClick={onComment}
         className="flex items-center gap-1 hover:text-blue-500 transition"
       >
-        <FaRegCommentDots /> Comentar
+        <FaRegCommentDots className="w-4 h-4 sm:w-5 sm:h-5" />
+        <span className={isEvent ? 'text-[10px] sm:text-sm' : ''}>
+          Comentar
+        </span>
       </button>
 
       <button
         onClick={onShare}
         className="flex items-center gap-1 hover:text-blue-500 transition"
       >
-        <FaShare /> Compartilhar
+        <FaShare className="w-4 h-4 sm:w-5 sm:h-5" />
+        <span className={isEvent ? 'text-[10px] sm:text-sm' : ''}>
+          Compartilhar
+        </span>
       </button>
 
       {isEvent && (
         <button
           onClick={handleAttendance}
           disabled={loading}
-          className={`flex items-center gap-1 px-3 py-1 rounded-2xl text-sm font-medium transition ${
+          className={`flex items-center gap-1 px-2 py-1 rounded-xl font-medium transition ${
             attending
               ? 'bg-green-100 text-green-600 border border-green-500'
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}
         >
-          <FaRegCalendarCheck />
-          {attending ? ' ✓ Confirmado' : ' Participar'}
+          <FaRegCalendarCheck className="w-4 h-4 sm:w-5 sm:h-5" />
+          <span className="text-[9px] sm:text-xs">
+            {attending ? '✓ Confirmado' : 'Participar'}
+          </span>
         </button>
       )}
     </div>
