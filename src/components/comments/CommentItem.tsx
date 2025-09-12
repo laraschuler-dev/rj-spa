@@ -4,10 +4,10 @@ import Typography from '../ui/Typography';
 import { resolveImageUrl } from '../../utils/resolveImageUrl';
 import { useAuth } from '../../hooks/useAuth';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
-import { Comment } from '../../types/Comment';
+import { PostComment } from '../../types/Comment';
 
 interface CommentItemProps {
-  comment: Comment;
+  comment: PostComment; // <-- ajuste aqui
   // eslint-disable-next-line no-unused-vars
   onUpdate: (commentId: number, newContent: string) => Promise<void>;
   // eslint-disable-next-line no-unused-vars

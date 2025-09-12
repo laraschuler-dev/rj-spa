@@ -1,3 +1,4 @@
+// src/components/comments/CommentSection.tsx
 import React, { useEffect, useState } from 'react';
 import { useComments } from '../../hooks/useComments';
 import CommentItem from './CommentItem';
@@ -82,19 +83,20 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId, shareId }) => {
         </button>
       </div>
 
-      {/* Lista de comentários */}
       {loading && comments.length === 0 ? (
         <p>Carregando comentários...</p>
       ) : (
-        comments.map((comment) => (
-          <CommentItem
-            key={comment.id}
-            comment={comment}
-            onUpdate={handleEdit}
-            onDelete={handleDelete}
-            isDeleting={isDeleting === comment.id}
-          />
-        ))
+        comments.map((comment) =>
+          comment ? (
+            <CommentItem
+              key={`post-${postId}-comment-${comment.id}`} // chave única e estável
+              comment={comment}
+              onUpdate={handleEdit}
+              onDelete={handleDelete}
+              isDeleting={isDeleting === comment.id}
+            />
+          ) : null
+        )
       )}
     </div>
   );

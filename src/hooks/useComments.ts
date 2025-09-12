@@ -1,91 +1,64 @@
-// useComments.ts
-import { useState } from 'react';
+// src/hooks/useComments.ts
+import { usePostStore } from '../stores/postStore';
 import api from '../services/api';
-import { Comment } from '../types/Comment';
+import {  PostComment } from '../types/Comment';
 
 export function useComments(postId: number, shareId?: number) {
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [commentCount, setCommentCount] = useState<number | null>(null);
+  const { comments, fetchComments, addComment, updateComment, removeComment } =
+    usePostStore();
 
-  // Alteração importante: enviar query param correto
-  const params = shareId ? { postShareId: shareId } : undefined;
-
-  const fetchComments = async () => {
-    try {
-      setLoading(true);
-      const res = await api.get(`/posts/${postId}/comments`, { params });
-      setComments(res.data.data);
-    } catch (err) {
-      console.error('Erro ao buscar comentários:', err);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchCommentCount = async () => {
-    try {
-      const res = await api.get(`/posts/${postId}/comments/count`, { params });
-      setCommentCount(res.data.count);
-    } catch (err) {
-      console.error('Erro ao contar comentários:', err);
-      throw err;
-    }
-  };
+  const key = shareId ? `share-${shareId}` : `post-${postId}`;
+  const currentComments = comments[key] || [];
 
   const createComment = async (content: string) => {
-    try {
-      const res = await api.post(
-        `/posts/${postId}/comment`,
-        { comment: content }, // body
-        { params: shareId ? { shareId } : {} } // query
-      );
+    const params = shareId ? { shareId } : {};
+    const res = await api.post(
+      `/posts/${postId}/comment`,
+      { comment: content },
+      { params }
+    );
 
-      await fetchComments();
-      await fetchCommentCount();
-      return res.data;
-    } catch (err) {
-      console.error('Erro ao criar comentário:', err);
-      throw err;
+    const created: PostComment =
+      res.data?.data ?? res.data?.comment ?? res.data ?? null;
+
+    if (created && created.id) {
+      addComment(postId, created, shareId);
+    } else {
+      await fetchComments(postId, shareId);
     }
+
+    return created;
   };
 
   const editComment = async (commentId: number, content: string) => {
-    try {
-      const res = await api.put(
-        `/posts/${postId}/comments/${commentId}`,
-        { content },
-        { params }
-      );
-      await fetchComments();
-      return res.data;
-    } catch (err) {
-      console.error('Erro ao editar comentário:', err);
-      throw err;
+    const params = shareId ? { postShareId: shareId } : undefined;
+    const res = await api.put(
+      `/posts/${postId}/comments/${commentId}`,
+      { content },
+      { params }
+    );
+
+    const updated:  PostComment =
+      res.data?.data ?? res.data?.comment ?? res.data ?? null;
+
+    if (updated && updated.id) {
+      updateComment(postId, updated, shareId);
+    } else {
+      await fetchComments(postId, shareId);
     }
+
+    return updated;
   };
 
   const deleteComment = async (commentId: number) => {
-    try {
-      const res = await api.delete(`/posts/${postId}/comments/${commentId}`, {
-        params,
-      });
-      await fetchComments();
-      await fetchCommentCount();
-      return res.data;
-    } catch (err) {
-      console.error('Erro ao excluir comentário:', err);
-      throw err;
-    }
+    const params = shareId ? { postShareId: shareId } : undefined;
+    await api.delete(`/posts/${postId}/comments/${commentId}`, { params });
+    removeComment(postId, commentId, shareId);
   };
 
   return {
-    comments,
-    loading,
-    commentCount,
-    fetchComments,
-    fetchCommentCount,
+    comments: currentComments,
+    fetchComments: () => fetchComments(postId, shareId),
     createComment,
     editComment,
     deleteComment,

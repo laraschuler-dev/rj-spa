@@ -1,7 +1,7 @@
-// src/stores/usePostStore.ts
 import { create } from 'zustand';
 import axios from '../services/api';
 import { PostListItem } from '../types/Post';
+import { PostComment } from '../types/Comment'; // <-- Adicione esta linha
 
 interface PostStoreState {
   posts: PostListItem[];
@@ -15,14 +15,26 @@ interface PostStoreState {
   addPost: (newPost: PostListItem) => void;
   removePost: (postId: number, shareId?: number) => void;
   toggleLikePost: (postId: number, shareId?: number, liked?: boolean) => void;
-
   toggleAttendance: (
     postId: number,
     shareId?: number,
     status?: 'interested' | 'confirmed' | null,
     counts?: { interestedCount: number; confirmedCount: number }
   ) => void;
+
+  // Comentários
+  comments: Record<string, PostComment[]>; // <-- Troque Comment por PostComment
+  fetchComments: (postId: number, shareId?: number) => Promise<void>;
+  addComment: (postId: number, comment: PostComment, shareId?: number) => void; // <-- Troque Comment por PostComment
+  updateComment: (
+    postId: number,
+    updatedComment: PostComment, // <-- Troque Comment por PostComment
+    shareId?: number
+  ) => void;
+  removeComment: (postId: number, commentId: number, shareId?: number) => void;
 }
+
+// O restante do código permanece igual, pois as funções já são genéricas e vão funcionar com o novo tipo.
 
 export const usePostStore = create<PostStoreState>((set, get) => ({
   posts: [],
@@ -115,6 +127,54 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
         }
         return p;
       }),
+    }));
+  },
+
+  comments: {},
+
+  fetchComments: async (postId, shareId) => {
+    const key = shareId ? `share-${shareId}` : `post-${postId}`;
+    try {
+      const params = shareId ? { postShareId: shareId } : undefined;
+      const res = await axios.get(`/posts/${postId}/comments`, { params });
+      set((state) => ({
+        comments: { ...state.comments, [key]: res.data.data },
+      }));
+    } catch (err) {
+      console.error('Erro ao buscar comentários no store:', err);
+    }
+  },
+
+  addComment: (postId, comment, shareId) => {
+    const key = shareId ? `share-${shareId}` : `post-${postId}`;
+    set((state) => ({
+      comments: {
+        ...state.comments,
+        [key]: [comment, ...(state.comments[key] || [])],
+      },
+    }));
+  },
+
+  updateComment: (postId, updatedComment, shareId) => {
+    const key = shareId ? `share-${shareId}` : `post-${postId}`;
+    set((state) => ({
+      comments: {
+        ...state.comments,
+        [key]:
+          state.comments[key]?.map((c) =>
+            c.id === updatedComment.id ? { ...c, ...updatedComment } : c
+          ) || [],
+      },
+    }));
+  },
+
+  removeComment: (postId, commentId, shareId) => {
+    const key = shareId ? `share-${shareId}` : `post-${postId}`;
+    set((state) => ({
+      comments: {
+        ...state.comments,
+        [key]: state.comments[key]?.filter((c) => c.id !== commentId) || [],
+      },
     }));
   },
 
