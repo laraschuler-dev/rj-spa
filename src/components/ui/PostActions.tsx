@@ -13,7 +13,6 @@ interface PostActionsProps {
     id: number;
     categoryId: number;
     sharedBy?: { id: number } | null;
-    isAttending?: boolean | null;
   };
   postIdForAttendance?: number;
   postShareIdForAttendance?: number;
@@ -33,18 +32,16 @@ const PostActions: React.FC<PostActionsProps> = ({
   onShare,
 }) => {
   const [liked, setLiked] = useState(isLiked);
-  const { status, toggleAttendance, loading } = useEventAttendance(
-    postIdForAttendance,
-    postShareIdForAttendance
-  );
-  const [attending, setAttending] = useState(status.userStatus === 'confirmed');
 
-  useEffect(() => {
-    setAttending(status.userStatus === 'confirmed');
-  }, [status.userStatus]);
+  // Usa hook para marcar/desmarcar presença
+  const {
+    status,
+    toggleAttendance,
+    loading: attendanceLoading,
+  } = useEventAttendance(postIdForAttendance, postShareIdForAttendance);
 
   const handleAttendance = async () => {
-    if (!postIdForAttendance || loading) return;
+    if (!postIdForAttendance || attendanceLoading) return;
     try {
       await toggleAttendance();
     } catch (error) {
@@ -63,6 +60,7 @@ const PostActions: React.FC<PostActionsProps> = ({
   };
 
   const isEvent = post.categoryId === 8;
+  const attending = status.userStatus === 'confirmed';
 
   return (
     <div
@@ -105,7 +103,7 @@ const PostActions: React.FC<PostActionsProps> = ({
       {isEvent && (
         <button
           onClick={handleAttendance}
-          disabled={loading}
+          disabled={attendanceLoading}
           className={`flex items-center gap-1 px-2 py-1 rounded-xl font-medium transition ${
             attending
               ? 'bg-green-100 text-green-600 border border-green-500'

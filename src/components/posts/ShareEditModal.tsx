@@ -1,3 +1,4 @@
+// components/posts/ShareEditModal.tsx
 import React, { useEffect, useState } from 'react';
 import Typography from '../ui/Typography';
 import PostPreviewCard from './PostPreviewCard';
@@ -5,13 +6,13 @@ import { usePostDetails } from '../../hooks/usePostDetails';
 import { useEditPost } from '../../hooks/useEditPost';
 import SubmitButton from '../ui/SubmitButton';
 import CancelButton from '../ui/CancelButton';
+import { usePostStore } from '../../stores/postStore';
 
 interface ShareEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   postId: number;
   shareId: number;
-  onSave: () => void;
 }
 
 const ShareEditModal: React.FC<ShareEditModalProps> = ({
@@ -19,11 +20,11 @@ const ShareEditModal: React.FC<ShareEditModalProps> = ({
   onClose,
   postId,
   shareId,
-  onSave,
 }) => {
   const { post, loading } = usePostDetails(postId, shareId);
   const [message, setMessage] = useState('');
   const { editPost, loading: saving } = useEditPost({ postId, shareId });
+  const { updatePost } = usePostStore();
 
   useEffect(() => {
     setMessage(post?.sharedBy?.message ?? '');
@@ -32,8 +33,8 @@ const ShareEditModal: React.FC<ShareEditModalProps> = ({
   const handleSave = async () => {
     const formData = new FormData();
     formData.append('message', message);
-    await editPost(formData);
-    onSave();
+    const updatedShare = await editPost(formData);
+    if (updatedShare) updatePost(updatedShare); // Atualiza a mensagem do share
     onClose();
   };
 
@@ -48,7 +49,6 @@ const ShareEditModal: React.FC<ShareEditModalProps> = ({
         className="bg-white rounded-2xl w-full max-w-[700px] p-6 relative"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Botão fechar no topo */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 font-bold text-xl"

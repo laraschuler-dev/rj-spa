@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from '../services/api';
+import { usePostStore } from '../stores/postStore';
 
 interface EventAttendanceStatus {
   userStatus: 'interested' | 'confirmed' | null;
@@ -7,8 +8,8 @@ interface EventAttendanceStatus {
   confirmedCount: number;
 }
 
-// hooks/useEventAttendance.ts
 export function useEventAttendance(postId?: number, postShareId?: number) {
+  const { toggleAttendance: updateStoreAttendance } = usePostStore();
   const [status, setStatus] = useState<EventAttendanceStatus>({
     userStatus: null,
     interestedCount: 0,
@@ -16,6 +17,7 @@ export function useEventAttendance(postId?: number, postShareId?: number) {
   });
   const [loading, setLoading] = useState(false);
 
+  // Carrega status inicial do backend
   useEffect(() => {
     if (!postId) return;
 
@@ -36,31 +38,50 @@ export function useEventAttendance(postId?: number, postShareId?: number) {
     fetchStatus();
   }, [postId, postShareId]);
 
+  // Toggle de presença
   const toggleAttendance = async () => {
     if (!postId) return;
 
     setLoading(true);
-    try {
-      // se o usuário já está confirmado, vai remover
-      const newStatus =
-        status.userStatus === 'confirmed' ? 'confirmed' : 'confirmed';
+    const isConfirmed = status.userStatus === 'confirmed';
+    const newUserStatus: 'confirmed' | null = isConfirmed ? null : 'confirmed';
+    const newConfirmedCount = isConfirmed
+      ? status.confirmedCount - 1
+      : status.confirmedCount + 1;
 
-      const res = await axios.post(
-        `/posts/${postId}/attend`,
-        { status: newStatus },
-        { params: postShareId ? { postShareId } : {} }
-      );
-      // atualizar o status retornado
+    try {
+      // Atualiza estado local imediatamente (UX instantânea)
       setStatus((prev) => ({
         ...prev,
-        userStatus: prev.userStatus === 'confirmed' ? null : 'confirmed',
-        confirmedCount:
-          prev.userStatus === 'confirmed'
-            ? prev.confirmedCount - 1
-            : prev.confirmedCount + 1,
+        userStatus: newUserStatus,
+        confirmedCount: newConfirmedCount,
       }));
+
+      // Atualiza store global
+      updateStoreAttendance(postId, postShareId, newUserStatus, {
+        interestedCount: status.interestedCount,
+        confirmedCount: newConfirmedCount,
+      });
+
+      // Chamada ao backend (toggle)
+      await axios.post(
+        `/posts/${postId}/attend`,
+        { status: 'confirmed' }, // sempre enviado
+        { params: postShareId ? { postShareId } : {} }
+      );
     } catch (error) {
       console.error('[useEventAttendance] Erro ao registrar presença:', error);
+
+      // Reverte estado local e store em caso de erro
+      setStatus((prev) => ({
+        ...prev,
+        userStatus: status.userStatus,
+        confirmedCount: status.confirmedCount,
+      }));
+      updateStoreAttendance(postId, postShareId, status.userStatus, {
+        interestedCount: status.interestedCount,
+        confirmedCount: status.confirmedCount,
+      });
     } finally {
       setLoading(false);
     }

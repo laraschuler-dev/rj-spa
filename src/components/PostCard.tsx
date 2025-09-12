@@ -90,6 +90,12 @@ const PostCard: React.FC<PostCardProps> = ({
   const displayedAuthor =
     expanded && sharedBy ? sharedBy.originalAuthor || author : author;
 
+  // Garante que sempre seja Date válido
+  const safeCreatedAt = createdAt ? new Date(createdAt) : new Date();
+  const safeSharedAt = sharedBy?.sharedAt
+    ? new Date(sharedBy.sharedAt)
+    : new Date();
+
   return (
     <div className="bg-white shadow-md rounded-2xl p-4 space-y-3 max-w-[600px] mx-auto w-full">
       {/* Se for compartilhamento */}
@@ -110,7 +116,7 @@ const PostCard: React.FC<PostCardProps> = ({
             <span className="text-sm">
               Compartilhado por <strong>{sharedBy.name}</strong> •{' '}
               <span className="text-xs text-gray-400">
-                {formatTimeAgo(sharedBy.sharedAt)}
+                {formatTimeAgo(safeSharedAt.toISOString())}
               </span>
             </span>
 
@@ -162,7 +168,7 @@ const PostCard: React.FC<PostCardProps> = ({
               </strong>
             </Typography>
             <Typography variant="p" className="text-xs text-gray-500">
-              {formatTimeAgo(createdAt)}
+              {formatTimeAgo(safeCreatedAt.toISOString())}
             </Typography>
           </div>
         </div>

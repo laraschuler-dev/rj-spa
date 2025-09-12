@@ -4,24 +4,23 @@ import axios from '../../services/api';
 import PostFormFactory from './PostFormFactory';
 import { useEditPost } from '../../hooks/useEditPost';
 import { toast } from 'react-toastify';
+import { usePostStore } from '../../stores/postStore';
 
 interface EditPostModalProps {
   postId: number;
   shareId?: number;
   onClose: () => void;
-  onSuccess?: () => void;
 }
 
 const EditPostModal: React.FC<EditPostModalProps> = ({
   postId,
   shareId,
   onClose,
-  onSuccess,
 }) => {
   const [initialData, setInitialData] = useState<any>(null);
   const [categoryId, setCategoryId] = useState<number | null>(null);
-
   const { editPost, loading } = useEditPost({ postId, shareId });
+  const { updatePost } = usePostStore();
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -30,7 +29,6 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
         const { data } = await axios.get(`/posts/${postId}`, params);
 
         setCategoryId(data.categoryId);
-
         setInitialData({
           id: data.id,
           ...data.metadata,
@@ -42,7 +40,6 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
         console.error(error);
       }
     };
-
     fetchPost();
   }, [postId, shareId]);
 
@@ -57,7 +54,6 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
         className="bg-white rounded-2xl w-full max-w-[700px] p-6 relative"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Botão fechar */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 font-bold text-xl"
@@ -70,9 +66,9 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
           mode="edit"
           initialData={initialData}
           onSubmit={async (formData: FormData) => {
-            await editPost(formData);
+            const updatedPost = await editPost(formData);
+            if (updatedPost) updatePost(updatedPost);
             onClose();
-            onSuccess?.();
           }}
           onClose={onClose}
         />

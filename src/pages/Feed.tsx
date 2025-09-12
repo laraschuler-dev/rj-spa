@@ -4,6 +4,7 @@ import Layout from '../components/layout/Layout';
 import PostCard from '../components/PostCard';
 import ShareModal from '../components/ShareModal';
 import { usePosts } from '../hooks/usePosts';
+import { usePostStore } from '../stores/postStore';
 import { useSharePost } from '../hooks/useSharePost';
 import { likePost } from '../hooks/useLikePost';
 import { useDeletePost } from '../hooks/useDeletePost';
@@ -13,12 +14,14 @@ import EditPostModal from '../components/posts/EditPostModal';
 import ShareEditModal from '../components/posts/ShareEditModal';
 
 const Feed: React.FC = () => {
-  const { posts, setPosts, fetchPosts, hasMore, loading } = usePosts();
+  const { posts, fetchPosts, hasMore, loading } = usePosts();
+  const { updatePost, addPost, removePost, toggleLikePost } = usePostStore();
   const { sharePost } = useSharePost();
+  const { deletePost } = useDeletePost();
 
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [postToShare, setPostToShare] = useState<any>(null);
-  const [selectedPost, setSelectedPost] = useState<any | null>(null); // Agora guardamos o post completo
+  const [selectedPost, setSelectedPost] = useState<any | null>(null);
   const [editingPost, setEditingPost] = useState<{
     id: number;
     shareId?: number;
@@ -34,6 +37,7 @@ const Feed: React.FC = () => {
     setShareModalOpen(false);
   };
 
+  // ✅ Função para compartilhar diretamente via store
   const handleShare = async (message?: string) => {
     if (!postToShare) return;
 
@@ -41,33 +45,25 @@ const Feed: React.FC = () => {
       const originalPostId = postToShare.sharedBy
         ? postToShare.sharedBy.postId
         : postToShare.id;
-
       const sharedPostDTO = await sharePost(originalPostId, message);
-      setPosts((prev) => [sharedPostDTO, ...prev]);
+      addPost(sharedPostDTO); // adiciona no topo do feed via store
     } catch (err) {
       console.error(err);
+      toast.error('Erro ao compartilhar o post');
     } finally {
       closeShareModal();
     }
   };
 
-  const { deletePost } = useDeletePost();
-
+  // ✅ Função para deletar diretamente via store
   const handleDelete = async (postId: number, shareId?: number) => {
     try {
       await deletePost(postId, shareId);
-
-      setPosts((prev) =>
-        prev.filter((p) => {
-          if (shareId) return p.sharedBy?.shareId !== shareId;
-          return p.id !== postId && !p.sharedBy;
-        })
-      );
-
+      removePost(postId, shareId); // remove do feed via store
       toast.success('Post excluído com sucesso!');
     } catch (err) {
+      console.error(err);
       toast.error('Erro ao excluir o post!');
-      console.error('Erro ao excluir:', err);
     }
   };
 
@@ -85,7 +81,7 @@ const Feed: React.FC = () => {
               id={post.id}
               title={post.metadata?.title || ''}
               content={post.content}
-              images={post.images}
+              images={post.images || []}
               createdAt={post.createdAt}
               categoryId={post.categoria_idcategoria}
               metadata={post.metadata}
@@ -102,16 +98,15 @@ const Feed: React.FC = () => {
                   : post.id;
                 const shareIdToSend = post.sharedBy?.shareId;
 
+                // chama a API para curtir/descurtir
                 const liked = await likePost(postIdToSend, shareIdToSend);
-                setPosts((prev) =>
-                  prev.map((p) =>
-                    p.uniqueKey === post.uniqueKey ? { ...p, liked } : p
-                  )
-                );
+
+                // atualiza apenas o liked no store
+                toggleLikePost(postIdToSend, shareIdToSend, liked);
               }}
               onShare={() => openShareModal(post)}
-              onDelete={handleDelete}
-              onOpenDetails={() => setSelectedPost(post)} // 🔹 Passa o post completo
+              onDelete={handleDelete} // usa store
+              onOpenDetails={() => setSelectedPost(post)}
               onEdit={(postId, shareId) =>
                 setEditingPost({ id: postId, shareId })
               }
@@ -131,7 +126,6 @@ const Feed: React.FC = () => {
         )}
       </div>
 
-      {/* 🔹 Modal de Detalhes */}
       {selectedPost && (
         <PostModal
           post={selectedPost}
@@ -141,30 +135,15 @@ const Feed: React.FC = () => {
               ? selectedPost.sharedBy.postId
               : selectedPost.id;
             const shareIdToSend = selectedPost.sharedBy?.shareId;
-
             const liked = await likePost(postIdToSend, shareIdToSend);
-            // Atualiza o post no feed corretamente
-            setPosts((prev) =>
-              prev.map((p) =>
-                p.id === selectedPost.id ||
-                p.sharedBy?.shareId === selectedPost.sharedBy?.shareId
-                  ? { ...p, liked }
-                  : p
-              )
-            );
-
-            // Também atualiza o selectedPost para refletir o like no modal
-            setSelectedPost((prev: any) => prev && { ...prev, liked });
+            updatePost({ ...selectedPost, liked }); // feed atualizado via store
+            setSelectedPost((prev) => prev && { ...prev, liked }); // modal atualizado
           }}
-          onShare={() => {
-            // Abre o mesmo ShareModal do feed
-            if (selectedPost) openShareModal(selectedPost);
-          }}
-          onDelete={handleDelete}
+          onShare={() => selectedPost && openShareModal(selectedPost)}
+          onDelete={handleDelete} // usa store
         />
       )}
 
-      {/* Modal de edição */}
       {editingPost &&
         (editingPost.shareId ? (
           <ShareEditModal
@@ -172,13 +151,13 @@ const Feed: React.FC = () => {
             onClose={() => setEditingPost(null)}
             postId={editingPost.id}
             shareId={editingPost.shareId}
-            onSave={() => fetchPosts()} // 🔹 só atualiza a lista
+            onSave={fetchPosts} // refresh leve
           />
         ) : (
           <EditPostModal
             postId={editingPost.id}
             onClose={() => setEditingPost(null)}
-            onSuccess={fetchPosts}
+            onSuccess={fetchPosts} // refresh leve
           />
         ))}
 
@@ -191,7 +170,7 @@ const Feed: React.FC = () => {
             content: postToShare.content,
             author: postToShare.user?.name || 'Usuário desconhecido',
           }}
-          onShare={handleShare}
+          onShare={handleShare} // usa store
         />
       )}
     </Layout>

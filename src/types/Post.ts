@@ -1,5 +1,11 @@
 import { Key } from 'react';
 
+export interface Attendance {
+  userStatus: 'interested' | 'confirmed' | null;
+  interestedCount: number;
+  confirmedCount: number;
+}
+
 export interface PostListItem {
   author: any;
   uniqueKey: Key | null | undefined; //Identificador único universal para renderização de listas
@@ -30,6 +36,7 @@ export interface PostListItem {
   images: string[];
   createdAt: string;
   liked?: boolean;
+  attendance?: Attendance;
   user: {
     id: number;
     name: string;
