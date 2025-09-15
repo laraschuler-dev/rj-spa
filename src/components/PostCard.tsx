@@ -28,7 +28,7 @@ interface PostCardProps {
   metadata?: {
     [key: string]: any;
   };
-  onLike?: () => void;
+  onLike?: (postId: number, shareId?: number) => void;
   onComment?: () => void;
   onShare?: () => void;
   onAttend?: () => void;
@@ -336,9 +336,11 @@ const PostCard: React.FC<PostCardProps> = ({
           post={{
             id,
             categoryId,
-            sharedBy: sharedBy ? { id: sharedBy.postId } : undefined,
+            sharedBy: sharedBy?.shareId
+              ? { shareId: sharedBy.shareId }
+              : undefined,
           }}
-          isLiked={isLiked}
+          isLiked={isLiked ?? false} // ⚠️ garante boolean
           onLike={onLike}
           onComment={() => setShowComments((prev) => !prev)}
           onShare={onShare}

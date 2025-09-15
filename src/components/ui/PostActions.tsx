@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   FaHeart,
   FaRegHeart,
@@ -12,12 +12,12 @@ interface PostActionsProps {
   post: {
     id: number;
     categoryId: number;
-    sharedBy?: { id: number } | null;
+    sharedBy?: { shareId: number } | null; // << importante
   };
   postIdForAttendance?: number;
   postShareIdForAttendance?: number;
   isLiked?: boolean;
-  onLike?: () => void;
+  onLike?: (postId: number, shareId?: number) => void; // << muda aqui
   onComment?: () => void;
   onShare?: () => void;
 }
@@ -26,13 +26,11 @@ const PostActions: React.FC<PostActionsProps> = ({
   post,
   postIdForAttendance,
   postShareIdForAttendance,
-  isLiked = false,
+  isLiked = false, // Recebe o estado da store
   onLike,
   onComment,
   onShare,
 }) => {
-  const [liked, setLiked] = useState(isLiked);
-
   // Usa hook para marcar/desmarcar presença
   const {
     status,
@@ -51,11 +49,12 @@ const PostActions: React.FC<PostActionsProps> = ({
 
   const handleLike = async () => {
     try {
-      setLiked((prev) => !prev);
-      if (onLike) await onLike();
+      if (onLike) {
+        await onLike(post.id, post.sharedBy?.shareId);
+      }
+      // O feedback visual vem da store através do isLiked
     } catch (error) {
       console.error('Erro ao curtir post:', error);
-      setLiked((prev) => !prev);
     }
   };
 
@@ -72,7 +71,7 @@ const PostActions: React.FC<PostActionsProps> = ({
         onClick={handleLike}
         className="flex items-center gap-1 hover:text-blue-500 transition"
       >
-        {liked ? (
+        {isLiked ? ( // Use isLiked da store em vez de estado local
           <FaHeart className="text-red-500 w-4 h-4 sm:w-5 sm:h-5" />
         ) : (
           <FaRegHeart className="w-4 h-4 sm:w-5 sm:h-5" />

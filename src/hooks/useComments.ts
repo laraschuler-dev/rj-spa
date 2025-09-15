@@ -1,7 +1,7 @@
 // src/hooks/useComments.ts
 import { usePostStore } from '../stores/postStore';
 import api from '../services/api';
-import {  PostComment } from '../types/Comment';
+import { PostComment } from '../types/Comment';
 
 export function useComments(postId: number, shareId?: number) {
   const { comments, fetchComments, addComment, updateComment, removeComment } =
@@ -38,7 +38,7 @@ export function useComments(postId: number, shareId?: number) {
       { params }
     );
 
-    const updated:  PostComment =
+    const updated: PostComment =
       res.data?.data ?? res.data?.comment ?? res.data ?? null;
 
     if (updated && updated.id) {

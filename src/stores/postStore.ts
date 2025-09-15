@@ -1,20 +1,22 @@
 import { create } from 'zustand';
 import axios from '../services/api';
 import { PostListItem } from '../types/Post';
-import { PostComment } from '../types/Comment'; // <-- Adicione esta linha
+import { PostComment } from '../types/Comment';
 
 interface PostStoreState {
   posts: PostListItem[];
   page: number;
   hasMore: boolean;
   loading: boolean;
+
   fetchPosts: (isInitialLoad?: boolean) => Promise<void>;
   refreshPosts: () => Promise<void>;
   setPosts: (posts: PostListItem[]) => void;
   updatePost: (updatedPost: PostListItem) => void;
   addPost: (newPost: PostListItem) => void;
   removePost: (postId: number, shareId?: number) => void;
-  toggleLikePost: (postId: number, shareId?: number, liked?: boolean) => void;
+  toggleLikePost: (postId: number, liked: boolean, shareId?: number) => void;
+
   toggleAttendance: (
     postId: number,
     shareId?: number,
@@ -22,19 +24,16 @@ interface PostStoreState {
     counts?: { interestedCount: number; confirmedCount: number }
   ) => void;
 
-  // Comentários
-  comments: Record<string, PostComment[]>; // <-- Troque Comment por PostComment
+  comments: Record<string, PostComment[]>;
   fetchComments: (postId: number, shareId?: number) => Promise<void>;
-  addComment: (postId: number, comment: PostComment, shareId?: number) => void; // <-- Troque Comment por PostComment
+  addComment: (postId: number, comment: PostComment, shareId?: number) => void;
   updateComment: (
     postId: number,
-    updatedComment: PostComment, // <-- Troque Comment por PostComment
+    updatedComment: PostComment,
     shareId?: number
   ) => void;
   removeComment: (postId: number, commentId: number, shareId?: number) => void;
 }
-
-// O restante do código permanece igual, pois as funções já são genéricas e vão funcionar com o novo tipo.
 
 export const usePostStore = create<PostStoreState>((set, get) => ({
   posts: [],
@@ -44,44 +43,39 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
 
   setPosts: (posts) => set({ posts }),
 
-  updatePost: (updatedPost: PostListItem) => {
-    set((state) => ({
-      posts: state.posts.map((p) => {
+  updatePost: (updatedPost: PostListItem, addIfNotExists = false) => {
+    set((state) => {
+      const key = updatedPost.sharedBy?.shareId
+        ? `share-${updatedPost.sharedBy.shareId}`
+        : `post-${updatedPost.id}`;
+
+      const exists = state.posts.some((p) => {
         const pKey = p.sharedBy?.shareId
           ? `share-${p.sharedBy.shareId}`
           : `post-${p.id}`;
-        const updatedKey = updatedPost.sharedBy?.shareId
-          ? `share-${updatedPost.sharedBy.shareId}`
-          : `post-${updatedPost.id}`;
+        return pKey === key;
+      });
 
-        if (pKey === updatedKey) {
-          return {
-            ...p,
-            ...updatedPost,
-            images: updatedPost.images ?? p.images,
-            createdAt: updatedPost.createdAt ?? p.createdAt,
-            sharedBy: updatedPost.sharedBy
-              ? {
-                  shareId: updatedPost.sharedBy.shareId!, // ✅ garante que não é undefined
-                  userId: updatedPost.sharedBy.userId,
-                  sharedAt: updatedPost.sharedBy.sharedAt,
-                  message: updatedPost.sharedBy.message ?? p.sharedBy?.message,
-                }
-              : p.sharedBy,
-            author: updatedPost.author ?? p.author,
-            attendance: updatedPost.attendance ?? p.attendance,
-          };
-        }
-
-        return p;
-      }),
-    }));
+      if (exists) {
+        return {
+          posts: state.posts.map((p) => {
+            const pKey = p.sharedBy?.shareId
+              ? `share-${p.sharedBy.shareId}`
+              : `post-${p.id}`;
+            if (pKey === key) return { ...p, ...updatedPost };
+            return p;
+          }),
+        };
+      } else if (addIfNotExists) {
+        return { posts: [updatedPost, ...state.posts] };
+      } else {
+        return {}; // não faz nada
+      }
+    });
   },
 
   addPost: (newPost) => {
-    set((state) => ({
-      posts: [newPost, ...state.posts],
-    }));
+    set((state) => ({ posts: [newPost, ...state.posts] }));
   },
 
   removePost: (postId, shareId) => {
@@ -94,19 +88,33 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
     }));
   },
 
-  toggleLikePost: (postId, shareId, liked) => {
-    set((state) => ({
-      posts: state.posts.map((p) => {
-        const isPost = !shareId && p.id === postId;
-        const isShare = shareId && p.sharedBy?.shareId === shareId;
-        if (isPost || isShare) {
-          return { ...p, liked };
-        }
-        return p;
-      }),
-    }));
-  },
+  toggleLikePost: (postId: number, liked: boolean, shareId?: number) => {
+    console.log('[postStore.toggleLikePost] input:', {
+      postId,
+      liked,
+      shareId,
+    });
 
+    set((state) => {
+      const updated = state.posts.map((p) => {
+        // Se estamos lidando com um post COMPARTILHADO (tem shareId)
+        if (shareId) {
+          // Só atualiza se for o MESMO post compartilhado
+          const isTargetShare = p.sharedBy?.shareId === shareId;
+          return isTargetShare ? { ...p, liked } : p;
+        }
+        // Se estamos lidando com um post ORIGINAL (sem shareId)
+        else {
+          // Só atualiza se for o MESMO post original E não for um compartilhamento
+          const isTargetOriginal = p.id === postId && !p.sharedBy;
+          return isTargetOriginal ? { ...p, liked } : p;
+        }
+      });
+
+      return { posts: updated };
+    });
+  },
+  
   toggleAttendance: (postId, shareId, status, counts) => {
     set((state) => ({
       posts: state.posts.map((p) => {
@@ -185,10 +193,7 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
     set({ loading: true });
     try {
       const res = await axios.get('/posts', {
-        params: {
-          page: isInitialLoad ? 1 : page,
-          limit: 10,
-        },
+        params: { page: isInitialLoad ? 1 : page, limit: 10 },
       });
 
       if (!res.data?.posts || res.data.posts.length === 0) {
@@ -197,13 +202,8 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
       }
 
       set((state) => {
-        if (isInitialLoad) {
-          return {
-            posts: res.data.posts,
-            page: 2,
-            hasMore: true,
-          };
-        }
+        if (isInitialLoad)
+          return { posts: res.data.posts, page: 2, hasMore: true };
 
         const newPosts = res.data.posts.filter(
           (newPost: PostListItem) =>

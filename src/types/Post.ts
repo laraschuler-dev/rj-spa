@@ -7,6 +7,7 @@ export interface Attendance {
 }
 
 export interface PostListItem {
+  likeCount: number | undefined;
   author: any;
   uniqueKey: Key | null | undefined; //Identificador único universal para renderização de listas
   id: number;
