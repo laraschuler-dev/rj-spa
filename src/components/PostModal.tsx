@@ -2,6 +2,7 @@ import React from 'react';
 import PostCard from './PostCard';
 import { usePostStore } from '../stores/postStore';
 import { PostListItem } from '../types/Post';
+import { useEventAttendance } from '../hooks/useEventAttendance';
 
 interface PostModalProps {
   postId: number;
@@ -20,17 +21,29 @@ const PostModal: React.FC<PostModalProps> = ({
   onShare,
   onDelete,
 }) => {
-  const { posts, toggleLikePost } = usePostStore();
+  console.log('Modal recebeu:', { postId, shareId });
+  const { posts, toggleLikePost } = usePostStore(); // ✅ Remova toggleAttendance não usado
+
+  // ✅ Use apenas o necessário do hook
+  const { status, toggleAttendance: toggleAttendanceHook } = useEventAttendance(
+    postId,
+    shareId
+  );
 
   // 🔑 Pega o post atualizado diretamente da store
   const modalPost: PostListItem | undefined = posts.find((p) => {
-    // Se estamos procurando um post COMPARTILHADO
     if (shareId) {
-      return p.sharedBy?.shareId === shareId;
-    }
-    // Se estamos procurando um post ORIGINAL
-    else {
-      return p.id === postId && !p.sharedBy; // ⚠️ IMPORTANTE: && !p.sharedBy
+      const matches = p.sharedBy?.shareId === shareId;
+      return matches;
+    } else {
+      const matches = p.id === postId && !p.sharedBy;
+      console.log('Buscando post original:', {
+        targetPostId: postId,
+        currentPostId: p.id,
+        hasSharedBy: !!p.sharedBy,
+        matches,
+      });
+      return matches;
     }
   });
 
@@ -38,17 +51,26 @@ const PostModal: React.FC<PostModalProps> = ({
 
   const handleLike = async () => {
     try {
-      // Atualiza a store primeiro para feedback visual imediato
-      toggleLikePost(postId, !modalPost.liked, shareId);
+      // ✅ Garanta que não está passando undefined para liked
+      const currentLiked = modalPost.liked ?? false;
+      toggleLikePost(postId, !currentLiked, shareId);
 
-      // Depois chama a API
       if (onLike) {
         await onLike(postId, shareId);
       }
     } catch (err) {
       console.error('Erro ao curtir/descurtir post:', err);
-      // Reverte se der erro
-      toggleLikePost(postId, modalPost.liked, shareId);
+      // ✅ Reverte com valor seguro
+      const currentLiked = modalPost.liked ?? false;
+      toggleLikePost(postId, currentLiked, shareId);
+    }
+  };
+
+  const handleAttendance = async () => {
+    try {
+      await toggleAttendanceHook();
+    } catch (err) {
+      console.error('Erro ao alternar presença:', err);
     }
   };
 
@@ -91,9 +113,11 @@ const PostModal: React.FC<PostModalProps> = ({
           isLiked={modalPost.liked ?? false}
           sharedBy={modalPost.sharedBy}
           expanded
-          onLike={handleLike} // Use a função corrigida
+          onLike={handleLike}
           onShare={onShare}
           onDelete={onDelete}
+          onAttend={handleAttendance} // ✅ DESCOMENTE - É NECESSÁRIO!
+          isAttending={status.userStatus === 'confirmed'}
         />
       </div>
     </div>

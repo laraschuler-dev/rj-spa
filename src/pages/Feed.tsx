@@ -86,14 +86,6 @@ const Feed: React.FC = () => {
               index === self.findIndex((p) => p.uniqueKey === post.uniqueKey)
           )
           .map((post) => {
-            console.log('[Feed] rendering PostCard:', {
-              id: post.id,
-              shareId: post.sharedBy?.shareId,
-              liked: post.liked,
-              likeCount: post.likeCount,
-              uniqueKey: post.uniqueKey,
-            });
-
             return (
               <PostCard
                 key={post.uniqueKey || `post-${post.id}`}
@@ -127,12 +119,18 @@ const Feed: React.FC = () => {
                 }}
                 onShare={() => openShareModal(post)}
                 onDelete={handleDelete}
-                onOpenDetails={() =>
+                onOpenDetails={() => {
+                  console.log('Abrindo modal para post:', {
+                    id: post.id, // ← Deve ser o ID original (60)
+                    shareId: post.sharedBy?.shareId, // ← Deve ser o shareId (40)
+                    postOriginalId: post.sharedBy?.postId, // ← Adicione para verificar
+                    postData: post,
+                  });
                   setSelectedPost({
                     id: post.id,
-                    shareId: post.sharedBy?.shareId, // Para post original: undefined
-                  })
-                }
+                    shareId: post.sharedBy?.shareId,
+                  });
+                }}
                 onEdit={(postId, shareId) =>
                   setEditingPost({ id: postId, shareId })
                 }
@@ -161,29 +159,28 @@ const Feed: React.FC = () => {
           onClose={() => setSelectedPost(null)}
           onLike={async () => {
             if (!selectedPost) return;
-
             const postIdToSend = selectedPost.id;
             const shareIdToSend = selectedPost.shareId;
-
             try {
               const { liked } = await likePost(postIdToSend, shareIdToSend);
-              toggleLikePost(postIdToSend, liked, shareIdToSend); // atualiza store
+              toggleLikePost(postIdToSend, liked, shareIdToSend);
             } catch (err) {
               console.error('Erro ao curtir/descurtir post:', err);
             }
           }}
           onShare={() => {
-            const post = posts.find((p) =>
-              selectedPost.shareId
-                ? p.sharedBy?.shareId === selectedPost.shareId
-                : p.id === selectedPost.id
-            );
+            const post = posts.find((p) => {
+              if (selectedPost.shareId) {
+                return p.sharedBy?.shareId === selectedPost.shareId;
+              } else {
+                return p.id === selectedPost.id && !p.sharedBy;
+              }
+            });
             if (post) openShareModal(post);
           }}
           onDelete={handleDelete}
         />
       )}
-
       {editingPost &&
         (editingPost.shareId ? (
           <ShareEditModal

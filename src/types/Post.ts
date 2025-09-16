@@ -1,9 +1,8 @@
 import { Key } from 'react';
 
-export interface Attendance {
-  userStatus: 'interested' | 'confirmed' | null;
-  interestedCount: number;
-  confirmedCount: number;
+export interface EventAttendance {
+  userId: number;
+  status: string; // 'confirmed' | 'interested' (se futuramente quiser abrir mais)
 }
 
 export interface PostListItem {
@@ -37,7 +36,8 @@ export interface PostListItem {
   images: string[];
   createdAt: string;
   liked?: boolean;
-  attendance?: Attendance;
+  attending?: boolean; // 👈 boolean simples pro usuário atual
+  eventAttendance?: EventAttendance[]; // 👈 lista de presenças (caso queira mostrar todos os participantes)
   user: {
     id: number;
     name: string;

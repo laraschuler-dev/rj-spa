@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   FaHeart,
   FaRegHeart,
@@ -12,38 +12,51 @@ interface PostActionsProps {
   post: {
     id: number;
     categoryId: number;
-    sharedBy?: { shareId: number } | null; // << importante
+    sharedBy?: { shareId: number } | null;
   };
   postIdForAttendance?: number;
   postShareIdForAttendance?: number;
   isLiked?: boolean;
-  onLike?: (postId: number, shareId?: number) => void; // << muda aqui
+  onLike?: (postId: number, shareId?: number) => void;
   onComment?: () => void;
   onShare?: () => void;
+  onAttend?: () => void;
+  isAttending?: boolean; // ✅ Já está na interface
 }
 
 const PostActions: React.FC<PostActionsProps> = ({
   post,
   postIdForAttendance,
   postShareIdForAttendance,
-  isLiked = false, // Recebe o estado da store
+  isLiked = false,
   onLike,
   onComment,
   onShare,
+  onAttend,
+  isAttending,
 }) => {
-  // Usa hook para marcar/desmarcar presença
+  // ✅ Use o hook APENAS se não tiver onAttend (ou seja, apenas no FEED)
   const {
     status,
     toggleAttendance,
     loading: attendanceLoading,
-  } = useEventAttendance(postIdForAttendance, postShareIdForAttendance);
+  } = useEventAttendance(
+    onAttend ? undefined : postIdForAttendance, // ⚠️ Se tem onAttend, não use hook
+    onAttend ? undefined : postShareIdForAttendance
+  );
 
   const handleAttendance = async () => {
-    if (!postIdForAttendance || attendanceLoading) return;
-    try {
-      await toggleAttendance();
-    } catch (error) {
-      console.error('[PostActions] Erro ao alternar presença:', error);
+    if (onAttend) {
+      // Se onAttend foi passado (modal), use isso
+      await onAttend();
+    } else {
+      // Senão, use o hook normal (feed)
+      if (!postIdForAttendance || attendanceLoading) return;
+      try {
+        await toggleAttendance();
+      } catch (error) {
+        console.error('[PostActions] Erro ao alternar presença:', error);
+      }
     }
   };
 
@@ -52,14 +65,17 @@ const PostActions: React.FC<PostActionsProps> = ({
       if (onLike) {
         await onLike(post.id, post.sharedBy?.shareId);
       }
-      // O feedback visual vem da store através do isLiked
     } catch (error) {
       console.error('Erro ao curtir post:', error);
     }
   };
 
   const isEvent = post.categoryId === 8;
-  const attending = status.userStatus === 'confirmed';
+
+  // ✅ CORREÇÃO: Se tem onAttend (modal), use isAttending. Senão, use status do hook.
+  const attending = onAttend
+    ? isAttending // ← Modal: usa prop
+    : status.userStatus === 'confirmed'; // ← Feed: usa hook
 
   return (
     <div
@@ -71,7 +87,7 @@ const PostActions: React.FC<PostActionsProps> = ({
         onClick={handleLike}
         className="flex items-center gap-1 hover:text-blue-500 transition"
       >
-        {isLiked ? ( // Use isLiked da store em vez de estado local
+        {isLiked ? (
           <FaHeart className="text-red-500 w-4 h-4 sm:w-5 sm:h-5" />
         ) : (
           <FaRegHeart className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -102,7 +118,7 @@ const PostActions: React.FC<PostActionsProps> = ({
       {isEvent && (
         <button
           onClick={handleAttendance}
-          disabled={attendanceLoading}
+          disabled={attendanceLoading && !onAttend} // ⚠️ Só desabilita se estiver usando hook
           className={`flex items-center gap-1 px-2 py-1 rounded-xl font-medium transition ${
             attending
               ? 'bg-green-100 text-green-600 border border-green-500'

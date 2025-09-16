@@ -32,8 +32,8 @@ interface PostCardProps {
   onComment?: () => void;
   onShare?: () => void;
   onAttend?: () => void;
-  isLiked?: boolean;
   isAttending?: boolean;
+  isLiked?: boolean;
   sharedBy?: {
     id: number;
     name: string;
@@ -68,7 +68,7 @@ const PostCard: React.FC<PostCardProps> = ({
   expanded = false,
   isInModal = false,
   onOpenDetails,
-  onEdit,
+  onEdit, // ✅ ADICIONE ESTA LINHA
 }) => {
   const [showComments, setShowComments] = useState(false);
   const navigate = useNavigate();
@@ -78,7 +78,7 @@ const PostCard: React.FC<PostCardProps> = ({
   const postIdForComments = sharedBy ? sharedBy.postId : id;
   const shareIdForComments = sharedBy?.shareId ?? undefined;
 
-  const { status } = useEventAttendance(
+  const { status, toggleAttendance, loading } = useEventAttendance(
     postIdForAttendance,
     postShareIdForAttendance
   );
@@ -344,8 +344,9 @@ const PostCard: React.FC<PostCardProps> = ({
           onLike={onLike}
           onComment={() => setShowComments((prev) => !prev)}
           onShare={onShare}
-          postIdForAttendance={postIdForAttendance}
-          postShareIdForAttendance={postShareIdForAttendance}
+          onAttend={toggleAttendance} // ✅ usa hook
+          isAttending={status.attending} // ✅ vem do hook
+          loadingAttend={loading} // opcional: se quiser desabilitar botão enquanto envia
         />
       )}
 

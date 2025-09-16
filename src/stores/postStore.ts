@@ -17,12 +17,7 @@ interface PostStoreState {
   removePost: (postId: number, shareId?: number) => void;
   toggleLikePost: (postId: number, liked: boolean, shareId?: number) => void;
 
-  toggleAttendance: (
-    postId: number,
-    shareId?: number,
-    status?: 'interested' | 'confirmed' | null,
-    counts?: { interestedCount: number; confirmedCount: number }
-  ) => void;
+  toggleAttendance: (postId, postShareId) => void;
 
   comments: Record<string, PostComment[]>;
   fetchComments: (postId: number, shareId?: number) => Promise<void>;
@@ -89,12 +84,6 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
   },
 
   toggleLikePost: (postId: number, liked: boolean, shareId?: number) => {
-    console.log('[postStore.toggleLikePost] input:', {
-      postId,
-      liked,
-      shareId,
-    });
-
     set((state) => {
       const updated = state.posts.map((p) => {
         // Se estamos lidando com um post COMPARTILHADO (tem shareId)
@@ -114,29 +103,24 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
       return { posts: updated };
     });
   },
-  
-  toggleAttendance: (postId, shareId, status, counts) => {
-    set((state) => ({
-      posts: state.posts.map((p) => {
-        const isPost = !shareId && p.id === postId;
-        const isShare = shareId && p.sharedBy?.shareId === shareId;
-        if (isPost || isShare) {
-          return {
-            ...p,
-            attendance: {
-              ...p.attendance,
-              userStatus: status ?? p.attendance?.userStatus ?? null,
-              interestedCount:
-                counts?.interestedCount ?? p.attendance?.interestedCount ?? 0,
-              confirmedCount:
-                counts?.confirmedCount ?? p.attendance?.confirmedCount ?? 0,
-            },
-          };
-        }
-        return p;
-      }),
-    }));
-  },
+
+  toggleAttendance: (postId, postShareId) =>
+    set((state) => {
+      const posts = state.posts.map((p) => {
+        const isSame =
+          (postShareId && p.sharedBy?.shareId === postShareId) ||
+          (!postShareId && p.id === postId && !p.sharedBy);
+
+        if (!isSame) return p;
+
+        return {
+          ...p,
+          attending: !p.attending, // toggle local
+        };
+      });
+
+      return { posts };
+    }),
 
   comments: {},
 

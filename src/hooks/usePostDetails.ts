@@ -11,10 +11,8 @@ export const usePostDetails = (postId: number, shareId?: number) => {
   useEffect(() => {
     if (!postId) return;
 
-    // chave única do post (share ou original)
     const key = shareId ? `share-${shareId}` : `post-${postId}`;
 
-    // 1️⃣ tenta buscar na store
     const existing = posts.find((p) => {
       const pKey = p.sharedBy?.shareId
         ? `share-${p.sharedBy.shareId}`
@@ -28,44 +26,42 @@ export const usePostDetails = (postId: number, shareId?: number) => {
       return;
     }
 
-    // 2️⃣ se não achar, busca na API
     const fetchPost = async () => {
       setLoading(true);
       try {
         const res = await axios.get(`/posts/${postId}`, {
           params: shareId ? { shareId } : undefined,
         });
-        // dentro de fetchPost, antes de setPost
+
         const fetchedPost = res.data;
 
         const normalizedPost: PostListItem = {
           ...fetchedPost,
-          // id SEMPRE será o id do post original
-          id: fetchedPost.postId ?? fetchedPost.id,
+          // ✅ CORREÇÃO: Mantenha os IDs originais
+          id: fetchedPost.id, // ← SEMPRE use o id direto
           liked: fetchedPost.liked ?? fetchedPost.likedByUser ?? false,
           likeCount: fetchedPost.likeCount ?? fetchedPost.likesCount ?? 0,
-          user: fetchedPost.user ?? fetchedPost.author, // feed usa `user`
+          user: fetchedPost.user ?? fetchedPost.author,
           images: Array.isArray(fetchedPost.images)
             ? fetchedPost.images.map((img: any) =>
                 typeof img === 'string' ? img : img.url
               )
             : [],
 
-          // se backend mandar só shareId/postId, normaliza
+          // ✅ CORREÇÃO CRÍTICA: Não force valores default para shareId
           sharedBy: fetchedPost.sharedBy
             ? {
                 ...fetchedPost.sharedBy,
-                shareId: fetchedPost.sharedBy.shareId ?? fetchedPost.id, // id do share
-                postId:
-                  fetchedPost.sharedBy.postId ??
-                  fetchedPost.postId ??
-                  fetchedPost.id, // id do post original
+                shareId: fetchedPost.sharedBy.shareId, // ← Use o valor original
+                postId: fetchedPost.sharedBy.postId, // ← Use o valor original
               }
             : undefined,
         };
 
+        console.log('Post normalizado:', normalizedPost); // ← Adicione log para debug
+
         setPost(normalizedPost);
-        updatePost(normalizedPost);
+        updatePost(normalizedPost, true); // ← addIfNotExists = true para garantir que adiciona
       } catch (err) {
         console.error('Erro ao carregar detalhes do post:', err);
       } finally {
