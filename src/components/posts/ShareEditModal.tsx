@@ -62,11 +62,17 @@ const ShareEditModal: React.FC<ShareEditModalProps> = ({
 
         <div className="mb-4">
           <PostPreviewCard
-            author={post.author}
-            createdAt={post.createdAt}
+            author={{
+              name:
+                post.sharedBy?.name ??
+                post.user?.name ??
+                'Usuário desconhecido',
+              avatarUrl: post.sharedBy?.avatarUrl ?? post.user?.avatarUrl,
+            }}
+            createdAt={post.sharedBy?.sharedAt ?? post.createdAt}
             metadata={post.metadata}
             content={post.content}
-            images={post.images}
+            images={post.images?.map((url, index) => ({ id: index, url }))}
           />
         </div>
 

@@ -1,5 +1,4 @@
-import { Dialog, Transition } from '@headlessui/react';
-import { Fragment, useState } from 'react';
+import { useState } from 'react';
 import Typography from './ui/Typography';
 import SubmitButton from './ui/SubmitButton';
 import CancelButton from './ui/CancelButton';
