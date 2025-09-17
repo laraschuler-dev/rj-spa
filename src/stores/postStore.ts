@@ -70,15 +70,32 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
   },
 
   addPost: (newPost) => {
-    set((state) => ({ posts: [newPost, ...state.posts] }));
+    set((state) => {
+      const exists = state.posts.some(
+        (p) =>
+          // Se for compartilhamento, compara pelo shareId
+          (p.sharedBy?.shareId &&
+            p.sharedBy.shareId === newPost.sharedBy?.shareId) ||
+          // Se for post original, compara pelo id
+          (!p.sharedBy && !newPost.sharedBy && p.id === newPost.id)
+      );
+
+      if (exists) {
+        return state; // não adiciona duplicado
+      }
+
+      return { posts: [newPost, ...state.posts] };
+    });
   },
 
-  removePost: (postId, shareId) => {
+  removePost: (postId: number, shareId?: number) => {
     set((state) => ({
-      posts: state.posts.filter(
-        (p) =>
-          !(p.id === postId && !shareId) &&
-          !(shareId && p.sharedBy?.shareId === shareId)
+      posts: state.posts.filter((p) =>
+        // Se for compartilhamento, remove só o compartilhamento específico
+        shareId
+          ? p.sharedBy?.shareId !== shareId
+          : // Se for post original, remove apenas o post original
+            !(p.id === postId && !p.sharedBy)
       ),
     }));
   },

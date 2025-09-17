@@ -37,8 +37,7 @@ export const usePostDetails = (postId: number, shareId?: number) => {
 
         const normalizedPost: PostListItem = {
           ...fetchedPost,
-          // ✅ CORREÇÃO: Mantenha os IDs originais
-          id: fetchedPost.id, // ← SEMPRE use o id direto
+          id: fetchedPost.id,
           liked: fetchedPost.liked ?? fetchedPost.likedByUser ?? false,
           likeCount: fetchedPost.likeCount ?? fetchedPost.likesCount ?? 0,
           user: fetchedPost.user ?? fetchedPost.author,
@@ -48,7 +47,6 @@ export const usePostDetails = (postId: number, shareId?: number) => {
               )
             : [],
 
-          // ✅ CORREÇÃO CRÍTICA: Não force valores default para shareId
           sharedBy: fetchedPost.sharedBy
             ? {
                 ...fetchedPost.sharedBy,
@@ -58,10 +56,8 @@ export const usePostDetails = (postId: number, shareId?: number) => {
             : undefined,
         };
 
-        console.log('Post normalizado:', normalizedPost); // ← Adicione log para debug
-
         setPost(normalizedPost);
-        updatePost(normalizedPost, true); // ← addIfNotExists = true para garantir que adiciona
+        updatePost(normalizedPost, true);
       } catch (err) {
         console.error('Erro ao carregar detalhes do post:', err);
       } finally {
