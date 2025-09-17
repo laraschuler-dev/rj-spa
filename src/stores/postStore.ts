@@ -187,44 +187,53 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
     }));
   },
 
-  fetchPosts: async (isInitialLoad = false) => {
-    const { page, hasMore, loading } = get();
-    if (loading || (!isInitialLoad && !hasMore)) return;
+  fetchPosts: async (isInitialLoad: boolean = false) => {
+    const { loading, page } = get();
+    console.log('📄 fetchPosts chamado', {
+      isInitialLoad,
+      currentPage: page,
+      loading,
+    });
+    if (loading) {
+      console.log('⏳ Já está carregando, ignorando...');
+      return;
+    }
 
     set({ loading: true });
+
     try {
+      const currentPage = isInitialLoad ? 1 : page;
+      console.log('fetchPosts -> usando page:', currentPage);
+
       const res = await axios.get('/posts', {
-        params: { page: isInitialLoad ? 1 : page, limit: 10 },
+        params: { page: currentPage, limit: 10 },
       });
 
-      if (!res.data?.posts || res.data.posts.length === 0) {
-        set({ hasMore: false });
-        return;
-      }
+      const postsFromApi: PostListItem[] = res.data.posts;
+      const pagination = res.data.pagination;
 
       set((state) => {
-        if (isInitialLoad)
-          return { posts: res.data.posts, page: 2, hasMore: true };
-
-        const newPosts = res.data.posts.filter(
-          (newPost: PostListItem) =>
-            !state.posts.some(
-              (post) =>
-                post.id === newPost.id ||
-                (post.sharedBy?.shareId &&
-                  post.sharedBy.shareId === newPost.sharedBy?.shareId)
-            )
-        );
+        const newPosts = isInitialLoad
+          ? postsFromApi
+          : [
+              ...state.posts,
+              ...postsFromApi.filter(
+                (p) =>
+                  !state.posts.some(
+                    (existing) => existing.uniqueKey === p.uniqueKey
+                  )
+              ),
+            ];
 
         return {
-          posts: [...state.posts, ...newPosts],
-          page: state.page + 1,
-          hasMore: res.data.posts.length > 0,
+          posts: newPosts,
+          page: currentPage + 1, // ✅ Correto: incrementa APÓS usar a página atual
+          hasMore: pagination.hasNextPage,
+          loading: false,
         };
       });
     } catch (err) {
       console.error('Erro ao buscar posts:', err);
-    } finally {
       set({ loading: false });
     }
   },

@@ -1,5 +1,5 @@
 // Feed.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Layout from '../components/layout/Layout';
 import PostCard from '../components/PostCard';
 import ShareModal from '../components/ShareModal';
@@ -11,11 +11,11 @@ import { toast } from 'react-toastify';
 import PostModal from '../components/PostModal';
 import EditPostModal from '../components/posts/EditPostModal';
 import ShareEditModal from '../components/posts/ShareEditModal';
+import { usePosts } from '../hooks/usePosts';
 
 const Feed: React.FC = () => {
   const {
     posts,
-    fetchPosts,
     hasMore,
     loading,
     toggleLikePost,
@@ -23,10 +23,14 @@ const Feed: React.FC = () => {
     removePost,
     updatePost,
   } = usePostStore();
+  const { refreshPosts, loadMorePosts } = usePosts();
 
   const { sharePost } = useSharePost();
   const { deletePost } = useDeletePost();
 
+  useEffect(() => {
+    refreshPosts();
+  }, [refreshPosts]);
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [postToShare, setPostToShare] = useState<any>(null);
   const [selectedPost, setSelectedPost] = useState<{
@@ -131,7 +135,7 @@ const Feed: React.FC = () => {
         {hasMore && (
           <div className="text-center mt-4">
             <button
-              onClick={fetchPosts}
+              onClick={loadMorePosts} // ✅ Agora usa loadMorePosts
               disabled={loading}
               className="text-primary hover:underline"
             >
