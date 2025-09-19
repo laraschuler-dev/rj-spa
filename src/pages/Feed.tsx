@@ -101,11 +101,20 @@ const Feed: React.FC = () => {
             createdAt={post.createdAt}
             categoryId={post.categoria_idcategoria}
             metadata={post.metadata}
-            author={{
-              id: post.user?.id,
-              name: post.user?.name || 'Usuário desconhecido',
-              avatarUrl: post.user?.avatarUrl,
-            }}
+            author={
+              post.categoria_idcategoria === 2 && post.metadata?.isAnonymous
+                ? {
+                    id: 0, // só para exibição
+                    name: 'Anônimo',
+                    avatarUrl: undefined,
+                  }
+                : {
+                    id: post.user?.id,
+                    name: post.user?.name || 'Usuário desconhecido',
+                    avatarUrl: post.user?.avatarUrl,
+                  }
+            }
+            // REMOVA: ownerId={post.user?.id} // 👈 Não precisa mais
             isLiked={post.liked}
             sharedBy={post.sharedBy}
             onLike={async () => {
@@ -129,6 +138,9 @@ const Feed: React.FC = () => {
             onEdit={(postId, shareId) =>
               setEditingPost({ id: postId, shareId })
             }
+            // 👇 ADICIONE ESTAS DUAS NOVAS PROPS
+            isPostOwner={post.isPostOwner} // 👈 Nova prop
+            isShareOwner={post.isShareOwner} // 👈 Nova prop
           />
         ))}
 

@@ -53,4 +53,6 @@ export interface PostListItem {
     message?: string;
     sharedAt: string;
   };
+  isPostOwner?: boolean;
+  isShareOwner?: boolean;
 }

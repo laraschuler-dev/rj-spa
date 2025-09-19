@@ -41,7 +41,6 @@ const CampaignPostForm: React.FC<CampaignPostFormProps> = ({
     content: initialData?.content ?? '',
     images: initialData?.images ?? [], // já vem do backend como {id, url} ou vazio para criação
   });
-  console.log('[CampaignPostForm] initial formData.images:', formData.images);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -167,7 +166,6 @@ const CampaignPostForm: React.FC<CampaignPostFormProps> = ({
                     )
                 ),
               }));
-              console.log('Imagem removida do estado local:', imageId);
             }}
           />
 

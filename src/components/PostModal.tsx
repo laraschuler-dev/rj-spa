@@ -11,6 +11,7 @@ interface PostModalProps {
   onLike?: (postId: number, shareId?: number) => void;
   onShare: () => void;
   onDelete: (postId: number, shareId?: number) => void;
+  onEdit: (postId: number, shareId?: number) => void;
 }
 
 const PostModal: React.FC<PostModalProps> = ({
@@ -20,8 +21,8 @@ const PostModal: React.FC<PostModalProps> = ({
   onLike,
   onShare,
   onDelete,
+  onEdit,
 }) => {
-  console.log('Modal recebeu:', { postId, shareId });
   const { posts, toggleLikePost } = usePostStore(); // ✅ Remova toggleAttendance não usado
 
   // ✅ Use apenas o necessário do hook
@@ -37,12 +38,6 @@ const PostModal: React.FC<PostModalProps> = ({
       return matches;
     } else {
       const matches = p.id === postId && !p.sharedBy;
-      console.log('Buscando post original:', {
-        targetPostId: postId,
-        currentPostId: p.id,
-        hasSharedBy: !!p.sharedBy,
-        matches,
-      });
       return matches;
     }
   });
@@ -74,6 +69,22 @@ const PostModal: React.FC<PostModalProps> = ({
     }
   };
 
+  const author =
+    modalPost.categoria_idcategoria === 2 && modalPost.metadata?.isAnonymous
+      ? {
+          id: 0,
+          name: 'Anônimo',
+          avatarUrl: undefined,
+        }
+      : {
+          id: modalPost.user?.id || modalPost.author?.id,
+          name:
+            modalPost.user?.name ||
+            modalPost.author?.name ||
+            'Usuário desconhecido',
+          avatarUrl: modalPost.user?.avatarUrl || modalPost.author?.avatarUrl,
+        };
+
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-start pt-20 overflow-auto"
@@ -102,22 +113,18 @@ const PostModal: React.FC<PostModalProps> = ({
           createdAt={modalPost.createdAt}
           categoryId={modalPost.categoria_idcategoria}
           metadata={modalPost.metadata}
-          author={{
-            id: modalPost.user?.id || modalPost.author?.id,
-            name:
-              modalPost.user?.name ||
-              modalPost.author?.name ||
-              'Usuário desconhecido',
-            avatarUrl: modalPost.user?.avatarUrl || modalPost.author?.avatarUrl,
-          }}
+          author={author}
           isLiked={modalPost.liked ?? false}
           sharedBy={modalPost.sharedBy}
           expanded
           onLike={handleLike}
           onShare={onShare}
           onDelete={onDelete}
-          onAttend={handleAttendance} // ✅ DESCOMENTE - É NECESSÁRIO!
+          onAttend={handleAttendance}
           isAttending={status.userStatus === 'confirmed'}
+          isPostOwner={modalPost.isPostOwner ?? false}
+          isShareOwner={modalPost.isShareOwner ?? false}
+          onEdit={onEdit}
         />
       </div>
     </div>

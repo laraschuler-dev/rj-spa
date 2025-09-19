@@ -49,6 +49,8 @@ interface PostCardProps {
   isInModal?: boolean;
   onOpenDetails?: (postId: number, shareId?: number) => void;
   onEdit?: (postId: number, shareId?: number) => void;
+  isPostOwner?: boolean;
+  isShareOwner?: boolean;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -68,7 +70,9 @@ const PostCard: React.FC<PostCardProps> = ({
   expanded = false,
   isInModal = false,
   onOpenDetails,
-  onEdit, // ✅ ADICIONE ESTA LINHA
+  onEdit,
+  isPostOwner = false,
+  isShareOwner = false,
 }) => {
   const [showComments, setShowComments] = useState(false);
   const navigate = useNavigate();
@@ -120,7 +124,7 @@ const PostCard: React.FC<PostCardProps> = ({
               </span>
             </span>
 
-            {sharedBy.id === user?.id && (
+            {isShareOwner && (
               <PostMenuButton
                 postId={sharedBy.postId}
                 shareId={sharedBy.shareId}
@@ -173,14 +177,15 @@ const PostCard: React.FC<PostCardProps> = ({
           </div>
         </div>
 
-        {!sharedBy && author.id === user?.id && (
-          <PostMenuButton
-            postId={id}
-            className="absolute top-0 right-0"
-            onEdit={onEdit}
-            onDelete={onDelete}
-          />
-        )}
+        {!sharedBy &&
+          isPostOwner && ( // 👈 Usa a flag isPostOwner
+            <PostMenuButton
+              postId={id}
+              className="absolute top-0 right-0"
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
+          )}
       </div>
 
       {/* Título e conteúdo */}
@@ -201,93 +206,111 @@ const PostCard: React.FC<PostCardProps> = ({
           </Typography>
           {expanded ? (
             <div className="text-sm text-gray-700 space-y-1">
-              {content && <p>{content}</p>}
+              {categoryId === 2 ? (
+                <>
+                  {metadata?.description && (
+                    <p>
+                      <strong>Descrição:</strong> {metadata.description}
+                    </p>
+                  )}
+                  {metadata?.isAnonymous !== undefined && (
+                    <p>
+                      <strong>Anonimato:</strong>{' '}
+                      {metadata.isAnonymous ? 'Sim' : 'Não'}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <>
+                  {content && <p>{content}</p>}
 
-              {metadata?.itemType && (
-                <p>
-                  <strong>Tipo:</strong> {metadata.itemType}
-                </p>
-              )}
-              {metadata?.condition && (
-                <p>
-                  <strong>Condição:</strong> {metadata.condition}
-                </p>
-              )}
-              {metadata?.location && (
-                <p>
-                  <strong>Local:</strong> {metadata.location}
-                </p>
-              )}
-              {metadata?.date && (
-                <p>
-                  <strong>Data:</strong> {metadata.date}
-                </p>
-              )}
-              {metadata?.availability && (
-                <p>
-                  <strong>Disponibilidade:</strong> {metadata.availability}
-                </p>
-              )}
-              {metadata?.description && (
-                <p>
-                  <strong>Descrição:</strong> {metadata.description}
-                </p>
-              )}
-              {metadata?.isAnonymous !== undefined && (
-                <p>
-                  <strong>Anonimato:</strong>{' '}
-                  {metadata.isAnonymous ? 'Sim' : 'Não'}
-                </p>
-              )}
-              {metadata?.goal && (
-                <p>
-                  <strong>Objetivo:</strong> {metadata.goal}
-                </p>
-              )}
-              {metadata?.deadline && (
-                <p>
-                  <strong>Prazo:</strong> {metadata.deadline}
-                </p>
-              )}
-              {metadata?.organizer && (
-                <p>
-                  <strong>Organizador:</strong> {metadata.organizer}
-                </p>
-              )}
-              {metadata?.type && (
-                <p>
-                  <strong>Tipo:</strong> {metadata.type}
-                </p>
-              )}
-              {metadata?.urgency && (
-                <p>
-                  <strong>Urgência:</strong> {metadata.urgency}
-                </p>
-              )}
-              {metadata?.serviceType && (
-                <p>
-                  <strong>Tipo de Serviço:</strong> {metadata.serviceType}
-                </p>
-              )}
-              {metadata?.qualifications && (
-                <p>
-                  <strong>Qualificações:</strong> {metadata.qualifications}
-                </p>
-              )}
-              {metadata?.format && (
-                <p>
-                  <strong>Formato:</strong> {metadata.format}
-                </p>
-              )}
-              {metadata?.duration && (
-                <p>
-                  <strong>Duração:</strong> {metadata.duration}
-                </p>
-              )}
-              {metadata?.requirements && (
-                <p>
-                  <strong>Requisitos:</strong> {metadata.requirements}
-                </p>
+                  {metadata?.itemType && (
+                    <p>
+                      <strong>Tipo:</strong> {metadata.itemType}
+                    </p>
+                  )}
+                  {metadata?.condition && (
+                    <p>
+                      <strong>Condição:</strong> {metadata.condition}
+                    </p>
+                  )}
+                  {metadata?.location && (
+                    <p>
+                      <strong>Local:</strong> {metadata.location}
+                    </p>
+                  )}
+                  {metadata?.date && (
+                    <p>
+                      <strong>Data:</strong> {metadata.date}
+                    </p>
+                  )}
+                  {metadata?.availability && (
+                    <p>
+                      <strong>Disponibilidade:</strong> {metadata.availability}
+                    </p>
+                  )}
+                  {metadata?.description && (
+                    <p>
+                      <strong>Descrição:</strong> {metadata.description}
+                    </p>
+                  )}
+                  {metadata?.isAnonymous !== undefined && (
+                    <p>
+                      <strong>Anonimato:</strong>{' '}
+                      {metadata.isAnonymous ? 'Sim' : 'Não'}
+                    </p>
+                  )}
+                  {metadata?.goal && (
+                    <p>
+                      <strong>Objetivo:</strong> {metadata.goal}
+                    </p>
+                  )}
+                  {metadata?.deadline && (
+                    <p>
+                      <strong>Prazo:</strong> {metadata.deadline}
+                    </p>
+                  )}
+                  {metadata?.organizer && (
+                    <p>
+                      <strong>Organizador:</strong> {metadata.organizer}
+                    </p>
+                  )}
+                  {metadata?.type && (
+                    <p>
+                      <strong>Tipo:</strong> {metadata.type}
+                    </p>
+                  )}
+                  {metadata?.urgency && (
+                    <p>
+                      <strong>Urgência:</strong> {metadata.urgency}
+                    </p>
+                  )}
+                  {metadata?.serviceType && (
+                    <p>
+                      <strong>Tipo de Serviço:</strong> {metadata.serviceType}
+                    </p>
+                  )}
+                  {metadata?.qualifications && (
+                    <p>
+                      <strong>Qualificações:</strong> {metadata.qualifications}
+                    </p>
+                  )}
+                  {metadata?.format && (
+                    <p>
+                      <strong>Formato:</strong> {metadata.format}
+                    </p>
+                  )}
+                  {metadata?.duration && (
+                    <p>
+                      <strong>Duração:</strong> {metadata.duration}
+                    </p>
+                  )}
+                  {metadata?.requirements && (
+                    <p>
+                      <strong>Requisitos:</strong> {metadata.requirements}
+                    </p>
+                  )}
+                </>
               )}
             </div>
           ) : (
@@ -295,12 +318,11 @@ const PostCard: React.FC<PostCardProps> = ({
               variant="p"
               className="text-sm text-gray-700 line-clamp-3"
             >
-              {content}
+              {categoryId === 2 ? metadata?.description : content}
             </Typography>
           )}
         </>
       )}
-
       {/* Carrossel de imagens */}
       {!isOriginalDeleted && images.length > 0 && (
         <Swiper spaceBetween={8} slidesPerView={1} className="rounded-xl">

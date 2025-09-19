@@ -5,7 +5,7 @@ import { useCreatePost } from '../../hooks/useCreatePost';
 
 const CreatePostPage = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
-  const { createPost, loading } = useCreatePost();
+  const { createPost } = useCreatePost();
 
   if (!categoryId) return <p>Categoria inválida.</p>;
 
@@ -15,12 +15,8 @@ const CreatePostPage = () => {
       mode="create"
       onSubmit={async (formData) => {
         const created = await createPost(formData);
-        if (created) {
-          // opcional: resetar formulário, fechar modal ou scroll para o post criado
-          console.log('Post criado:', created.id);
-        }
+        return created;
       }}
-      submitDisabled={loading} // desabilita botão durante request
     />
   );
 };
