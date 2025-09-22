@@ -1,70 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import axios from '../services/api';
+import React from 'react';
 import Typography from '../components/ui/Typography';
 import { Link } from 'react-router-dom';
 import { CgProfile } from 'react-icons/cg';
 import { FaMapMarkerAlt } from 'react-icons/fa';
-import useAuthStore from '../stores/authStore';
 import { FiEdit2 } from 'react-icons/fi';
 import BackButton from '../components/ui/BackButton';
-
-interface UserData {
-  name: string;
-  email: string;
-  fone?: string;
-}
-
-interface UserProfile {
-  translated_type?: string;
-  profile_photo?: string;
-  bio?: string;
-  city?: string;
-  state?: string;
-}
+import { useProfile } from '../hooks/useProfile';
+import axios from '../services/api';
 
 const ProfileView: React.FC = () => {
-  const [user, setUser] = useState<UserData | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const token = useAuthStore((state) => state.token);
-
+  const { user, profile, loading } = useProfile();
   const apiBaseUrl = axios.defaults.baseURL || '';
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await axios.get('/profile', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        const data = response.data;
-
-        setUser({
-          name: data.name,
-          email: data.email,
-          fone: data.fone,
-        });
-
-        setProfile({
-          translated_type: data.profile.translated_type,
-          profile_photo: data.profile.profile_photo,
-          bio: data.profile.bio,
-          city: data.profile.city,
-          state: data.profile.state,
-        });
-      } catch (error) {
-        console.error('Erro ao buscar perfil:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, [token]);
-
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="text-primary text-center hover:underline">
         Carregando perfil...
