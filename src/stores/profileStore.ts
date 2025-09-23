@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 interface UserData {
+  id: number;
   name: string;
   email: string;
   fone?: string;
@@ -20,7 +21,7 @@ interface ProfileState {
   profile: UserProfile | null;
   loading: boolean;
 
- setProfile(user: UserData, profile: UserProfile): void;
+  setProfile(user: UserData, profile: UserProfile): void;
   clearProfile: () => void;
   setLoading: (loading: boolean) => void;
 }

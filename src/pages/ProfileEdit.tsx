@@ -9,6 +9,7 @@ import CancelButton from '../components/ui/CancelButton';
 import { useProfileStore } from '../stores/profileStore';
 import { useEditProfile } from '../hooks/useEditProfile';
 import axios from '../services/api';
+import BackButton from '../components/ui/BackButton';
 
 const profileOptions = [
   { value: '', label: 'Perfil' },
@@ -80,6 +81,7 @@ const ProfileEdit: React.FC = () => {
 
   return (
     <main className="max-w-xl mx-auto mt-12 bg-white p-8 rounded-xl shadow-lg">
+      <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
       <Typography variant="h1" className="text-center text-primary mb-6">
         Editar Perfil
       </Typography>

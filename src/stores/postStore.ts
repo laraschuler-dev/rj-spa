@@ -11,12 +11,15 @@ interface PostStoreState {
 
   fetchPosts: (isInitialLoad?: boolean) => Promise<void>;
   refreshPosts: () => Promise<void>;
+
+  fetchUserPosts: (userId: number, isInitialLoad?: boolean) => Promise<void>;
+  refreshUserPosts: (userId: number) => Promise<void>;
+
   setPosts: (posts: PostListItem[]) => void;
   updatePost: (updatedPost: PostListItem) => void;
   addPost: (newPost: PostListItem) => void;
   removePost: (postId: number, shareId?: number) => void;
   toggleLikePost: (postId: number, liked: boolean, shareId?: number) => void;
-
   toggleAttendance: (postId, postShareId) => void;
 
   comments: Record<string, PostComment[]>;
@@ -240,5 +243,52 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
 
   refreshPosts: async () => {
     await get().fetchPosts(true);
+  },
+
+  fetchUserPosts: async (userId: number, isInitialLoad: boolean = false) => {
+    const { loading, page } = get();
+    if (loading) return;
+
+    set({ loading: true });
+
+    try {
+      const currentPage = isInitialLoad ? 1 : page;
+
+      const res = await axios.get(`/users/${userId}/posts`, {
+        params: { page: currentPage, limit: 10 },
+      });
+
+      const postsFromApi: PostListItem[] = res.data.data || [];
+      const pagination = res.data.pagination;
+
+      set((state) => {
+        const currentPosts = isInitialLoad ? [] : state.posts || [];
+
+        const newPosts = isInitialLoad
+          ? postsFromApi
+          : [
+              ...currentPosts,
+              ...postsFromApi.filter(
+                (p) =>
+                  !currentPosts.some(
+                    (existing) => existing.uniqueKey === p.uniqueKey
+                  )
+              ),
+            ];
+
+        return {
+          posts: newPosts,
+          page: isInitialLoad ? 2 : currentPage + 1,
+          hasMore: pagination?.hasNextPage || false,
+          loading: false,
+        };
+      });
+    } catch (err) {
+      console.error('❌ Erro ao buscar posts do usuário:', err);
+      set({ loading: false });
+    }
+  },
+  refreshUserPosts: async (userId: number) => {
+    await get().fetchUserPosts(userId, true);
   },
 }));
