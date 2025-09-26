@@ -28,7 +28,6 @@ interface SidebarProps {
 function Sidebar({ isFeed = false }: SidebarProps) {
   return (
     <aside className="hidden md:flex flex-col w-64 bg-sidebar text-white h-screen p-6 shadow-lg sticky top-16">
-      <div className={`${isFeed ? 'pt-20' : 'pt-4'} px-4`}></div> {/* Título */}
       <h2 className="text-2xl mb-6">Ações</h2>
       {/* Links de Navegação */}
       <nav className="flex flex-col gap-4">

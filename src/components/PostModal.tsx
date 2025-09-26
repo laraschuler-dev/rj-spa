@@ -10,7 +10,6 @@ interface PostModalProps {
   onClose: () => void;
   onLike?: (postId: number, shareId?: number) => void;
   onShare: () => void;
-  onDelete: (postId: number, shareId?: number) => void;
   onEdit: (postId: number, shareId?: number) => void;
 }
 
@@ -20,7 +19,6 @@ const PostModal: React.FC<PostModalProps> = ({
   onClose,
   onLike,
   onShare,
-  onDelete,
   onEdit,
 }) => {
   const { posts, toggleLikePost } = usePostStore(); // ✅ Remova toggleAttendance não usado
@@ -91,12 +89,12 @@ const PostModal: React.FC<PostModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl w-full max-w-[700px] p-6 relative"
+        className="bg-white rounded-2xl w-full max-w-[92vw] sm:max-w-[480px] md:max-w-[520px] mx-3 p-4 relative"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 font-bold text-xl"
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 font-bold text-3xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors z-10 focus:outline-none"
         >
           ×
         </button>
@@ -117,9 +115,9 @@ const PostModal: React.FC<PostModalProps> = ({
           isLiked={modalPost.liked ?? false}
           sharedBy={modalPost.sharedBy}
           expanded
+          isInModal={true}
           onLike={handleLike}
           onShare={onShare}
-          onDelete={onDelete}
           onAttend={handleAttendance}
           isAttending={status.userStatus === 'confirmed'}
           isPostOwner={modalPost.isPostOwner ?? false}

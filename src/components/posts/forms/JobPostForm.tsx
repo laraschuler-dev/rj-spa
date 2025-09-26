@@ -73,7 +73,11 @@ const JobPostForm: React.FC<JobPostFormProps> = ({
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
+    <main
+      className={`flex justify-center bg-background ${
+        mode === 'edit' ? 'min-h-0 py-2' : 'min-h-screen py-12 items-center'
+      }`}
+    >
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
         <Typography variant="h2" className="text-primary text-center mb-6">
           {mode === 'create' ? 'Nova Vaga' : 'Editar Vaga'}

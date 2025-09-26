@@ -32,7 +32,6 @@ const ProfileView: React.FC = () => {
     loading: postsLoading,
   } = useProfilePosts(user?.id);
 
-  // ✅ CORREÇÃO: useEffect com controle de execução
   const [initialLoadDone, setInitialLoadDone] = useState(false);
 
   useEffect(() => {
@@ -42,7 +41,6 @@ const ProfileView: React.FC = () => {
     }
   }, [user?.id, initialLoadDone, refreshPosts]);
 
-  // ✅ AÇÕES VÊM DIRETO DA STORE (IGUAL AO FEED)
   const { toggleLikePost, addPost, removePost, updatePost } = usePostStore();
 
   const { sharePost } = useSharePost();
@@ -53,7 +51,6 @@ const ProfileView: React.FC = () => {
     shareId?: number;
   } | null>(null);
 
-  // ✅ Estado para modais (IGUAL AO FEED)
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [postToShare, setPostToShare] = useState<any>(null);
   const [editingPost, setEditingPost] = useState<{
@@ -61,7 +58,6 @@ const ProfileView: React.FC = () => {
     shareId?: number;
   } | null>(null);
 
-  // ✅ Funções de compartilhamento (IGUAL AO FEED)
   const openShareModal = (post: any) => {
     setPostToShare(post);
     setShareModalOpen(true);
@@ -72,7 +68,6 @@ const ProfileView: React.FC = () => {
     setShareModalOpen(false);
   };
 
-  // ✅ COMPARTILHAR (IGUAL AO FEED)
   const handleShare = async (message?: string) => {
     if (!postToShare) return;
 
@@ -90,7 +85,6 @@ const ProfileView: React.FC = () => {
     }
   };
 
-  // ✅ DELETAR (IGUAL AO FEED)
   const handleDelete = async (postId: number, shareId?: number) => {
     try {
       // Passa shareId só se for um compartilhamento
@@ -100,16 +94,13 @@ const ProfileView: React.FC = () => {
         await deletePost(postId);
       }
 
-      removePost(postId, shareId); // ✅ atualiza a store corretamente
+      removePost(postId, shareId);
       toast.success('Post excluído com sucesso!');
     } catch (err) {
       console.error(err);
       toast.error('Erro ao excluir o post!');
     }
   };
-
-  // ✅ CURTIR (DIRETO NA STORE - SEM FUNÇÃO HANDLER REDUNDANTE)
-  // O PostCard chama toggleLikePost diretamente, igual no Feed
 
   if (loading) {
     return <div className="text-primary text-center">Carregando perfil...</div>;
@@ -129,9 +120,8 @@ const ProfileView: React.FC = () => {
   return (
     <main className="min-h-screen bg-background px-4 py-12">
       <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
-
       {/* Card de perfil */}
-      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg text-center mx-auto">
+      <div className="w-full max-w-[600px] bg-white p-8 rounded-2xl shadow-lg text-center mx-auto">
         {profile.profile_photo ? (
           <img
             src={`${apiBaseUrl}${profile.profile_photo}`}
@@ -189,10 +179,56 @@ const ProfileView: React.FC = () => {
           </Link>
         </div>
       </div>
-
+      <div className="mt-8 max-w-[600px] mx-auto w-full">
+        <div className="bg-white rounded-2xl shadow-lg p-6 text-center border border-gray-100">
+          <div className="w-16 h-16 mx-auto mb-3 bg-gradient-to-r from-primary to-primary-light rounded-full flex items-center justify-center">
+            <svg
+              className="w-8 h-8 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+          </div>
+          <Typography
+            variant="h3"
+            className="text-lg font-semibold text-gray-800 mb-2"
+          >
+            Compartilhe algo novo
+          </Typography>
+          <Typography variant="p" className="text-gray-600 text-sm mb-4">
+            Conte novidades, ofereça ajuda ou inicie uma discussão
+          </Typography>
+          <Link
+            to="/posts/create/9"
+            className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-medium py-2.5 px-6 rounded-xl transition-colors duration-200"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Criar Post
+          </Link>
+        </div>
+      </div>
       {/* Lista de posts do usuário - AGORA USA userPosts do useProfilePosts */}
       {user.id && (
-        <div className="mt-8 max-w-md mx-auto space-y-4">
+        <div className="mt-8 max-w-[600px] mx-auto space-y-6 w-full">
           {postsLoading && (
             <p className="text-center text-gray-500">Carregando posts...</p>
           )}
@@ -214,8 +250,13 @@ const ProfileView: React.FC = () => {
                 categoryId={post.categoria_idcategoria}
                 metadata={post.metadata}
                 author={
-                  post.categoria_idcategoria === 2 && post.metadata?.isAnonymous
-                    ? { id: 0, name: 'Anônimo' }
+                  // 👇 A API já aplica anonimização, então use os dados que vêm dela
+                  post.user?.id === 0 // Post anônimo (já tratado pela API)
+                    ? {
+                        id: 0,
+                        name: 'Usuário Anônimo',
+                        avatarUrl: undefined,
+                      }
                     : {
                         id: post.user?.id,
                         name: post.user?.name || 'Usuário desconhecido',
@@ -225,7 +266,6 @@ const ProfileView: React.FC = () => {
                 }
                 isLiked={post.liked}
                 sharedBy={post.sharedBy}
-                // ✅ CURTIR DIRETO NA STORE (IGUAL AO FEED)
                 onLike={async () => {
                   const postIdToSend = post.sharedBy?.postId || post.id;
                   const shareIdToSend = post.sharedBy?.shareId;
@@ -250,8 +290,9 @@ const ProfileView: React.FC = () => {
                 onEdit={(postId, shareId) =>
                   setEditingPost({ id: postId, shareId })
                 }
-                isPostOwner={user.id === post.user?.id}
-                isShareOwner={user.id === post.sharedBy?.id}
+                // 👇 USE AS FLAGS DA API (já calculadas corretamente)
+                isPostOwner={post.isPostOwner ?? false}
+                isShareOwner={post.isShareOwner ?? false}
               />
             );
           })}
@@ -261,7 +302,7 @@ const ProfileView: React.FC = () => {
               <button
                 onClick={loadMorePosts}
                 disabled={postsLoading}
-                className="text-primary hover:underline"
+                className="text-primary hover:underline focus:outline-none"
               >
                 {postsLoading ? 'Carregando...' : 'Carregar mais'}
               </button>
@@ -269,14 +310,12 @@ const ProfileView: React.FC = () => {
           )}
         </div>
       )}
-
       {/* Modais (MESMO CÓDIGO DO FEED) */}
       {selectedPost && (
         <PostModal
           postId={selectedPost.id}
           shareId={selectedPost.shareId}
           onClose={() => setSelectedPost(null)}
-          // ✅ CURTIR DIRETO NA STORE (IGUAL AO FEED)
           onLike={async () => {
             if (!selectedPost) return;
             const postIdToSend = selectedPost.id;
@@ -299,7 +338,6 @@ const ProfileView: React.FC = () => {
           onDelete={handleDelete}
         />
       )}
-
       {postToShare && (
         <ShareModal
           isOpen={shareModalOpen}
@@ -312,7 +350,6 @@ const ProfileView: React.FC = () => {
           onShare={handleShare}
         />
       )}
-
       {editingPost &&
         (editingPost.shareId ? (
           <ShareEditModal

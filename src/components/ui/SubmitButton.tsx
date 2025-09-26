@@ -19,7 +19,7 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({
       onClick={onClick}
       disabled={disabled}
       className={clsx(
-        'w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark transition flex justify-center items-center',
+        'w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark transition flex justify-center items-center focus:outline-none',
         {
           // Aumentado o padding e fonte
           'bg-primary text-white hover:bg-secondary': variant === 'primary', // Azul por padrão, laranja no hover

@@ -35,13 +35,12 @@ const PostActions: React.FC<PostActionsProps> = ({
   onAttend,
   isAttending,
 }) => {
-  // ✅ Use o hook APENAS se não tiver onAttend (ou seja, apenas no FEED)
   const {
     status,
     toggleAttendance,
     loading: attendanceLoading,
   } = useEventAttendance(
-    onAttend ? undefined : postIdForAttendance, // ⚠️ Se tem onAttend, não use hook
+    onAttend ? undefined : postIdForAttendance,
     onAttend ? undefined : postShareIdForAttendance
   );
 
@@ -63,7 +62,8 @@ const PostActions: React.FC<PostActionsProps> = ({
   const handleLike = async () => {
     try {
       if (onLike) {
-        await onLike(post.id, post.sharedBy?.shareId);
+        // ✅ Remove o await para resposta mais rápida
+        onLike(post.id, post.sharedBy?.shareId);
       }
     } catch (error) {
       console.error('Erro ao curtir post:', error);
@@ -72,10 +72,7 @@ const PostActions: React.FC<PostActionsProps> = ({
 
   const isEvent = post.categoryId === 8;
 
-  // ✅ CORREÇÃO: Se tem onAttend (modal), use isAttending. Senão, use status do hook.
-  const attending = onAttend
-    ? isAttending // ← Modal: usa prop
-    : status.userStatus === 'confirmed'; // ← Feed: usa hook
+  const attending = onAttend ? isAttending : status.userStatus === 'confirmed';
 
   return (
     <div
@@ -85,7 +82,7 @@ const PostActions: React.FC<PostActionsProps> = ({
     >
       <button
         onClick={handleLike}
-        className="flex items-center gap-1 hover:text-blue-500 transition"
+        className="flex items-center gap-1 hover:text-blue-500 transition focus:outline-none"
       >
         {isLiked ? (
           <FaHeart className="text-red-500 w-4 h-4 sm:w-5 sm:h-5" />
@@ -97,7 +94,7 @@ const PostActions: React.FC<PostActionsProps> = ({
 
       <button
         onClick={onComment}
-        className="flex items-center gap-1 hover:text-blue-500 transition"
+        className="flex items-center gap-1 hover:text-blue-500 transition focus:outline-none"
       >
         <FaRegCommentDots className="w-4 h-4 sm:w-5 sm:h-5" />
         <span className={isEvent ? 'text-[10px] sm:text-sm' : ''}>
@@ -107,7 +104,7 @@ const PostActions: React.FC<PostActionsProps> = ({
 
       <button
         onClick={onShare}
-        className="flex items-center gap-1 hover:text-blue-500 transition"
+        className="flex items-center gap-1 hover:text-blue-500 transition focus:outline-none"
       >
         <FaShare className="w-4 h-4 sm:w-5 sm:h-5" />
         <span className={isEvent ? 'text-[10px] sm:text-sm' : ''}>
@@ -119,7 +116,7 @@ const PostActions: React.FC<PostActionsProps> = ({
         <button
           onClick={handleAttendance}
           disabled={attendanceLoading && !onAttend} // ⚠️ Só desabilita se estiver usando hook
-          className={`flex items-center gap-1 px-2 py-1 rounded-xl font-medium transition ${
+          className={`flex items-center gap-1 px-2 py-1 rounded-xl font-medium transition focus:outline-none ${
             attending
               ? 'bg-green-100 text-green-600 border border-green-500'
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'

@@ -29,7 +29,7 @@ const CancelButton: React.FC<CancelButtonProps> = ({
     <button
       type="button"
       onClick={handleClick}
-      className={`text-red-600 hover:text-red-800 text-sm font-medium mt-4 block mx-auto ${className}`}
+      className={`text-gray-700 hover:text-gray-900 text-sm font-semibold underline underline-offset-2 mt-4 mx-auto block transition-colors duration-150 ${className} focus:outline-none`}
     >
       {label}
     </button>

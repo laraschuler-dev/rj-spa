@@ -34,7 +34,7 @@ const ShareEditModal: React.FC<ShareEditModalProps> = ({
     const formData = new FormData();
     formData.append('message', message);
     const updatedShare = await editPost(formData);
-    if (updatedShare) updatePost(updatedShare); // Atualiza a mensagem do share
+    if (updatedShare) updatePost(updatedShare);
     onClose();
   };
 
@@ -42,53 +42,56 @@ const ShareEditModal: React.FC<ShareEditModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-start pt-20 overflow-auto"
+      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-start p-4 overflow-auto"
       onClick={onClose}
     >
+      {/* ✅ MEIO-TERMO: max-w-lg (512px) - nem largo nem estreito */}
       <div
-        className="bg-white rounded-2xl w-full max-w-[700px] p-6 relative"
+        className="bg-white rounded-2xl w-full max-w-lg my-8" // ✅ max-w-lg
         onClick={(e) => e.stopPropagation()}
       >
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 font-bold text-xl"
-        >
-          ×
-        </button>
+        <div className="p-6 relative">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 font-bold text-3xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors z-10 focus:outline-none"
+          >
+            ×
+          </button>
 
-        <Typography variant="h2" className="text-primary text-center mb-6">
-          Editar Compartilhamento
-        </Typography>
+          <Typography variant="h2" className="text-primary text-center mb-4">
+            Editar Compartilhamento
+          </Typography>
 
-        <div className="mb-4">
-          <PostPreviewCard
-            author={{
-              name:
-                post.sharedBy?.name ??
-                post.user?.name ??
-                'Usuário desconhecido',
-              avatarUrl: post.sharedBy?.avatarUrl ?? post.user?.avatarUrl,
-            }}
-            createdAt={post.sharedBy?.sharedAt ?? post.createdAt}
-            metadata={post.metadata}
-            content={post.content}
-            images={post.images?.map((url, index) => ({ id: index, url }))}
+          <div className="mb-4">
+            <PostPreviewCard
+              author={{
+                name:
+                  post.sharedBy?.name ??
+                  post.user?.name ??
+                  'Usuário desconhecido',
+                avatarUrl: post.sharedBy?.avatarUrl ?? post.user?.avatarUrl,
+              }}
+              createdAt={post.sharedBy?.sharedAt ?? post.createdAt}
+              metadata={post.metadata}
+              content={post.content}
+              images={post.images?.map((url, index) => ({ id: index, url }))}
+            />
+          </div>
+
+          <textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Edite a mensagem do compartilhamento"
+            className="w-full p-3 border rounded-lg text-sm resize-none mb-4 focus:outline-none focus:ring-2 focus:ring-primary"
+            rows={3}
           />
-        </div>
 
-        <textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Edite a mensagem do compartilhamento"
-          className="w-full p-3 border rounded-lg text-sm resize-none mb-4 focus:outline-none focus:ring-2 focus:ring-primary"
-          rows={4}
-        />
-
-        <div className="flex flex-col items-center gap-2 mt-2">
-          <SubmitButton onClick={handleSave} disabled={saving}>
-            {saving ? 'Salvando...' : 'Salvar'}
-          </SubmitButton>
-          <CancelButton mode="edit" onCloseModal={onClose} className="mt-1" />
+          <div className="flex flex-col gap-3">
+            <SubmitButton onClick={handleSave} disabled={saving}>
+              {saving ? 'Salvando...' : 'Salvar'}
+            </SubmitButton>
+            <CancelButton mode="edit" onCloseModal={onClose} />
+          </div>
         </div>
       </div>
     </div>

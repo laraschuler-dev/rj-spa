@@ -124,11 +124,11 @@ const PostCard: React.FC<PostCardProps> = ({
               </span>
             </span>
 
-            {isShareOwner && (
+            {isShareOwner && !isInModal && (
               <PostMenuButton
                 postId={sharedBy.postId}
                 shareId={sharedBy.shareId}
-                className="absolute top-0 right-0"
+                className="ml-auto"
                 onEdit={onEdit}
                 onDelete={onDelete}
               />
@@ -177,15 +177,14 @@ const PostCard: React.FC<PostCardProps> = ({
           </div>
         </div>
 
-        {!sharedBy &&
-          isPostOwner && ( // 👈 Usa a flag isPostOwner
-            <PostMenuButton
-              postId={id}
-              className="absolute top-0 right-0"
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
-          )}
+        {!sharedBy && isPostOwner && !isInModal && (
+          <PostMenuButton
+            postId={id}
+            className="absolute top-0 right-0"
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
+        )}
       </div>
 
       {/* Título e conteúdo */}
@@ -331,7 +330,7 @@ const PostCard: React.FC<PostCardProps> = ({
               <img
                 src={resolveImageUrl(url)}
                 alt={`Imagem ${index + 1}`}
-                className="w-full aspect-[4/3] md:aspect-[16/9] object-cover rounded-xl"
+                className="w-full max-h-96 object-contain rounded-xl bg-gray-100"
               />
             </SwiperSlide>
           ))}
@@ -343,7 +342,7 @@ const PostCard: React.FC<PostCardProps> = ({
         <div className="text-right">
           {!expanded && !isInModal && (
             <button
-              className="text-blue-500 text-sm font-medium hover:underline"
+              className="text-blue-500 text-sm font-medium hover:underline focus:outline-none"
               onClick={onOpenDetails}
             >
               Ver mais

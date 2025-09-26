@@ -77,7 +77,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId, shareId }) => {
         <button
           onClick={handleCreate}
           disabled={isCreating}
-          className="bg-blue-500 text-white px-3 py-1 rounded-xl text-sm hover:bg-blue-600 disabled:opacity-50"
+          className="bg-blue-500 text-white px-3 py-1 rounded-xl text-sm hover:bg-blue-600 disabled:opacity-50 focus:outline-none"
         >
           {isCreating ? 'Enviando...' : 'Comentar'}
         </button>

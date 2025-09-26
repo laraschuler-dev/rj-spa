@@ -6,7 +6,6 @@ import ImageUpload from '../../../components/ui/ImageUpload';
 import { UploadImage } from '../../../types/upload';
 import { useDeletePostImage } from '../../../hooks/useDeletePostImage';
 import CancelButton from '../../ui/CancelButton';
-import BackButton from '../../ui/BackButton';
 
 interface CampaignPostFormProps {
   onSubmit: (data: FormData) => Promise<void>;
@@ -82,8 +81,11 @@ const CampaignPostForm: React.FC<CampaignPostFormProps> = ({
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
-      <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
+    <main
+      className={`flex justify-center bg-background ${
+        mode === 'edit' ? 'min-h-0 py-2' : 'min-h-screen py-12 items-center'
+      }`}
+    >
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
         <Typography variant="h2" className="text-primary text-center mb-6">
           {mode === 'create' ? 'Nova Campanha' : 'Editar Campanha'}

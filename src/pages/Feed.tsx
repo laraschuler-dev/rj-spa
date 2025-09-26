@@ -104,7 +104,7 @@ const Feed: React.FC = () => {
             author={
               post.categoria_idcategoria === 2 && post.metadata?.isAnonymous
                 ? {
-                    id: 0, // só para exibição
+                    id: 0,
                     name: 'Anônimo',
                     avatarUrl: undefined,
                   }
@@ -114,7 +114,6 @@ const Feed: React.FC = () => {
                     avatarUrl: post.user?.avatarUrl,
                   }
             }
-            // REMOVA: ownerId={post.user?.id} // 👈 Não precisa mais
             isLiked={post.liked}
             sharedBy={post.sharedBy}
             onLike={async () => {
@@ -138,18 +137,17 @@ const Feed: React.FC = () => {
             onEdit={(postId, shareId) =>
               setEditingPost({ id: postId, shareId })
             }
-            // 👇 ADICIONE ESTAS DUAS NOVAS PROPS
-            isPostOwner={post.isPostOwner} // 👈 Nova prop
-            isShareOwner={post.isShareOwner} // 👈 Nova prop
+            isPostOwner={post.isPostOwner}
+            isShareOwner={post.isShareOwner}
           />
         ))}
 
         {hasMore && (
           <div className="text-center mt-4">
             <button
-              onClick={loadMorePosts} // ✅ Agora usa loadMorePosts
+              onClick={loadMorePosts}
               disabled={loading}
-              className="text-primary hover:underline"
+              className="text-primary hover:underline focus:outline-none"
             >
               {loading ? 'Carregando...' : 'Carregar mais'}
             </button>
