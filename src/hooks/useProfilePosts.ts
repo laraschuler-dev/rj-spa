@@ -1,8 +1,10 @@
-// useProfilePosts.ts
 import { useEffect } from 'react';
 import { usePostStore } from '../stores/postStore';
+import { useAuth } from '../hooks/useAuth';
 
 export function useProfilePosts(userId: number | undefined) {
+  const { user: currentUser } = useAuth();
+
   const {
     posts = [],
     fetchUserPosts,
@@ -13,26 +15,26 @@ export function useProfilePosts(userId: number | undefined) {
 
   // ✅ Função para refresh que será retornada
   const refreshPosts = () => {
-    if (userId) {
-      return refreshUserPosts(userId);
+    if (userId && currentUser?.id) {
+      return refreshUserPosts(userId, currentUser.id);
     }
   };
 
   // ✅ useEffect usando a função interna refreshPosts
   useEffect(() => {
-    if (userId) {
-      refreshUserPosts(userId); // ✅ Chama diretamente da store
+    if (userId && currentUser?.id) {
+      refreshUserPosts(userId, currentUser.id);
     }
-  }, [userId]); // ✅ Só depende do userId
-
-  const userPosts = (posts || []).filter(
-    (post) => post.user?.id === userId || post.sharedBy?.id === userId
-  );
+  }, [userId, currentUser?.id]);
 
   return {
-    posts: userPosts,
-    loadMorePosts: () => userId && fetchUserPosts(userId, false),
-    refreshPosts: () => userId && refreshUserPosts(userId), // ✅ Retorna a função correta
+    posts: posts,
+    loadMorePosts: () =>
+      userId &&
+      currentUser?.id &&
+      fetchUserPosts(userId, currentUser.id, false),
+    refreshPosts: () =>
+      userId && currentUser?.id && refreshUserPosts(userId, currentUser.id),
     hasMore,
     loading,
   };

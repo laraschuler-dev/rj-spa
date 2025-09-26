@@ -12,8 +12,13 @@ interface PostStoreState {
   fetchPosts: (isInitialLoad?: boolean) => Promise<void>;
   refreshPosts: () => Promise<void>;
 
-  fetchUserPosts: (userId: number, isInitialLoad?: boolean) => Promise<void>;
-  refreshUserPosts: (userId: number) => Promise<void>;
+  // 👇 Atualize estas assinaturas
+  fetchUserPosts: (
+    userId: number,
+    requestingUserId: number,
+    isInitialLoad?: boolean
+  ) => Promise<void>;
+  refreshUserPosts: (userId: number, requestingUserId: number) => Promise<void>;
 
   setPosts: (posts: PostListItem[]) => void;
   updatePost: (updatedPost: PostListItem) => void;
@@ -245,7 +250,12 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
     await get().fetchPosts(true);
   },
 
-  fetchUserPosts: async (userId: number, isInitialLoad: boolean = false) => {
+  // Adicione requestingUserId às funções de user posts
+  fetchUserPosts: async (
+    userId: number,
+    requestingUserId: number,
+    isInitialLoad: boolean = false
+  ) => {
     const { loading, page } = get();
     if (loading) return;
 
@@ -255,7 +265,11 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
       const currentPage = isInitialLoad ? 1 : page;
 
       const res = await axios.get(`/users/${userId}/posts`, {
-        params: { page: currentPage, limit: 10 },
+        params: {
+          page: currentPage,
+          limit: 10,
+          requestingUserId, // 👈 Envia para a API filtrar
+        },
       });
 
       const postsFromApi: PostListItem[] = res.data.data || [];
@@ -288,7 +302,8 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
       set({ loading: false });
     }
   },
-  refreshUserPosts: async (userId: number) => {
-    await get().fetchUserPosts(userId, true);
+
+  refreshUserPosts: async (userId: number, requestingUserId: number) => {
+    await get().fetchUserPosts(userId, requestingUserId, true);
   },
 }));

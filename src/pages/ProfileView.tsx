@@ -234,10 +234,7 @@ const ProfileView: React.FC = () => {
           )}
 
           {(userPosts || []).map((post) => {
-            // ← Proteção adicional
             if (!post) return null;
-            const postIdToSend = post.sharedBy?.postId || post.id;
-            const shareIdToSend = post.sharedBy?.shareId;
 
             return (
               <PostCard
@@ -296,7 +293,6 @@ const ProfileView: React.FC = () => {
               />
             );
           })}
-
           {hasMore && (
             <div className="text-center mt-4">
               <button
