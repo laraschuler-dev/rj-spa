@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   FaHeart,
   FaRegHeart,
@@ -12,15 +12,17 @@ interface PostActionsProps {
   post: {
     id: number;
     categoryId: number;
-    sharedBy?: { id: number } | null;
-    isAttending?: boolean | null;
+    sharedBy?: { shareId: number } | null;
   };
   postIdForAttendance?: number;
   postShareIdForAttendance?: number;
   isLiked?: boolean;
-  onLike?: () => void;
+  onLike?: (postId: number, shareId?: number) => void;
   onComment?: () => void;
   onShare?: () => void;
+  onAttend?: () => void;
+  isAttending?: boolean; // ✅ Já está na interface
+  loadingAttend?: boolean;
 }
 
 const PostActions: React.FC<PostActionsProps> = ({
@@ -31,38 +33,47 @@ const PostActions: React.FC<PostActionsProps> = ({
   onLike,
   onComment,
   onShare,
+  onAttend,
+  isAttending,
 }) => {
-  const [liked, setLiked] = useState(isLiked);
-  const { status, toggleAttendance, loading } = useEventAttendance(
-    postIdForAttendance,
-    postShareIdForAttendance
+  const {
+    status,
+    toggleAttendance,
+    loading: attendanceLoading,
+  } = useEventAttendance(
+    onAttend ? undefined : postIdForAttendance,
+    onAttend ? undefined : postShareIdForAttendance
   );
-  const [attending, setAttending] = useState(status.userStatus === 'confirmed');
-
-  useEffect(() => {
-    setAttending(status.userStatus === 'confirmed');
-  }, [status.userStatus]);
 
   const handleAttendance = async () => {
-    if (!postIdForAttendance || loading) return;
-    try {
-      await toggleAttendance();
-    } catch (error) {
-      console.error('[PostActions] Erro ao alternar presença:', error);
+    if (onAttend) {
+      // Se onAttend foi passado (modal), use isso
+      await onAttend();
+    } else {
+      // Senão, use o hook normal (feed)
+      if (!postIdForAttendance || attendanceLoading) return;
+      try {
+        await toggleAttendance();
+      } catch (error) {
+        console.error('[PostActions] Erro ao alternar presença:', error);
+      }
     }
   };
 
   const handleLike = async () => {
     try {
-      setLiked((prev) => !prev);
-      if (onLike) await onLike();
+      if (onLike) {
+        // ✅ Remove o await para resposta mais rápida
+        onLike(post.id, post.sharedBy?.shareId);
+      }
     } catch (error) {
       console.error('Erro ao curtir post:', error);
-      setLiked((prev) => !prev);
     }
   };
 
   const isEvent = post.categoryId === 8;
+
+  const attending = onAttend ? isAttending : status.userStatus === 'confirmed';
 
   return (
     <div
@@ -72,9 +83,9 @@ const PostActions: React.FC<PostActionsProps> = ({
     >
       <button
         onClick={handleLike}
-        className="flex items-center gap-1 hover:text-blue-500 transition"
+        className="flex items-center gap-1 hover:text-blue-500 transition focus:outline-none"
       >
-        {liked ? (
+        {isLiked ? (
           <FaHeart className="text-red-500 w-4 h-4 sm:w-5 sm:h-5" />
         ) : (
           <FaRegHeart className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -84,7 +95,7 @@ const PostActions: React.FC<PostActionsProps> = ({
 
       <button
         onClick={onComment}
-        className="flex items-center gap-1 hover:text-blue-500 transition"
+        className="flex items-center gap-1 hover:text-blue-500 transition focus:outline-none"
       >
         <FaRegCommentDots className="w-4 h-4 sm:w-5 sm:h-5" />
         <span className={isEvent ? 'text-[10px] sm:text-sm' : ''}>
@@ -94,7 +105,7 @@ const PostActions: React.FC<PostActionsProps> = ({
 
       <button
         onClick={onShare}
-        className="flex items-center gap-1 hover:text-blue-500 transition"
+        className="flex items-center gap-1 hover:text-blue-500 transition focus:outline-none"
       >
         <FaShare className="w-4 h-4 sm:w-5 sm:h-5" />
         <span className={isEvent ? 'text-[10px] sm:text-sm' : ''}>
@@ -105,8 +116,8 @@ const PostActions: React.FC<PostActionsProps> = ({
       {isEvent && (
         <button
           onClick={handleAttendance}
-          disabled={loading}
-          className={`flex items-center gap-1 px-2 py-1 rounded-xl font-medium transition ${
+          disabled={attendanceLoading && !onAttend} // ⚠️ Só desabilita se estiver usando hook
+          className={`flex items-center gap-1 px-2 py-1 rounded-xl font-medium transition focus:outline-none ${
             attending
               ? 'bg-green-100 text-green-600 border border-green-500'
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'

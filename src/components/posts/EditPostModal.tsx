@@ -4,24 +4,26 @@ import axios from '../../services/api';
 import PostFormFactory from './PostFormFactory';
 import { useEditPost } from '../../hooks/useEditPost';
 import { toast } from 'react-toastify';
+import { usePostStore } from '../../stores/postStore';
+import { PostListItem } from '../../types/Post';
+
 
 interface EditPostModalProps {
   postId: number;
   shareId?: number;
   onClose: () => void;
-  onSuccess?: () => void;
+  onSuccess?: (updatedPost: PostListItem) => void;
 }
 
 const EditPostModal: React.FC<EditPostModalProps> = ({
   postId,
   shareId,
   onClose,
-  onSuccess,
 }) => {
   const [initialData, setInitialData] = useState<any>(null);
   const [categoryId, setCategoryId] = useState<number | null>(null);
-
   const { editPost, loading } = useEditPost({ postId, shareId });
+  const { updatePost } = usePostStore();
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -30,7 +32,6 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
         const { data } = await axios.get(`/posts/${postId}`, params);
 
         setCategoryId(data.categoryId);
-
         setInitialData({
           id: data.id,
           ...data.metadata,
@@ -42,7 +43,6 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
         console.error(error);
       }
     };
-
     fetchPost();
   }, [postId, shareId]);
 
@@ -50,32 +50,34 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-start pt-20 overflow-auto"
+      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-start p-2 overflow-auto"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl w-full max-w-[700px] p-6 relative"
+        className="bg-white rounded-2xl w-full max-w-[700px] my-8"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Botão fechar */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 font-bold text-xl"
-        >
-          ×
-        </button>
+        <div className="p-6 relative">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 font-bold text-3xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors z-10 focus:outline-none"
+          >
+            ×
+          </button>
 
-        <PostFormFactory
-          categoryId={categoryId}
-          mode="edit"
-          initialData={initialData}
-          onSubmit={async (formData: FormData) => {
-            await editPost(formData);
-            onClose();
-            onSuccess?.();
-          }}
-          onClose={onClose}
-        />
+          <PostFormFactory
+            categoryId={categoryId}
+            mode="edit"
+            initialData={initialData}
+            onSubmit={async (formData: FormData) => {
+              const updatedPost = await editPost(formData);
+              if (updatedPost) updatePost(updatedPost);
+              onClose();
+            }}
+            onClose={onClose}
+            loading={loading}
+          />
+        </div>
       </div>
     </div>
   );

@@ -1,70 +1,47 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from '../services/api';
+import { usePostStore } from '../stores/postStore';
 
-interface EventAttendanceStatus {
-  userStatus: 'interested' | 'confirmed' | null;
-  interestedCount: number;
-  confirmedCount: number;
-}
-
-// hooks/useEventAttendance.ts
 export function useEventAttendance(postId?: number, postShareId?: number) {
-  const [status, setStatus] = useState<EventAttendanceStatus>({
-    userStatus: null,
-    interestedCount: 0,
-    confirmedCount: 0,
-  });
+  const { posts, toggleAttendance } = usePostStore();
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+  // Localiza o post/share na store
+  const post = posts.find((p) =>
+    postShareId
+      ? p.sharedBy?.shareId === postShareId
+      : p.id === postId && !p.sharedBy
+  );
+
+  const status = {
+    attending: post?.attending ?? false,
+    userStatus: post?.attending ? 'confirmed' : null,
+  };
+
+  const toggle = async () => {
     if (!postId) return;
 
-    const fetchStatus = async () => {
-      try {
-        const res = await axios.get(`/posts/${postId}/attend-status`, {
-          params: postShareId ? { postShareId } : {},
-        });
-        setStatus(res.data);
-      } catch (error) {
-        console.error(
-          '[useEventAttendance] Erro ao carregar status de presença:',
-          error
-        );
-      }
-    };
-
-    fetchStatus();
-  }, [postId, postShareId]);
-
-  const toggleAttendance = async () => {
-    if (!postId) return;
-
-    setLoading(true);
     try {
-      // se o usuário já está confirmado, vai remover
-      const newStatus =
-        status.userStatus === 'confirmed' ? 'confirmed' : 'confirmed';
+      setLoading(true);
 
-      const res = await axios.post(
+      // Atualização otimista na store (toggle local)
+      toggleAttendance(postId, postShareId);
+
+      // Chamada para API: sempre envia 'confirmed', backend faz toggle
+      await axios.post(
         `/posts/${postId}/attend`,
-        { status: newStatus },
+        { status: 'confirmed' },
         { params: postShareId ? { postShareId } : {} }
       );
-      // atualizar o status retornado
-      setStatus((prev) => ({
-        ...prev,
-        userStatus: prev.userStatus === 'confirmed' ? null : 'confirmed',
-        confirmedCount:
-          prev.userStatus === 'confirmed'
-            ? prev.confirmedCount - 1
-            : prev.confirmedCount + 1,
-      }));
     } catch (error) {
       console.error('[useEventAttendance] Erro ao registrar presença:', error);
+
+      // Reverte em caso de erro
+      toggleAttendance(postId, postShareId);
     } finally {
       setLoading(false);
     }
   };
 
-  return { status, loading, toggleAttendance };
+  return { status, loading, toggleAttendance: toggle };
 }

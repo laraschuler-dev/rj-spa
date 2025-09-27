@@ -1,6 +1,12 @@
 import { Key } from 'react';
 
+export interface EventAttendance {
+  userId: number;
+  status: string; // 'confirmed' | 'interested' (se futuramente quiser abrir mais)
+}
+
 export interface PostListItem {
+  likeCount: number | undefined;
   author: any;
   uniqueKey: Key | null | undefined; //Identificador único universal para renderização de listas
   id: number;
@@ -30,6 +36,8 @@ export interface PostListItem {
   images: string[];
   createdAt: string;
   liked?: boolean;
+  attending?: boolean; // 👈 boolean simples pro usuário atual
+  eventAttendance?: EventAttendance[]; // 👈 lista de presenças (caso queira mostrar todos os participantes)
   user: {
     id: number;
     name: string;
@@ -45,4 +53,6 @@ export interface PostListItem {
     message?: string;
     sharedAt: string;
   };
+  isPostOwner?: boolean;
+  isShareOwner?: boolean;
 }

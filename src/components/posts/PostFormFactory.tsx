@@ -15,6 +15,8 @@ interface PostFormFactoryProps {
   onSubmit: (data: FormData) => Promise<void>;
   initialData?: any;
   onClose?: () => void;
+  isModal?: boolean;
+  loading?: boolean;
 }
 
 const formMap: Record<number, React.FC<PostFormFactoryProps>> = {
@@ -49,6 +51,7 @@ const PostFormFactory: React.FC<PostFormFactoryProps> = ({
       onSubmit={onSubmit}
       initialData={initialData}
       onClose={onClose}
+      isModal={mode === 'edit'}
     />
   );
 };

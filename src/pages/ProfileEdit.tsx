@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import axios from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import CustomSelect from '../components/ui/CustomSelect';
 import Typography from '../components/ui/Typography';
-import useAuthStore from '../stores/authStore';
 import { CgProfile } from 'react-icons/cg';
 import SubmitButton from '../components/ui/SubmitButton';
-import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import CancelButton from '../components/ui/CancelButton';
+import { useProfileStore } from '../stores/profileStore';
+import { useEditProfile, ProfileFormData } from '../hooks/useEditProfile';
+import axios from '../services/api';
+import BackButton from '../components/ui/BackButton';
 
 const profileOptions = [
   { value: '', label: 'Perfil' },
@@ -20,7 +21,11 @@ const profileOptions = [
 ];
 
 const ProfileEdit: React.FC = () => {
-  const [form, setForm] = useState({
+  const navigate = useNavigate();
+  const { profile } = useProfileStore();
+  const { editProfile, loading } = useEditProfile();
+
+  const [form, setForm] = useState<ProfileFormData>({
     profile_type: '',
     bio: '',
     city: '',
@@ -28,35 +33,22 @@ const ProfileEdit: React.FC = () => {
   });
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState(true);
-  const token = useAuthStore((state) => state.token);
-  const navigate = useNavigate();
 
+  // Atualiza form quando profile muda na store
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await axios.get('/profile', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setForm({
-          profile_type: res.data.profile?.profile_type || '',
-          bio: res.data.profile?.bio || '',
-          city: res.data.profile?.city || '',
-          state: res.data.profile?.state || '',
-        });
-        if (res.data.profile?.profile_photo) {
-          setPhotoPreview(
-            `${axios.defaults.baseURL}${res.data.profile.profile_photo}`
-          );
-        }
-      } catch (err) {
-        console.error('Erro ao carregar dados do perfil:', err);
-      } finally {
-        setLoading(false);
+    if (profile) {
+      setForm({
+        profile_type: (profile.profile_type as any) || '',
+        bio: profile.bio || '',
+        city: profile.city || '',
+        state: profile.state || '',
+      });
+
+      if (profile.profile_photo) {
+        setPhotoPreview(`${axios.defaults.baseURL}${profile.profile_photo}`);
       }
-    };
-    fetchProfile();
-  }, [token]);
+    }
+  }, [profile]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -65,7 +57,10 @@ const ProfileEdit: React.FC = () => {
   };
 
   const handleSelect = (value: string) => {
-    setForm({ ...form, profile_type: value });
+    setForm({
+      ...form,
+      profile_type: value as ProfileFormData['profile_type'],
+    });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,48 +73,24 @@ const ProfileEdit: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const result = await editProfile(form, photoFile);
 
-    try {
-      await axios.put('/profile', form, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (photoFile) {
-        const formData = new FormData();
-        formData.append('profile_photo', photoFile);
-
-        await axios.put('/profile/photo', formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-      }
-
+    if (result.success) {
       toast.success('Perfil atualizado com sucesso!');
       navigate('/profile');
-    } catch (err: any) {
-      if (err.response?.data?.error) {
-        toast.error(err.response.data.error);
-      } else if (err.request) {
-        toast.error('Erro de conexão com o servidor.');
-      } else {
-        toast.error('Erro inesperado ao salvar perfil.');
-      }
-      console.error('Erro ao salvar perfil:', err);
+    } else if (result.error) {
+      toast.error(result.error);
     }
   };
 
-  if (loading) return <p className="text-center mt-10">Carregando...</p>;
-
   return (
     <main className="max-w-xl mx-auto mt-12 bg-white p-8 rounded-xl shadow-lg">
+      <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
       <Typography variant="h1" className="text-center text-primary mb-6">
         Editar Perfil
       </Typography>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Foto de perfil personalizada */}
         <div className="flex flex-col items-center gap-2">
           {photoPreview ? (
             <img
@@ -144,7 +115,6 @@ const ProfileEdit: React.FC = () => {
         </div>
 
         <CustomSelect
-          label="Tipo de perfil"
           options={profileOptions}
           value={form.profile_type}
           onChange={handleSelect}
@@ -178,8 +148,10 @@ const ProfileEdit: React.FC = () => {
         </div>
 
         <div className="flex flex-col items-center gap-2">
-          <SubmitButton>Salvar</SubmitButton>
-          <CancelButton className="mx-auto block" />
+          <SubmitButton disabled={loading}>
+            {loading ? 'Salvando...' : 'Salvar'}
+          </SubmitButton>
+          <CancelButton mode="edit" className="mx-auto block" />
         </div>
       </form>
     </main>

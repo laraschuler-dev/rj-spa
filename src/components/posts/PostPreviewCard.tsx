@@ -63,7 +63,7 @@ const PostPreviewCard: React.FC<PostPreviewCardProps> = ({
               <img
                 src={resolveImageUrl(img.url)}
                 alt="post image"
-                className="w-full aspect-[4/3] md:aspect-[16/9] object-cover rounded-xl"
+                className="w-full max-h-96 object-contain rounded-xl bg-gray-100"
               />
             </SwiperSlide>
           ))}

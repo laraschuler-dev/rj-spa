@@ -20,7 +20,7 @@ const PostMenuButton: React.FC<PostMenuButtonProps> = ({
 }) => {
   return (
     <Menu as="div" className={`relative ${className || ''}`}>
-      <Menu.Button className="text-gray-600 hover:text-gray-800">
+      <Menu.Button className="text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-0">
         <BsThreeDots size={18} />
       </Menu.Button>
 
@@ -39,9 +39,7 @@ const PostMenuButton: React.FC<PostMenuButtonProps> = ({
               {({ active }) => (
                 <button
                   onClick={() => onEdit(postId, shareId)}
-                  className={`${
-                    active ? 'bg-gray-100' : ''
-                  } w-full text-left px-4 py-2 text-sm text-gray-700`}
+                  className={`${active ? 'bg-gray-100' : ''} w-full text-left px-4 py-2 text-sm text-gray-700 focus:outline-none focus:ring-0`}
                 >
                   Editar
                 </button>
@@ -53,9 +51,7 @@ const PostMenuButton: React.FC<PostMenuButtonProps> = ({
               {({ active }) => (
                 <button
                   onClick={() => onDelete(postId, shareId)}
-                  className={`${
-                    active ? 'bg-gray-100' : ''
-                  } w-full text-left px-4 py-2 text-sm text-red-600`}
+                  className={`${active ? 'bg-gray-100' : ''} w-full text-left px-4 py-2 text-sm text-red-600 focus:outline-none focus:ring-0`}
                 >
                   Excluir
                 </button>

@@ -76,8 +76,15 @@ const EventPostForm: React.FC<EventPostFormProps> = ({
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
-      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
+    <main
+      className={`flex justify-center bg-background ${
+        mode === 'edit' ? 'min-h-0 py-2' : 'min-h-screen py-12 items-center'
+      }`}
+    >
+      <div
+        className={`w-full bg-white p-8 rounded-2xl shadow-lg 
+    ${mode === 'create' ? 'max-w-xs sm:max-w-md' : 'max-w-md'}`}
+      >
         <Typography variant="h2" className="text-primary text-center mb-6">
           {mode === 'create' ? 'Novo Evento' : 'Editar Evento'}
         </Typography>
@@ -95,9 +102,10 @@ const EventPostForm: React.FC<EventPostFormProps> = ({
 
           <textarea
             name="content"
-            placeholder="Descrição do evento (opcional)"
+            placeholder="Descrição do evento"
             value={formData.content}
             onChange={handleChange}
+            required
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
 

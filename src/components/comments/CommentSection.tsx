@@ -1,3 +1,4 @@
+// src/components/comments/CommentSection.tsx
 import React, { useEffect, useState } from 'react';
 import { useComments } from '../../hooks/useComments';
 import CommentItem from './CommentItem';
@@ -76,25 +77,26 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId, shareId }) => {
         <button
           onClick={handleCreate}
           disabled={isCreating}
-          className="bg-blue-500 text-white px-3 py-1 rounded-xl text-sm hover:bg-blue-600 disabled:opacity-50"
+          className="bg-blue-500 text-white px-3 py-1 rounded-xl text-sm hover:bg-blue-600 disabled:opacity-50 focus:outline-none"
         >
           {isCreating ? 'Enviando...' : 'Comentar'}
         </button>
       </div>
 
-      {/* Lista de comentários */}
       {loading && comments.length === 0 ? (
         <p>Carregando comentários...</p>
       ) : (
-        comments.map((comment) => (
-          <CommentItem
-            key={comment.id}
-            comment={comment}
-            onUpdate={handleEdit}
-            onDelete={handleDelete}
-            isDeleting={isDeleting === comment.id}
-          />
-        ))
+        comments.map((comment) =>
+          comment ? (
+            <CommentItem
+              key={`post-${postId}-comment-${comment.id}`} // chave única e estável
+              comment={comment}
+              onUpdate={handleEdit}
+              onDelete={handleDelete}
+              isDeleting={isDeleting === comment.id}
+            />
+          ) : null
+        )
       )}
     </div>
   );

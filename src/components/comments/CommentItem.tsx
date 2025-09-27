@@ -4,10 +4,10 @@ import Typography from '../ui/Typography';
 import { resolveImageUrl } from '../../utils/resolveImageUrl';
 import { useAuth } from '../../hooks/useAuth';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
-import { Comment } from '../../types/Comment';
+import { PostComment } from '../../types/Comment';
 
 interface CommentItemProps {
-  comment: Comment;
+  comment: PostComment; // <-- ajuste aqui
   // eslint-disable-next-line no-unused-vars
   onUpdate: (commentId: number, newContent: string) => Promise<void>;
   // eslint-disable-next-line no-unused-vars
@@ -74,7 +74,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
             <div className="flex gap-2 mt-1">
               <button
                 onClick={handleEdit}
-                className="text-sm text-blue-500 hover:underline"
+                className="text-sm text-blue-500 hover:underline focus:outline-none"
               >
                 Salvar
               </button>
@@ -83,7 +83,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                   setIsEditing(false);
                   setEditedContent(comment.content);
                 }}
-                className="text-sm text-gray-500 hover:underline"
+                className="text-sm text-gray-500 hover:underline focus:outline-none"
               >
                 Cancelar
               </button>
@@ -101,14 +101,14 @@ const CommentItem: React.FC<CommentItemProps> = ({
         <div className="flex flex-col items-end gap-1 text-gray-500 text-sm">
           <button
             onClick={() => setIsEditing(true)}
-            className="hover:text-blue-500"
+            className="hover:text-blue-500 focus:outline-none"
           >
             Editar
           </button>
           <button
             onClick={handleDelete}
             disabled={isDeleting}
-            className="hover:text-red-500 disabled:opacity-50"
+            className="hover:text-red-500 disabled:opacity-50 focus:outline-none"
           >
             {isDeleting ? 'Excluindo...' : 'Excluir'}
           </button>

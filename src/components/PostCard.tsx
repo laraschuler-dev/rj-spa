@@ -9,8 +9,6 @@ import CommentSection from './comments/CommentSection';
 import { formatTimeAgo } from '../utils/formatTimeAgo';
 import PostMenuButton from './ui/PostMenuButton';
 import { useEventAttendance } from '../hooks/useEventAttendance';
-import { useAuth } from '../hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
 
 interface PostCardProps {
   id: number;
@@ -28,12 +26,12 @@ interface PostCardProps {
   metadata?: {
     [key: string]: any;
   };
-  onLike?: () => void;
+  onLike?: (postId: number, shareId?: number) => void;
   onComment?: () => void;
   onShare?: () => void;
   onAttend?: () => void;
-  isLiked?: boolean;
   isAttending?: boolean;
+  isLiked?: boolean;
   sharedBy?: {
     id: number;
     name: string;
@@ -49,6 +47,8 @@ interface PostCardProps {
   isInModal?: boolean;
   onOpenDetails?: (postId: number, shareId?: number) => void;
   onEdit?: (postId: number, shareId?: number) => void;
+  isPostOwner?: boolean;
+  isShareOwner?: boolean;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -69,26 +69,28 @@ const PostCard: React.FC<PostCardProps> = ({
   isInModal = false,
   onOpenDetails,
   onEdit,
+  isPostOwner = false,
+  isShareOwner = false,
 }) => {
   const [showComments, setShowComments] = useState(false);
-  const navigate = useNavigate();
   const postIdForAttendance = sharedBy?.postId ?? id;
   const postShareIdForAttendance = sharedBy?.shareId;
 
   const postIdForComments = sharedBy ? sharedBy.postId : id;
   const shareIdForComments = sharedBy?.shareId ?? undefined;
 
-  const { status } = useEventAttendance(
+  const { status, toggleAttendance, loading } = useEventAttendance(
     postIdForAttendance,
     postShareIdForAttendance
   );
 
-  const { user } = useAuth();
-
   const isOriginalDeleted = metadata?.isDeletedOriginal ?? false;
 
-  const displayedAuthor =
-    expanded && sharedBy ? sharedBy.originalAuthor || author : author;
+  // Garante que sempre seja Date válido
+  const safeCreatedAt = createdAt ? new Date(createdAt) : new Date();
+  const safeSharedAt = sharedBy?.sharedAt
+    ? new Date(sharedBy.sharedAt)
+    : new Date();
 
   return (
     <div className="bg-white shadow-md rounded-2xl p-4 space-y-3 max-w-[600px] mx-auto w-full">
@@ -110,15 +112,15 @@ const PostCard: React.FC<PostCardProps> = ({
             <span className="text-sm">
               Compartilhado por <strong>{sharedBy.name}</strong> •{' '}
               <span className="text-xs text-gray-400">
-                {formatTimeAgo(sharedBy.sharedAt)}
+                {formatTimeAgo(safeSharedAt.toISOString())}
               </span>
             </span>
 
-            {sharedBy.id === user?.id && (
+            {isShareOwner && !isInModal && (
               <PostMenuButton
                 postId={sharedBy.postId}
                 shareId={sharedBy.shareId}
-                className="absolute top-0 right-0"
+                className="ml-auto"
                 onEdit={onEdit}
                 onDelete={onDelete}
               />
@@ -162,12 +164,12 @@ const PostCard: React.FC<PostCardProps> = ({
               </strong>
             </Typography>
             <Typography variant="p" className="text-xs text-gray-500">
-              {formatTimeAgo(createdAt)}
+              {formatTimeAgo(safeCreatedAt.toISOString())}
             </Typography>
           </div>
         </div>
 
-        {!sharedBy && author.id === user?.id && (
+        {!sharedBy && isPostOwner && !isInModal && (
           <PostMenuButton
             postId={id}
             className="absolute top-0 right-0"
@@ -195,93 +197,111 @@ const PostCard: React.FC<PostCardProps> = ({
           </Typography>
           {expanded ? (
             <div className="text-sm text-gray-700 space-y-1">
-              {content && <p>{content}</p>}
+              {categoryId === 2 ? (
+                <>
+                  {metadata?.description && (
+                    <p>
+                      <strong>Descrição:</strong> {metadata.description}
+                    </p>
+                  )}
+                  {metadata?.isAnonymous !== undefined && (
+                    <p>
+                      <strong>Anonimato:</strong>{' '}
+                      {metadata.isAnonymous ? 'Sim' : 'Não'}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <>
+                  {content && <p>{content}</p>}
 
-              {metadata?.itemType && (
-                <p>
-                  <strong>Tipo:</strong> {metadata.itemType}
-                </p>
-              )}
-              {metadata?.condition && (
-                <p>
-                  <strong>Condição:</strong> {metadata.condition}
-                </p>
-              )}
-              {metadata?.location && (
-                <p>
-                  <strong>Local:</strong> {metadata.location}
-                </p>
-              )}
-              {metadata?.date && (
-                <p>
-                  <strong>Data:</strong> {metadata.date}
-                </p>
-              )}
-              {metadata?.availability && (
-                <p>
-                  <strong>Disponibilidade:</strong> {metadata.availability}
-                </p>
-              )}
-              {metadata?.description && (
-                <p>
-                  <strong>Descrição:</strong> {metadata.description}
-                </p>
-              )}
-              {metadata?.isAnonymous !== undefined && (
-                <p>
-                  <strong>Anonimato:</strong>{' '}
-                  {metadata.isAnonymous ? 'Sim' : 'Não'}
-                </p>
-              )}
-              {metadata?.goal && (
-                <p>
-                  <strong>Objetivo:</strong> {metadata.goal}
-                </p>
-              )}
-              {metadata?.deadline && (
-                <p>
-                  <strong>Prazo:</strong> {metadata.deadline}
-                </p>
-              )}
-              {metadata?.organizer && (
-                <p>
-                  <strong>Organizador:</strong> {metadata.organizer}
-                </p>
-              )}
-              {metadata?.type && (
-                <p>
-                  <strong>Tipo:</strong> {metadata.type}
-                </p>
-              )}
-              {metadata?.urgency && (
-                <p>
-                  <strong>Urgência:</strong> {metadata.urgency}
-                </p>
-              )}
-              {metadata?.serviceType && (
-                <p>
-                  <strong>Tipo de Serviço:</strong> {metadata.serviceType}
-                </p>
-              )}
-              {metadata?.qualifications && (
-                <p>
-                  <strong>Qualificações:</strong> {metadata.qualifications}
-                </p>
-              )}
-              {metadata?.format && (
-                <p>
-                  <strong>Formato:</strong> {metadata.format}
-                </p>
-              )}
-              {metadata?.duration && (
-                <p>
-                  <strong>Duração:</strong> {metadata.duration}
-                </p>
-              )}
-              {metadata?.requirements && (
-                <p>
-                  <strong>Requisitos:</strong> {metadata.requirements}
-                </p>
+                  {metadata?.itemType && (
+                    <p>
+                      <strong>Tipo:</strong> {metadata.itemType}
+                    </p>
+                  )}
+                  {metadata?.condition && (
+                    <p>
+                      <strong>Condição:</strong> {metadata.condition}
+                    </p>
+                  )}
+                  {metadata?.location && (
+                    <p>
+                      <strong>Local:</strong> {metadata.location}
+                    </p>
+                  )}
+                  {metadata?.date && (
+                    <p>
+                      <strong>Data:</strong> {metadata.date}
+                    </p>
+                  )}
+                  {metadata?.availability && (
+                    <p>
+                      <strong>Disponibilidade:</strong> {metadata.availability}
+                    </p>
+                  )}
+                  {metadata?.description && (
+                    <p>
+                      <strong>Descrição:</strong> {metadata.description}
+                    </p>
+                  )}
+                  {metadata?.isAnonymous !== undefined && (
+                    <p>
+                      <strong>Anonimato:</strong>{' '}
+                      {metadata.isAnonymous ? 'Sim' : 'Não'}
+                    </p>
+                  )}
+                  {metadata?.goal && (
+                    <p>
+                      <strong>Objetivo:</strong> {metadata.goal}
+                    </p>
+                  )}
+                  {metadata?.deadline && (
+                    <p>
+                      <strong>Prazo:</strong> {metadata.deadline}
+                    </p>
+                  )}
+                  {metadata?.organizer && (
+                    <p>
+                      <strong>Organizador:</strong> {metadata.organizer}
+                    </p>
+                  )}
+                  {metadata?.type && (
+                    <p>
+                      <strong>Tipo:</strong> {metadata.type}
+                    </p>
+                  )}
+                  {metadata?.urgency && (
+                    <p>
+                      <strong>Urgência:</strong> {metadata.urgency}
+                    </p>
+                  )}
+                  {metadata?.serviceType && (
+                    <p>
+                      <strong>Tipo de Serviço:</strong> {metadata.serviceType}
+                    </p>
+                  )}
+                  {metadata?.qualifications && (
+                    <p>
+                      <strong>Qualificações:</strong> {metadata.qualifications}
+                    </p>
+                  )}
+                  {metadata?.format && (
+                    <p>
+                      <strong>Formato:</strong> {metadata.format}
+                    </p>
+                  )}
+                  {metadata?.duration && (
+                    <p>
+                      <strong>Duração:</strong> {metadata.duration}
+                    </p>
+                  )}
+                  {metadata?.requirements && (
+                    <p>
+                      <strong>Requisitos:</strong> {metadata.requirements}
+                    </p>
+                  )}
+                </>
               )}
             </div>
           ) : (
@@ -289,12 +309,11 @@ const PostCard: React.FC<PostCardProps> = ({
               variant="p"
               className="text-sm text-gray-700 line-clamp-3"
             >
-              {content}
+              {categoryId === 2 ? metadata?.description : content}
             </Typography>
           )}
         </>
       )}
-
       {/* Carrossel de imagens */}
       {!isOriginalDeleted && images.length > 0 && (
         <Swiper spaceBetween={8} slidesPerView={1} className="rounded-xl">
@@ -303,7 +322,7 @@ const PostCard: React.FC<PostCardProps> = ({
               <img
                 src={resolveImageUrl(url)}
                 alt={`Imagem ${index + 1}`}
-                className="w-full aspect-[4/3] md:aspect-[16/9] object-cover rounded-xl"
+                className="w-full max-h-96 object-contain rounded-xl bg-gray-100"
               />
             </SwiperSlide>
           ))}
@@ -315,8 +334,8 @@ const PostCard: React.FC<PostCardProps> = ({
         <div className="text-right">
           {!expanded && !isInModal && (
             <button
-              className="text-blue-500 text-sm font-medium hover:underline"
-              onClick={onOpenDetails}
+              className="text-blue-500 text-sm font-medium hover:underline focus:outline-none"
+              onClick={() => onOpenDetails?.(id, sharedBy?.shareId)}
             >
               Ver mais
             </button>
@@ -330,14 +349,17 @@ const PostCard: React.FC<PostCardProps> = ({
           post={{
             id,
             categoryId,
-            sharedBy: sharedBy ? { id: sharedBy.postId } : undefined,
+            sharedBy: sharedBy?.shareId
+              ? { shareId: sharedBy.shareId }
+              : undefined,
           }}
-          isLiked={isLiked}
+          isLiked={isLiked ?? false} // ⚠️ garante boolean
           onLike={onLike}
           onComment={() => setShowComments((prev) => !prev)}
           onShare={onShare}
-          postIdForAttendance={postIdForAttendance}
-          postShareIdForAttendance={postShareIdForAttendance}
+          onAttend={toggleAttendance} // ✅ usa hook
+          isAttending={status.attending} // ✅ vem do hook
+          loadingAttend={loading} // opcional: se quiser desabilitar botão enquanto envia
         />
       )}
 

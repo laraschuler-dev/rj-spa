@@ -120,7 +120,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           onClick={onClose}
         >
           {isAuthenticated ? <CgProfile size={20} /> : <CgLogIn size={20} />}
-          {isAuthenticated ? 'Perfil' : 'Entrar'}
+          {isAuthenticated ? 'Feed' : 'Entrar'}
         </Link>
       </nav>
 

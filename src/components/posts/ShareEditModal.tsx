@@ -1,3 +1,4 @@
+// components/posts/ShareEditModal.tsx
 import React, { useEffect, useState } from 'react';
 import Typography from '../ui/Typography';
 import PostPreviewCard from './PostPreviewCard';
@@ -5,13 +6,14 @@ import { usePostDetails } from '../../hooks/usePostDetails';
 import { useEditPost } from '../../hooks/useEditPost';
 import SubmitButton from '../ui/SubmitButton';
 import CancelButton from '../ui/CancelButton';
+import { usePostStore } from '../../stores/postStore';
 
 interface ShareEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   postId: number;
   shareId: number;
-  onSave: () => void;
+  onSave?: (updatedPost: any) => void; // ✅ adicionado
 }
 
 const ShareEditModal: React.FC<ShareEditModalProps> = ({
@@ -19,70 +21,88 @@ const ShareEditModal: React.FC<ShareEditModalProps> = ({
   onClose,
   postId,
   shareId,
-  onSave,
+  onSave, // ✅ desestruturação
 }) => {
   const { post, loading } = usePostDetails(postId, shareId);
   const [message, setMessage] = useState('');
   const { editPost, loading: saving } = useEditPost({ postId, shareId });
+  const { updatePost } = usePostStore();
 
   useEffect(() => {
     setMessage(post?.sharedBy?.message ?? '');
   }, [post]);
 
   const handleSave = async () => {
-    const formData = new FormData();
-    formData.append('message', message);
-    await editPost(formData);
-    onSave();
-    onClose();
+    try {
+      const formData = new FormData();
+      formData.append('message', message);
+
+      const updated = await editPost(formData);
+
+      if (updated) {
+        updatePost(updated); // atualiza store
+        onSave?.(updated); // ✅ chama callback opcional
+        onClose();
+      }
+    } catch (err) {
+      console.error('Erro ao atualizar compartilhamento:', err);
+    }
   };
 
   if (!isOpen || loading || !post) return null;
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-start pt-20 overflow-auto"
+      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-start p-4 overflow-auto"
       onClick={onClose}
     >
+      {/* ✅ MEIO-TERMO: max-w-lg (512px) - nem largo nem estreito */}
       <div
-        className="bg-white rounded-2xl w-full max-w-[700px] p-6 relative"
+        className="bg-white rounded-2xl w-full max-w-lg my-8" // ✅ max-w-lg
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Botão fechar no topo */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 font-bold text-xl"
-        >
-          ×
-        </button>
+        <div className="p-6 relative">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 font-bold text-3xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors z-10 focus:outline-none"
+          >
+            ×
+          </button>
 
-        <Typography variant="h2" className="text-primary text-center mb-6">
-          Editar Compartilhamento
-        </Typography>
+          <Typography variant="h2" className="text-primary text-center mb-4">
+            Editar Compartilhamento
+          </Typography>
 
-        <div className="mb-4">
-          <PostPreviewCard
-            author={post.author}
-            createdAt={post.createdAt}
-            metadata={post.metadata}
-            content={post.content}
-            images={post.images}
+          <div className="mb-4">
+            <PostPreviewCard
+              author={{
+                name:
+                  post.sharedBy?.name ??
+                  post.user?.name ??
+                  'Usuário desconhecido',
+                avatarUrl: post.sharedBy?.avatarUrl ?? post.user?.avatarUrl,
+              }}
+              createdAt={post.sharedBy?.sharedAt ?? post.createdAt}
+              metadata={post.metadata}
+              content={post.content}
+              images={post.images?.map((url, index) => ({ id: index, url }))}
+            />
+          </div>
+
+          <textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Edite a mensagem do compartilhamento"
+            className="w-full p-3 border rounded-lg text-sm resize-none mb-4 focus:outline-none focus:ring-2 focus:ring-primary"
+            rows={3}
           />
-        </div>
 
-        <textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Edite a mensagem do compartilhamento"
-          className="w-full p-3 border rounded-lg text-sm resize-none mb-4 focus:outline-none focus:ring-2 focus:ring-primary"
-          rows={4}
-        />
-
-        <div className="flex flex-col items-center gap-2 mt-2">
-          <SubmitButton onClick={handleSave} disabled={saving}>
-            {saving ? 'Salvando...' : 'Salvar'}
-          </SubmitButton>
-          <CancelButton mode="edit" onCloseModal={onClose} className="mt-1" />
+          <div className="flex flex-col gap-3">
+            <SubmitButton onClick={handleSave} disabled={saving}>
+              {saving ? 'Salvando...' : 'Salvar'}
+            </SubmitButton>
+            <CancelButton mode="edit" onCloseModal={onClose} />
+          </div>
         </div>
       </div>
     </div>

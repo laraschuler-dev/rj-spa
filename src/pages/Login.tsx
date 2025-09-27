@@ -35,11 +35,11 @@ const Login: React.FC = () => {
     try {
       const response = await api.post('/auth/session', formData);
 
-      toast.success('Login realizado com sucesso!');
       setToken(response.data.token);
       localStorage.setItem('token', response.data.token);
 
       await validateToken();
+      toast.success('Login realizado com sucesso!');
     } catch (err: any) {
       if (err.response?.data?.error) {
         toast.error(err.response.data.error);

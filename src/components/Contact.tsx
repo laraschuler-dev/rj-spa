@@ -101,25 +101,47 @@ const Contact = () => {
 
       {/* Informações de Contato */}
       <div className="mt-12 text-gray-700">
-        <div className="flex items-center justify-center gap-4">
-          <FaEnvelope className="text-xl text-primary" />
-          <p className="text-lg">redefinindojornadas@gmail.com</p>
+        <div className="flex items-center justify-center gap-3 md:gap-4">
+          <div className="text-primary transform scale-150 md:scale-125">
+            <FaEnvelope />
+          </div>
+          <p className="text-[20px] md:text-[24px] lg:text-[28px]">
+            redefinindojornadas@gmail.com
+          </p>
         </div>
-        <div className="flex items-center justify-center gap-4 mt-4">
-          <FaMapMarkerAlt className="text-xl text-primary" />
-          <p className="text-lg">Taquara, RS - Brasil</p>
+        <div className="flex items-center justify-center gap-3 md:gap-4 mt-4">
+          <div className="text-primary transform scale-150 md:scale-125">
+            <FaMapMarkerAlt />
+          </div>
+          <p className="text-[20px] md:text-[24px] lg:text-[28px]">
+            Taquara, RS - Brasil
+          </p>
         </div>
       </div>
-
       {/* Redes Sociais */}
       <div className="mt-8 flex justify-center gap-6">
-        <a href="#" className="text-primary hover:text-primary-dark transition">
+        <a
+          href="https://www.facebook.com/share/1JTmmk3s5e/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary hover:text-primary-dark transition"
+        >
           <FaFacebook size={30} />
         </a>
-        <a href="#" className="text-primary hover:text-primary-dark transition">
+        <a
+          href="https://www.instagram.com/redefinindojornadas?igsh=NjNsc2x5NjF5eXN6"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary hover:text-primary-dark transition"
+        >
           <FaInstagram size={30} />
         </a>
-        <a href="#" className="text-primary hover:text-primary-dark transition">
+        <a
+          href="https://www.linkedin.com/in/lara-schuler?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary hover:text-primary-dark transition"
+        >
           <FaLinkedin size={30} />
         </a>
       </div>
