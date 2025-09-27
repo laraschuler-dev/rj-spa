@@ -29,7 +29,7 @@ const HeaderFeed: React.FC = () => {
           to="/meus-posts"
           className="hover:text-accent transition-colors cursor-pointer"
         >
-          Meus Posts
+          Doações
         </Link>
         <Link
           to="/eventos"

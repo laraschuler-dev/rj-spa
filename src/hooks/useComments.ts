@@ -1,4 +1,5 @@
 // src/hooks/useComments.ts
+import { useState } from 'react';
 import { usePostStore } from '../stores/postStore';
 import api from '../services/api';
 import { PostComment } from '../types/Comment';
@@ -7,8 +8,19 @@ export function useComments(postId: number, shareId?: number) {
   const { comments, fetchComments, addComment, updateComment, removeComment } =
     usePostStore();
 
+  const [loading, setLoading] = useState(false); // 👈 novo estado
+
   const key = shareId ? `share-${shareId}` : `post-${postId}`;
   const currentComments = comments[key] || [];
+
+  const fetchWithLoading = async () => {
+    setLoading(true);
+    try {
+      await fetchComments(postId, shareId);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const createComment = async (content: string) => {
     const params = shareId ? { shareId } : {};
@@ -24,7 +36,7 @@ export function useComments(postId: number, shareId?: number) {
     if (created && created.id) {
       addComment(postId, created, shareId);
     } else {
-      await fetchComments(postId, shareId);
+      await fetchWithLoading();
     }
 
     return created;
@@ -44,7 +56,7 @@ export function useComments(postId: number, shareId?: number) {
     if (updated && updated.id) {
       updateComment(postId, updated, shareId);
     } else {
-      await fetchComments(postId, shareId);
+      await fetchWithLoading();
     }
 
     return updated;
@@ -58,7 +70,8 @@ export function useComments(postId: number, shareId?: number) {
 
   return {
     comments: currentComments,
-    fetchComments: () => fetchComments(postId, shareId),
+    loading, // 👈 exporta loading
+    fetchComments: fetchWithLoading, // 👈 usa wrapper com loading
     createComment,
     editComment,
     deleteComment,

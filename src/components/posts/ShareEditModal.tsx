@@ -13,6 +13,7 @@ interface ShareEditModalProps {
   onClose: () => void;
   postId: number;
   shareId: number;
+  onSave?: (updatedPost: any) => void; // ✅ adicionado
 }
 
 const ShareEditModal: React.FC<ShareEditModalProps> = ({
@@ -20,6 +21,7 @@ const ShareEditModal: React.FC<ShareEditModalProps> = ({
   onClose,
   postId,
   shareId,
+  onSave, // ✅ desestruturação
 }) => {
   const { post, loading } = usePostDetails(postId, shareId);
   const [message, setMessage] = useState('');
@@ -31,11 +33,20 @@ const ShareEditModal: React.FC<ShareEditModalProps> = ({
   }, [post]);
 
   const handleSave = async () => {
-    const formData = new FormData();
-    formData.append('message', message);
-    const updatedShare = await editPost(formData);
-    if (updatedShare) updatePost(updatedShare);
-    onClose();
+    try {
+      const formData = new FormData();
+      formData.append('message', message);
+
+      const updated = await editPost(formData);
+
+      if (updated) {
+        updatePost(updated); // atualiza store
+        onSave?.(updated); // ✅ chama callback opcional
+        onClose();
+      }
+    } catch (err) {
+      console.error('Erro ao atualizar compartilhamento:', err);
+    }
   };
 
   if (!isOpen || loading || !post) return null;

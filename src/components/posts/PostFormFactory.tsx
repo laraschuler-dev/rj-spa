@@ -16,6 +16,7 @@ interface PostFormFactoryProps {
   initialData?: any;
   onClose?: () => void;
   isModal?: boolean;
+  loading?: boolean;
 }
 
 const formMap: Record<number, React.FC<PostFormFactoryProps>> = {

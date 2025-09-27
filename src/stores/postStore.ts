@@ -25,7 +25,7 @@ interface PostStoreState {
   addPost: (newPost: PostListItem) => void;
   removePost: (postId: number, shareId?: number) => void;
   toggleLikePost: (postId: number, liked: boolean, shareId?: number) => void;
-  toggleAttendance: (postId, postShareId) => void;
+  toggleAttendance: (postId: number, postShareId?: number) => void;
 
   comments: Record<string, PostComment[]>;
   fetchComments: (postId: number, shareId?: number) => Promise<void>;
@@ -129,7 +129,7 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
     });
   },
 
-  toggleAttendance: (postId, postShareId) =>
+  toggleAttendance: (postId: number, postShareId?: number) =>
     set((state) => {
       const posts = state.posts.map((p) => {
         const isSame =

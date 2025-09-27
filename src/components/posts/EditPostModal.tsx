@@ -5,11 +5,14 @@ import PostFormFactory from './PostFormFactory';
 import { useEditPost } from '../../hooks/useEditPost';
 import { toast } from 'react-toastify';
 import { usePostStore } from '../../stores/postStore';
+import { PostListItem } from '../../types/Post';
+
 
 interface EditPostModalProps {
   postId: number;
   shareId?: number;
   onClose: () => void;
+  onSuccess?: (updatedPost: PostListItem) => void;
 }
 
 const EditPostModal: React.FC<EditPostModalProps> = ({
@@ -72,6 +75,7 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
               onClose();
             }}
             onClose={onClose}
+            loading={loading}
           />
         </div>
       </div>

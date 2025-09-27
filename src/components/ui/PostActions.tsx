@@ -22,6 +22,7 @@ interface PostActionsProps {
   onShare?: () => void;
   onAttend?: () => void;
   isAttending?: boolean; // ✅ Já está na interface
+  loadingAttend?: boolean;
 }
 
 const PostActions: React.FC<PostActionsProps> = ({

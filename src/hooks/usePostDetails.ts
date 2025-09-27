@@ -57,7 +57,7 @@ export const usePostDetails = (postId: number, shareId?: number) => {
         };
 
         setPost(normalizedPost);
-        updatePost(normalizedPost, true);
+        updatePost(normalizedPost);
       } catch (err) {
         console.error('Erro ao carregar detalhes do post:', err);
       } finally {

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { usePostStore } from '../stores/postStore';
 import { useAuth } from '../hooks/useAuth';
 
@@ -13,28 +13,24 @@ export function useProfilePosts(userId: number | undefined) {
     loading,
   } = usePostStore();
 
-  // ✅ Função para refresh que será retornada
-  const refreshPosts = () => {
+  const refreshPosts = useCallback(() => {
     if (userId && currentUser?.id) {
       return refreshUserPosts(userId, currentUser.id);
     }
-  };
+  }, [userId, currentUser?.id, refreshUserPosts]);
 
-  // ✅ useEffect usando a função interna refreshPosts
+  // Carrega posts inicialmente
   useEffect(() => {
-    if (userId && currentUser?.id) {
-      refreshUserPosts(userId, currentUser.id);
-    }
-  }, [userId, currentUser?.id]);
+    refreshPosts();
+  }, [refreshPosts]);
 
   return {
-    posts: posts,
+    posts,
     loadMorePosts: () =>
       userId &&
       currentUser?.id &&
       fetchUserPosts(userId, currentUser.id, false),
-    refreshPosts: () =>
-      userId && currentUser?.id && refreshUserPosts(userId, currentUser.id),
+    refreshPosts,
     hasMore,
     loading,
   };

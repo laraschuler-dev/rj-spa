@@ -9,8 +9,6 @@ import CommentSection from './comments/CommentSection';
 import { formatTimeAgo } from '../utils/formatTimeAgo';
 import PostMenuButton from './ui/PostMenuButton';
 import { useEventAttendance } from '../hooks/useEventAttendance';
-import { useAuth } from '../hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
 
 interface PostCardProps {
   id: number;
@@ -75,7 +73,6 @@ const PostCard: React.FC<PostCardProps> = ({
   isShareOwner = false,
 }) => {
   const [showComments, setShowComments] = useState(false);
-  const navigate = useNavigate();
   const postIdForAttendance = sharedBy?.postId ?? id;
   const postShareIdForAttendance = sharedBy?.shareId;
 
@@ -87,12 +84,7 @@ const PostCard: React.FC<PostCardProps> = ({
     postShareIdForAttendance
   );
 
-  const { user } = useAuth();
-
   const isOriginalDeleted = metadata?.isDeletedOriginal ?? false;
-
-  const displayedAuthor =
-    expanded && sharedBy ? sharedBy.originalAuthor || author : author;
 
   // Garante que sempre seja Date válido
   const safeCreatedAt = createdAt ? new Date(createdAt) : new Date();
@@ -343,7 +335,7 @@ const PostCard: React.FC<PostCardProps> = ({
           {!expanded && !isInModal && (
             <button
               className="text-blue-500 text-sm font-medium hover:underline focus:outline-none"
-              onClick={onOpenDetails}
+              onClick={() => onOpenDetails?.(id, sharedBy?.shareId)}
             >
               Ver mais
             </button>

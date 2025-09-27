@@ -7,7 +7,7 @@ import SubmitButton from '../components/ui/SubmitButton';
 import { toast } from 'react-toastify';
 import CancelButton from '../components/ui/CancelButton';
 import { useProfileStore } from '../stores/profileStore';
-import { useEditProfile } from '../hooks/useEditProfile';
+import { useEditProfile, ProfileFormData } from '../hooks/useEditProfile';
 import axios from '../services/api';
 import BackButton from '../components/ui/BackButton';
 
@@ -25,7 +25,7 @@ const ProfileEdit: React.FC = () => {
   const { profile } = useProfileStore();
   const { editProfile, loading } = useEditProfile();
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<ProfileFormData>({
     profile_type: '',
     bio: '',
     city: '',
@@ -34,15 +34,16 @@ const ProfileEdit: React.FC = () => {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
 
-  // Preenche form e preview quando profile da store é carregado
+  // Atualiza form quando profile muda na store
   useEffect(() => {
     if (profile) {
       setForm({
-        profile_type: profile.profile_type || '',
+        profile_type: (profile.profile_type as any) || '',
         bio: profile.bio || '',
         city: profile.city || '',
         state: profile.state || '',
       });
+
       if (profile.profile_photo) {
         setPhotoPreview(`${axios.defaults.baseURL}${profile.profile_photo}`);
       }
@@ -56,7 +57,10 @@ const ProfileEdit: React.FC = () => {
   };
 
   const handleSelect = (value: string) => {
-    setForm({ ...form, profile_type: value });
+    setForm({
+      ...form,
+      profile_type: value as ProfileFormData['profile_type'],
+    });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,7 +91,6 @@ const ProfileEdit: React.FC = () => {
       </Typography>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Foto de perfil */}
         <div className="flex flex-col items-center gap-2">
           {photoPreview ? (
             <img
@@ -112,7 +115,6 @@ const ProfileEdit: React.FC = () => {
         </div>
 
         <CustomSelect
-          label="Tipo de perfil"
           options={profileOptions}
           value={form.profile_type}
           onChange={handleSelect}
@@ -149,7 +151,7 @@ const ProfileEdit: React.FC = () => {
           <SubmitButton disabled={loading}>
             {loading ? 'Salvando...' : 'Salvar'}
           </SubmitButton>
-          <CancelButton className="mx-auto block" />
+          <CancelButton mode="edit" className="mx-auto block" />
         </div>
       </form>
     </main>

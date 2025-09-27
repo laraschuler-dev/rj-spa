@@ -18,6 +18,7 @@ interface CustomSelectProps {
   onChange: (val: string) => void;
   options: Option[];
   placeholder?: string;
+  label?: string;
 }
 
 const CustomSelect: React.FC<CustomSelectProps> = ({

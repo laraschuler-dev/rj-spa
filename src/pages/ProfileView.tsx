@@ -32,14 +32,11 @@ const ProfileView: React.FC = () => {
     loading: postsLoading,
   } = useProfilePosts(user?.id);
 
-  const [initialLoadDone, setInitialLoadDone] = useState(false);
-
   useEffect(() => {
-    if (user?.id && !initialLoadDone) {
+    if (user?.id) {
       refreshPosts();
-      setInitialLoadDone(true);
     }
-  }, [user?.id, initialLoadDone, refreshPosts]);
+  }, [user?.id, refreshPosts]);
 
   const { toggleLikePost, addPost, removePost, updatePost } = usePostStore();
 
@@ -332,6 +329,7 @@ const ProfileView: React.FC = () => {
             if (post) openShareModal(post);
           }}
           onDelete={handleDelete}
+          onEdit={(postId, shareId) => setEditingPost({ id: postId, shareId })}
         />
       )}
       {postToShare && (

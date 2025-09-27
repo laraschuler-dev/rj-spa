@@ -4,6 +4,7 @@ import { usePostStore } from '../stores/postStore';
 import { PostListItem } from '../types/Post';
 import { useEventAttendance } from '../hooks/useEventAttendance';
 
+
 interface PostModalProps {
   postId: number;
   shareId?: number;
@@ -11,6 +12,7 @@ interface PostModalProps {
   onLike?: (postId: number, shareId?: number) => void;
   onShare: () => void;
   onEdit: (postId: number, shareId?: number) => void;
+  onDelete?: (postId: number, shareId?: number) => Promise<void>;
 }
 
 const PostModal: React.FC<PostModalProps> = ({

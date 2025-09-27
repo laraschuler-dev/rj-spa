@@ -12,6 +12,7 @@ interface ShareModalProps {
     content: string;
     author: string;
   };
+  onSave?: (updatedPost: any) => void;
 }
 
 const ShareModal: React.FC<ShareModalProps> = ({
@@ -19,6 +20,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
   onClose,
   onShare,
   postSummary,
+  onSave,
 }) => {
   const [message, setMessage] = useState('');
 
@@ -26,10 +28,13 @@ const ShareModal: React.FC<ShareModalProps> = ({
     onShare(message);
     setMessage('');
     onClose();
+    // Se quiser usar onSave após compartilhar
+    if (onSave) {
+      onSave({ message }); // exemplo de payload
+    }
   };
 
   if (!isOpen) return null;
-
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-start pt-20 overflow-auto"

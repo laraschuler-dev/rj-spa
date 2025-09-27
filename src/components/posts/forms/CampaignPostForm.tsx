@@ -38,7 +38,7 @@ const CampaignPostForm: React.FC<CampaignPostFormProps> = ({
     deadline: initialData?.deadline ?? '',
     organizer: initialData?.organizer ?? '',
     content: initialData?.content ?? '',
-    images: initialData?.images ?? [], // já vem do backend como {id, url} ou vazio para criação
+    images: initialData?.images ?? [],
   });
 
   const handleChange = (
@@ -86,7 +86,10 @@ const CampaignPostForm: React.FC<CampaignPostFormProps> = ({
         mode === 'edit' ? 'min-h-0 py-2' : 'min-h-screen py-12 items-center'
       }`}
     >
-      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
+      <div
+        className={`w-full bg-white p-8 rounded-2xl shadow-lg 
+    ${mode === 'create' ? 'max-w-xs sm:max-w-md' : 'max-w-md'}`}
+      >
         <Typography variant="h2" className="text-primary text-center mb-6">
           {mode === 'create' ? 'Nova Campanha' : 'Editar Campanha'}
         </Typography>

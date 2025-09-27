@@ -181,6 +181,7 @@ const Feed: React.FC = () => {
             if (post) openShareModal(post);
           }}
           onDelete={handleDelete}
+          onEdit={(postId, shareId) => setEditingPost({ id: postId, shareId })}
         />
       )}
 
