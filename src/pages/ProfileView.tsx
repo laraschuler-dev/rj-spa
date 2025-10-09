@@ -263,14 +263,21 @@ const ProfileView: React.FC = () => {
                 onLike={async () => {
                   const postIdToSend = post.sharedBy?.postId || post.id;
                   const shareIdToSend = post.sharedBy?.shareId;
+                  const currentLiked = post.liked ?? false;
+                  toggleLikePost(postIdToSend, !currentLiked, shareIdToSend);
+
                   try {
                     const { liked } = await likePost(
                       postIdToSend,
                       shareIdToSend
                     );
-                    toggleLikePost(postIdToSend, liked, shareIdToSend);
+                    if (liked !== !currentLiked) {
+                      toggleLikePost(postIdToSend, liked, shareIdToSend);
+                    }
                   } catch (err) {
+                    toggleLikePost(postIdToSend, currentLiked, shareIdToSend);
                     console.error('Erro ao curtir/descurtir post:', err);
+                    toast.error('Erro ao curtir o post');
                   }
                 }}
                 onShare={() => openShareModal(post)}
@@ -313,10 +320,27 @@ const ProfileView: React.FC = () => {
             if (!selectedPost) return;
             const postIdToSend = selectedPost.id;
             const shareIdToSend = selectedPost.shareId;
+
+            const post = userPosts.find((p) =>
+              selectedPost.shareId
+                ? p.sharedBy?.shareId === selectedPost.shareId
+                : p.id === selectedPost.id && !p.sharedBy
+            );
+
+            if (!post) return;
+
+            // ✅ CURTIDA OTIMISTA
+            const currentLiked = post.liked ?? false;
+            toggleLikePost(postIdToSend, !currentLiked, shareIdToSend);
+
             try {
               const { liked } = await likePost(postIdToSend, shareIdToSend);
-              toggleLikePost(postIdToSend, liked, shareIdToSend);
+
+              if (liked !== !currentLiked) {
+                toggleLikePost(postIdToSend, liked, shareIdToSend);
+              }
             } catch (err) {
+              toggleLikePost(postIdToSend, currentLiked, shareIdToSend);
               console.error('Erro ao curtir/descurtir post:', err);
             }
           }}

@@ -22,7 +22,7 @@ export const useEditPost = ({ postId, shareId }: UseEditPostProps) => {
         params
       );
       toast.success('Post atualizado com sucesso!');
-      return updatedPost; // <-- retorna post completo
+      return updatedPost;
     } catch (error: any) {
       toast.error('Erro ao atualizar o post.');
       console.error(error);

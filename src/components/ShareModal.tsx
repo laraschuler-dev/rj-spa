@@ -23,18 +23,33 @@ const ShareModal: React.FC<ShareModalProps> = ({
   onSave,
 }) => {
   const [message, setMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado de loading
 
-  const handleShare = () => {
-    onShare(message);
-    setMessage('');
-    onClose();
-    // Se quiser usar onSave após compartilhar
-    if (onSave) {
-      onSave({ message }); // exemplo de payload
+  const handleShare = async () => {
+    // Impede múltiplos cliques
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+
+    try {
+      await onShare(message);
+      setMessage('');
+
+      // Se quiser usar onSave após compartilhar
+      if (onSave) {
+        onSave({ message }); // exemplo de payload
+      }
+
+      onClose();
+    } catch (error) {
+      console.error('Erro ao compartilhar:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   if (!isOpen) return null;
+
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-start pt-20 overflow-auto"
@@ -79,7 +94,9 @@ const ShareModal: React.FC<ShareModalProps> = ({
 
         {/* Botões no mesmo padrão */}
         <div className="flex flex-col items-center gap-2 mt-2">
-          <SubmitButton onClick={handleShare}>Compartilhar</SubmitButton>
+          <SubmitButton onClick={handleShare} loading={isSubmitting}>
+            Compartilhar
+          </SubmitButton>
           <CancelButton mode="edit" onCloseModal={onClose} />
         </div>
       </div>

@@ -38,7 +38,6 @@ const App = () => {
               />
               <Route path="/profile" element={<ProfileView />} />
               <Route path="/profile/edit" element={<ProfileEdit />} />
-              <Route path="/profile/edit" element={<ProfileEdit />} />
               <Route path="/account-settings" element={<AccountSettings />} />
             </Route>
           </Routes>
