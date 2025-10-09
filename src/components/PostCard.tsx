@@ -7,6 +7,7 @@ import { resolveImageUrl } from '../utils/resolveImageUrl';
 import PostActions from './ui/PostActions';
 import CommentSection from './comments/CommentSection';
 import { formatTimeAgo } from '../utils/formatTimeAgo';
+import formatDateBR from '../utils/formatDateBR';
 import PostMenuButton from './ui/PostMenuButton';
 import { useEventAttendance } from '../hooks/useEventAttendance';
 
@@ -232,7 +233,7 @@ const PostCard: React.FC<PostCardProps> = ({
                   )}
                   {metadata?.date && (
                     <p>
-                      <strong>Data:</strong> {metadata.date}
+                      <strong>Data:</strong> {formatDateBR(metadata.date)}
                     </p>
                   )}
                   {metadata?.availability && (
@@ -258,7 +259,7 @@ const PostCard: React.FC<PostCardProps> = ({
                   )}
                   {metadata?.deadline && (
                     <p>
-                      <strong>Prazo:</strong> {metadata.deadline}
+                      <strong>Prazo:</strong> {formatDateBR(metadata.deadline)}
                     </p>
                   )}
                   {metadata?.organizer && (

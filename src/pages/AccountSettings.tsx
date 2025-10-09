@@ -17,6 +17,10 @@ const AccountSettings: React.FC = () => {
     newPassword: '',
   });
 
+  // Estados de loading para cada ação
+  const [isUpdatingAccount, setIsUpdatingAccount] = useState(false);
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+
   useEffect(() => {
     axios
       .get('/auth/me')
@@ -43,6 +47,10 @@ const AccountSettings: React.FC = () => {
   };
 
   const updateAccount = async () => {
+    // Impede múltiplos envios
+    if (isUpdatingAccount) return;
+    setIsUpdatingAccount(true);
+
     try {
       await axios.put('/auth/account', formData);
       toast.success('Dados atualizados com sucesso.');
@@ -50,10 +58,16 @@ const AccountSettings: React.FC = () => {
       const backendMessage =
         err.response?.data?.error || 'Erro ao atualizar dados.';
       toast.error(backendMessage);
+    } finally {
+      setIsUpdatingAccount(false);
     }
   };
 
   const updatePassword = async () => {
+    // Impede múltiplos envios
+    if (isUpdatingPassword) return;
+    setIsUpdatingPassword(true);
+
     try {
       await axios.put('/auth/password', passwordData);
       toast.success('Senha atualizada com sucesso.');
@@ -62,6 +76,8 @@ const AccountSettings: React.FC = () => {
       const backendMessage =
         err.response?.data?.error || 'Erro ao atualizar senha.';
       toast.error(backendMessage);
+    } finally {
+      setIsUpdatingPassword(false);
     }
   };
 
@@ -106,7 +122,7 @@ const AccountSettings: React.FC = () => {
             />
           </div>
           <div className="text-right">
-            <SubmitButton onClick={updateAccount}>
+            <SubmitButton onClick={updateAccount} loading={isUpdatingAccount}>
               Salvar Alterações
             </SubmitButton>
           </div>
@@ -153,7 +169,9 @@ const AccountSettings: React.FC = () => {
             </div>
           </form>
           <div className="text-right">
-            <SubmitButton onClick={updatePassword}>Alterar Senha</SubmitButton>
+            <SubmitButton onClick={updatePassword} loading={isUpdatingPassword}>
+              Alterar Senha
+            </SubmitButton>
           </div>
         </div>
       </div>

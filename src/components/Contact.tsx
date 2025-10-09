@@ -19,6 +19,9 @@ const Contact = () => {
     message: '',
   });
 
+  // Estado para controlar o loading
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -29,6 +32,10 @@ const Contact = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
+    // Impede múltiplos envios
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
     try {
       await axios.post('/contact', formData);
       toast.success('Mensagem enviada com sucesso!');
@@ -38,6 +45,9 @@ const Contact = () => {
         error.response?.data?.error ||
         'Erro ao enviar mensagem. Tente novamente mais tarde.';
       toast.error(msg);
+    } finally {
+      // Reativa o botão após o envio (sucesso ou erro)
+      setIsSubmitting(false);
     }
   };
 
@@ -95,7 +105,8 @@ const Contact = () => {
             className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none"
             required
           />
-          <SubmitButton>Enviar Mensagem</SubmitButton>
+          {/* SubmitButton com estado de loading */}
+          <SubmitButton loading={isSubmitting}>Enviar Mensagem</SubmitButton>
         </form>
       </div>
 

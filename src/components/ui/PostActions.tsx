@@ -75,6 +75,10 @@ const PostActions: React.FC<PostActionsProps> = ({
 
   const attending = onAttend ? isAttending : status.userStatus === 'confirmed';
 
+  const iconSizeClass = isEvent
+    ? 'w-2.5 h-2.5 sm:w-3.5 sm:h-3.5'
+    : 'w-4 h-4 sm:w-5 sm:h-5';
+
   return (
     <div
       className={`flex justify-between items-center border-t pt-3 text-gray-600 ${
@@ -86,9 +90,9 @@ const PostActions: React.FC<PostActionsProps> = ({
         className="flex items-center gap-1 hover:text-blue-500 transition focus:outline-none"
       >
         {isLiked ? (
-          <FaHeart className="text-red-500 w-4 h-4 sm:w-5 sm:h-5" />
+          <FaHeart className={`text-red-500 ${iconSizeClass}`} />
         ) : (
-          <FaRegHeart className="w-4 h-4 sm:w-5 sm:h-5" />
+          <FaRegHeart className={iconSizeClass} />
         )}
         <span className={isEvent ? 'text-[10px] sm:text-sm' : ''}>Curtir</span>
       </button>
@@ -97,7 +101,7 @@ const PostActions: React.FC<PostActionsProps> = ({
         onClick={onComment}
         className="flex items-center gap-1 hover:text-blue-500 transition focus:outline-none"
       >
-        <FaRegCommentDots className="w-4 h-4 sm:w-5 sm:h-5" />
+        <FaRegCommentDots className={iconSizeClass} />
         <span className={isEvent ? 'text-[10px] sm:text-sm' : ''}>
           Comentar
         </span>
@@ -107,7 +111,7 @@ const PostActions: React.FC<PostActionsProps> = ({
         onClick={onShare}
         className="flex items-center gap-1 hover:text-blue-500 transition focus:outline-none"
       >
-        <FaShare className="w-4 h-4 sm:w-5 sm:h-5" />
+        <FaShare className={iconSizeClass} />
         <span className={isEvent ? 'text-[10px] sm:text-sm' : ''}>
           Compartilhar
         </span>
@@ -116,14 +120,14 @@ const PostActions: React.FC<PostActionsProps> = ({
       {isEvent && (
         <button
           onClick={handleAttendance}
-          disabled={attendanceLoading && !onAttend} // ⚠️ Só desabilita se estiver usando hook
+          disabled={attendanceLoading && !onAttend}
           className={`flex items-center gap-1 px-2 py-1 rounded-xl font-medium transition focus:outline-none ${
             attending
               ? 'bg-green-100 text-green-600 border border-green-500'
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}
         >
-          <FaRegCalendarCheck className="w-4 h-4 sm:w-5 sm:h-5" />
+          <FaRegCalendarCheck className={iconSizeClass} />
           <span className="text-[9px] sm:text-xs">
             {attending ? '✓ Confirmado' : 'Participar'}
           </span>

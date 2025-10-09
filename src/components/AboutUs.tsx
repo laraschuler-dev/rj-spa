@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import Typography from './ui/Typography';
 import Button from './ui/Button';
+import { Link } from 'react-router-dom';
 
 const AboutUs = () => {
   return (
@@ -73,7 +74,9 @@ const AboutUs = () => {
 
         {/* Botão de Ação */}
         <div className="mt-8 text-center">
-          <Button variant="primary">Junte-se a Nós</Button>
+          <Link to="/login">
+            <Button variant="primary">Junte-se a Nós</Button>
+          </Link>
         </div>
       </motion.div>
     </section>

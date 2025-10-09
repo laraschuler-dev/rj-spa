@@ -16,6 +16,8 @@ const Register = () => {
     confirmPassword: '',
   });
   const [error, setError] = useState('');
+  // Estado para controlar o loading
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,11 +28,16 @@ const Register = () => {
     e.preventDefault();
     setError('');
 
+    // Impede múltiplos envios
+    if (isSubmitting) return;
+
     // Verifica se as senhas coincidem
     if (formData.password !== formData.confirmPassword) {
       toast.error('As senhas não coincidem.');
       return;
     }
+
+    setIsSubmitting(true);
 
     try {
       await api.post('/auth/users', {
@@ -55,6 +62,9 @@ const Register = () => {
         // Erro desconhecido
         toast.error('Ocorreu um erro inesperado. Tente novamente.');
       }
+    } finally {
+      // Reativa o botão após o envio (sucesso ou erro)
+      setIsSubmitting(false);
     }
   };
 
@@ -158,7 +168,7 @@ const Register = () => {
           {error && <p className="text-red-500 text-sm">{error}</p>}
 
           {/* Botão de Criar Conta */}
-          <SubmitButton>Criar Conta</SubmitButton>
+          <SubmitButton loading={isSubmitting}>Criar Conta</SubmitButton>
         </form>
 
         {/* Divisor */}

@@ -19,6 +19,8 @@ const Login: React.FC = () => {
   const user = useAuthStore((state) => state.user);
   const token = useAuthStore((state) => state.token);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // ✅ Redireciona só quando o usuário estiver disponível
   useEffect(() => {
     if (token && user) {
@@ -32,12 +34,15 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+
     try {
       const response = await api.post('/auth/session', formData);
-
       setToken(response.data.token);
       localStorage.setItem('token', response.data.token);
-
       await validateToken();
       toast.success('Login realizado com sucesso!');
     } catch (err: any) {
@@ -48,6 +53,8 @@ const Login: React.FC = () => {
       } else {
         toast.error('Erro inesperado ao fazer login.');
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -108,7 +115,7 @@ const Login: React.FC = () => {
           </div>
 
           {/* Botão de Entrar */}
-          <SubmitButton>Entrar</SubmitButton>
+          <SubmitButton loading={isSubmitting}>Entrar</SubmitButton>
         </form>
 
         {/* Divisor */}
