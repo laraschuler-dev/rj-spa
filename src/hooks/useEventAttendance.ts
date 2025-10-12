@@ -7,11 +7,17 @@ export function useEventAttendance(postId?: number, postShareId?: number) {
   const [loading, setLoading] = useState(false);
 
   // Localiza o post/share na store
-  const post = posts.find((p) =>
-    postShareId
-      ? p.sharedBy?.shareId === postShareId
-      : p.id === postId && !p.sharedBy
-  );
+  // No useEventAttendance.ts - CORREÇÃO
+  const post = posts.find((p) => {
+    // Se temos postShareId, busca pelo compartilhamento específico
+    if (postShareId) {
+      return p.sharedBy?.shareId === postShareId;
+    }
+    // Se não temos postShareId, busca pelo post original
+    else {
+      return p.id === postId && !p.sharedBy;
+    }
+  });
 
   const status = {
     attending: post?.attending ?? false,

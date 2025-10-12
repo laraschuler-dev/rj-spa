@@ -1,3 +1,4 @@
+// src/components/HeaderFeed.tsx
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FiBell, FiMail, FiMenu, FiLogOut } from 'react-icons/fi';
@@ -5,6 +6,8 @@ import { CgProfile } from 'react-icons/cg';
 import MobileMenuFeed from '../ui/MobileMenuFeed';
 import { useLogout } from '../../hooks/useLogout';
 import { FiSettings } from 'react-icons/fi';
+import SearchBar from '../SearchBar';
+import SearchBarMobile from '../SearchBarMobile';
 
 const HeaderFeed: React.FC = () => {
   const logout = useLogout();
@@ -13,12 +16,20 @@ const HeaderFeed: React.FC = () => {
   return (
     <header className="bg-primary text-background py-4 px-6 shadow-md flex items-center justify-between fixed top-0 left-0 w-full z-50">
       {/* Logo / Home */}
-      <Link to="/" className="text-xl md:text-2xl font-heading cursor-pointer">
+      <Link
+        to="/"
+        className="text-xl md:text-2xl font-heading cursor-pointer flex-shrink-0"
+      >
         Redefinindo Jornadas
       </Link>
 
+      {/* SearchBar - Centralizado e responsivo */}
+      <div className="hidden md:flex flex-1 max-w-2xl mx-6">
+        <SearchBar />
+      </div>
+
       {/* Acoes principais - oculto no mobile */}
-      <nav className="hidden md:flex items-center gap-6">
+      <nav className="hidden md:flex items-center gap-6 flex-shrink-0">
         <Link
           to="/posts/create/9"
           className="hover:text-accent transition-colors cursor-pointer"
@@ -37,20 +48,16 @@ const HeaderFeed: React.FC = () => {
         >
           Eventos
         </Link>
-        <Link
-          to="/eventos"
-          className="hover:text-accent transition-colors cursor-pointer"
-        >
-          Serviços
-        </Link>
       </nav>
 
       {/* Ícones e Perfil */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 flex-shrink-0">
+        {/* Search Mobile - ícone que abre modal */}
+        <div className="md:hidden">
+          <SearchBarMobile />
+        </div>
+
         {/* Ícones visíveis em todas as telas */}
-        <Link to="/mensagens" aria-label="Mensagens">
-          <FiMail size={24} className="hover:text-accent transition" />
-        </Link>
         <Link to="/notificacoes" aria-label="Notificações">
           <FiBell size={24} className="hover:text-accent transition" />
         </Link>

@@ -6,7 +6,6 @@ import { useEditPost } from '../../hooks/useEditPost';
 import { toast } from 'react-toastify';
 import { usePostStore } from '../../stores/postStore';
 import { PostListItem } from '../../types/Post';
-import SubmitButton from '../ui/SubmitButton'; // ✅ Importe o SubmitButton
 
 interface EditPostModalProps {
   postId: number;
@@ -24,7 +23,7 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const { editPost, loading } = useEditPost({ postId, shareId });
   const { updatePost } = usePostStore();
-  const [isSubmitting, setIsSubmitting] = useState(false); // ✅ Estado local
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -47,20 +46,21 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
     fetchPost();
   }, [postId, shareId]);
 
-  const handleSubmit = async (formData: FormData) => {
-    if (isSubmitting) return;
-    setIsSubmitting(true);
-
-    try {
-      const updatedPost = await editPost(formData);
-      if (updatedPost) updatePost(updatedPost);
-      onClose();
-    } catch (error) {
-      console.error('Erro ao editar post:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  // ✅ REMOVA esta função não utilizada:
+  // const handleSubmit = async (formData: FormData) => {
+  //   if (isSubmitting) return;
+  //   setIsSubmitting(true);
+  //
+  //   try {
+  //     const updatedPost = await editPost(formData);
+  //     if (updatedPost) updatePost(updatedPost);
+  //     onClose();
+  //   } catch (error) {
+  //     console.error('Erro ao editar post:', error);
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
 
   if (!initialData || categoryId === null) return null;
 
@@ -80,23 +80,35 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
           >
             ×
           </button>
+
           <PostFormFactory
             categoryId={categoryId}
             mode="edit"
             initialData={initialData}
             onSubmit={async (formData: FormData) => {
-              const updatedPost = await editPost(formData);
-              if (updatedPost) updatePost(updatedPost);
-              onClose();
+              if (isSubmitting) return;
+              setIsSubmitting(true); // ✅ Ativa o loading
+
+              try {
+                const updatedPost = await editPost(formData);
+                if (updatedPost) updatePost(updatedPost);
+                onClose();
+              } catch (error) {
+                console.error('Erro ao editar post:', error);
+              } finally {
+                setIsSubmitting(false); // ✅ Desativa o loading
+              }
             }}
             onClose={onClose}
             loading={loading}
           />
-          <div className="mt-4 pt-4 border-t">
+
+          {/* ✅ Este botão adicional não é necessário - REMOVA */}
+          {/* <div className="mt-4 pt-4 border-t">
             <SubmitButton loading={isSubmitting}>
               Salvar Alterações
             </SubmitButton>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

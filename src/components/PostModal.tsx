@@ -4,7 +4,6 @@ import { usePostStore } from '../stores/postStore';
 import { PostListItem } from '../types/Post';
 import { useEventAttendance } from '../hooks/useEventAttendance';
 
-
 interface PostModalProps {
   postId: number;
   shareId?: number;

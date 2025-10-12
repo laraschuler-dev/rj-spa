@@ -244,8 +244,7 @@ const ProfileView: React.FC = () => {
                 categoryId={post.categoria_idcategoria}
                 metadata={post.metadata}
                 author={
-                  // 👇 A API já aplica anonimização, então use os dados que vêm dela
-                  post.user?.id === 0 // Post anônimo (já tratado pela API)
+                  post.user?.id === 0
                     ? {
                         id: 0,
                         name: 'Usuário Anônimo',

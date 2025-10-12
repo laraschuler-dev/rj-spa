@@ -132,16 +132,25 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
   toggleAttendance: (postId: number, postShareId?: number) =>
     set((state) => {
       const posts = state.posts.map((p) => {
-        const isSame =
-          (postShareId && p.sharedBy?.shareId === postShareId) ||
-          (!postShareId && p.id === postId && !p.sharedBy);
-
-        if (!isSame) return p;
-
-        return {
-          ...p,
-          attending: !p.attending, // toggle local
-        };
+        // Para posts compartilhados: compara pelo shareId
+        if (postShareId) {
+          if (p.sharedBy?.shareId === postShareId) {
+            return {
+              ...p,
+              attending: !p.attending,
+            };
+          }
+        }
+        // Para posts originais: compara pelo id e garante que não é compartilhamento
+        else {
+          if (p.id === postId && !p.sharedBy) {
+            return {
+              ...p,
+              attending: !p.attending,
+            };
+          }
+        }
+        return p;
       });
 
       return { posts };

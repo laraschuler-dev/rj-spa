@@ -75,13 +75,22 @@ const ShareEditModal: React.FC<ShareEditModalProps> = ({
 
           <div className="mb-4">
             <PostPreviewCard
-              author={{
-                name:
-                  post.sharedBy?.name ??
-                  post.user?.name ??
-                  'Usuário desconhecido',
-                avatarUrl: post.sharedBy?.avatarUrl ?? post.user?.avatarUrl,
-              }}
+              author={
+                post.categoria_idcategoria === 2 && post.metadata?.isAnonymous
+                  ? {
+                      id: 0,
+                      name: 'Anônimo',
+                      avatarUrl: undefined,
+                    }
+                  : {
+                      id: post.user?.id || post.author?.id,
+                      name:
+                        post.user?.name ||
+                        post.author?.name ||
+                        'Usuário desconhecido',
+                      avatarUrl: post.user?.avatarUrl || post.author?.avatarUrl,
+                    }
+              }
               createdAt={post.sharedBy?.sharedAt ?? post.createdAt}
               metadata={post.metadata}
               content={post.content}
