@@ -14,6 +14,9 @@ import ProfileView from './pages/ProfileView';
 import ProfileEdit from './pages/ProfileEdit';
 import AccountSettings from './pages/AccountSettings';
 import CreatePostPage from './pages/posts/CreatePostPage';
+import EventsPage from './pages/EventsPage';
+import DonationsPage from './pages/DonationsPage';
+import ServicesPage from './pages/ServicesPage';
 
 const App = () => {
   return (
@@ -36,6 +39,9 @@ const App = () => {
                 path="posts/create/:categoryId"
                 element={<CreatePostPage />}
               />
+              <Route path="/events" element={<EventsPage />} />
+              <Route path="/donations" element={<DonationsPage />} />
+              <Route path="/services" element={<ServicesPage />} />
               <Route path="/profile" element={<ProfileView />} />
               <Route path="/profile/:userId" element={<ProfileView />} />
               <Route path="/profile/edit" element={<ProfileEdit />} />

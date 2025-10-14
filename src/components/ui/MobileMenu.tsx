@@ -67,9 +67,9 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
         <IoMdClose />
       </button>
 
-      {/* Logo (Agora com clique para scrollar ao topo) */}
+      {/* Logo */}
       <h2
-        className="text-xl font-heading mb-4 mt-8 cursor-pointer"
+        className="text-xl font-heading font-bold hover:text-accent transition-colors mb-4 mt-8 cursor-pointer"
         onClick={handleLogoClick}
       >
         Redefinindo Jornadas

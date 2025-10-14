@@ -90,6 +90,7 @@ const Feed: React.FC = () => {
 
   return (
     <Layout variant="feed">
+      <div className="mb-6"></div>
       <div className="space-y-6">
         {posts.map((post) => (
           <PostCard

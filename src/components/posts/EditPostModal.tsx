@@ -46,22 +46,6 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
     fetchPost();
   }, [postId, shareId]);
 
-  // ✅ REMOVA esta função não utilizada:
-  // const handleSubmit = async (formData: FormData) => {
-  //   if (isSubmitting) return;
-  //   setIsSubmitting(true);
-  //
-  //   try {
-  //     const updatedPost = await editPost(formData);
-  //     if (updatedPost) updatePost(updatedPost);
-  //     onClose();
-  //   } catch (error) {
-  //     console.error('Erro ao editar post:', error);
-  //   } finally {
-  //     setIsSubmitting(false);
-  //   }
-  // };
-
   if (!initialData || categoryId === null) return null;
 
   return (
@@ -87,7 +71,7 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
             initialData={initialData}
             onSubmit={async (formData: FormData) => {
               if (isSubmitting) return;
-              setIsSubmitting(true); // ✅ Ativa o loading
+              setIsSubmitting(true);
 
               try {
                 const updatedPost = await editPost(formData);
@@ -96,19 +80,12 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
               } catch (error) {
                 console.error('Erro ao editar post:', error);
               } finally {
-                setIsSubmitting(false); // ✅ Desativa o loading
+                setIsSubmitting(false);
               }
             }}
             onClose={onClose}
             loading={loading}
           />
-
-          {/* ✅ Este botão adicional não é necessário - REMOVA */}
-          {/* <div className="mt-4 pt-4 border-t">
-            <SubmitButton loading={isSubmitting}>
-              Salvar Alterações
-            </SubmitButton>
-          </div> */}
         </div>
       </div>
     </div>

@@ -14,13 +14,12 @@ const Header: React.FC = () => {
 
   return (
     <header className="bg-primary text-background py-4 px-6 shadow-md flex items-center justify-between fixed top-0 left-0 w-full z-50">
-      {/* Logo */}
       {!isMenuOpen && (
         <ScrollLink
           to="introduction"
           smooth={true}
           duration={500}
-          className="text-xl md:text-2xl font-heading cursor-pointer"
+          className="text-xl md:text-2xl font-heading font-bold cursor-pointer hover:text-accent transition-colors"
         >
           Redefinindo Jornadas
         </ScrollLink>

@@ -1,11 +1,19 @@
-// src/components/HeaderFeed.tsx
+// src/components/HeaderFeed.tsx - VERSÃO COM LOGO MAIOR E ESPAÇAMENTO AJUSTADO
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FiBell, FiMail, FiMenu, FiLogOut } from 'react-icons/fi';
+import {
+  FiBell,
+  FiMenu,
+  FiLogOut,
+  FiHome,
+  FiSettings,
+  FiBriefcase,
+  FiCalendar,
+  FiGift,
+} from 'react-icons/fi';
 import { CgProfile } from 'react-icons/cg';
 import MobileMenuFeed from '../ui/MobileMenuFeed';
 import { useLogout } from '../../hooks/useLogout';
-import { FiSettings } from 'react-icons/fi';
 import SearchBar from '../SearchBar';
 import SearchBarMobile from '../SearchBarMobile';
 
@@ -14,85 +22,106 @@ const HeaderFeed: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   return (
-    <header className="bg-primary text-background py-4 px-6 shadow-md flex items-center justify-between fixed top-0 left-0 w-full z-50">
-      {/* Logo / Home */}
-      <Link
-        to="/"
-        className="text-xl md:text-2xl font-heading cursor-pointer flex-shrink-0"
-      >
-        Redefinindo Jornadas
-      </Link>
+    <header className="bg-primary text-background py-4 px-4 md:px-6 flex items-center justify-between fixed top-0 left-0 w-full z-50">
+      {/* Logo + Navegação Principal */}
+      <div className="flex items-center gap-2 md:gap-10 flex-shrink-0">
+        {/* Logo - MAIOR no mobile */}
+        <Link
+          to="/"
+          className="text-lg md:text-xl font-heading font-bold cursor-pointer hover:text-accent transition-colors whitespace-nowrap"
+        >
+          Redefinindo Jornadas
+        </Link>
+        {/* Navegação Desktop */}
+        <nav className="hidden md:flex items-center gap-0 bg-primary-dark/20 rounded-lg p-1">
+          <Link
+            to="/feed"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded text-sm hover:bg-primary-dark/50 hover:text-accent transition-all duration-200"
+          >
+            <FiHome size={16} />
+            <span>Feed</span>
+          </Link>
+          <Link
+            to="/donations"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded text-sm hover:bg-primary-dark/50 hover:text-accent transition-all duration-200"
+          >
+            <FiGift size={16} />
+            <span>Doações</span>
+          </Link>
+          <Link
+            to="/events"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded text-sm hover:bg-primary-dark/50 hover:text-accent transition-all duration-200"
+          >
+            <FiCalendar size={16} />
+            <span>Eventos</span>
+          </Link>
+          <Link
+            to="/services"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded text-sm hover:bg-primary-dark/50 hover:text-accent transition-all duration-200"
+          >
+            <FiBriefcase size={16} />
+            <span>Serviços</span>
+          </Link>
+        </nav>
+      </div>
 
-      {/* SearchBar - Centralizado e responsivo */}
-      <div className="hidden md:flex flex-1 max-w-2xl mx-6">
+      {/* SearchBar - Centralizado com mais espaço */}
+      <div className="hidden md:flex flex-1 max-w-2xl mx-10">
         <SearchBar />
       </div>
 
-      {/* Acoes principais - oculto no mobile */}
-      <nav className="hidden md:flex items-center gap-6 flex-shrink-0">
-        <Link
-          to="/posts/create/9"
-          className="hover:text-accent transition-colors cursor-pointer"
-        >
-          Criar Post
-        </Link>
-        <Link
-          to="/meus-posts"
-          className="hover:text-accent transition-colors cursor-pointer"
-        >
-          Doações
-        </Link>
-        <Link
-          to="/eventos"
-          className="hover:text-accent transition-colors cursor-pointer"
-        >
-          Eventos
-        </Link>
-      </nav>
-
-      {/* Ícones e Perfil */}
-      <div className="flex items-center gap-4 flex-shrink-0">
-        {/* Search Mobile - ícone que abre modal */}
+      {/* Área do Usuário - MOBILE OTIMIZADO */}
+      <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
         <div className="md:hidden">
           <SearchBarMobile />
         </div>
-
-        {/* Ícones visíveis em todas as telas */}
-        <Link to="/notificacoes" aria-label="Notificações">
-          <FiBell size={24} className="hover:text-accent transition" />
-        </Link>
-
-        {/* Só visível no desktop */}
-        <Link
-          to="/profile"
-          className="hidden md:flex items-center gap-1 hover:text-accent transition"
+        {/* Ícones de Ação - ESPAÇAMENTO REDUZIDO no mobile */}
+        <div className="flex items-center gap-1 md:gap-2 bg-primary-dark/20 rounded-lg p-1">
+          <Link to="/notificacoes" aria-label="Notificações">
+            <FiBell
+              size={18}
+              className="hover:text-accent transition-all duration-200 group"
+            />
+          </Link>
+          {/* Perfil - Apenas Desktop */}
+          <Link
+            to="/profile"
+            className="hidden md:flex items-center gap-1.5 p-1.5 rounded hover:bg-primary-dark/50 hover:text-accent transition-all duration-200 group"
+          >
+            <CgProfile size={18} />
+            <span className="text-sm">Perfil</span>
+          </Link>
+          {/* Configurações - Apenas Desktop */}
+          <Link
+            to="/account-settings"
+            className="hidden md:flex p-1.5 rounded hover:bg-primary-dark/50 hover:text-accent transition-all duration-200 group"
+            aria-label="Configurações"
+          >
+            <FiSettings size={18} />
+          </Link>
+          {/* Logout - Apenas Desktop */}
+          <button
+            onClick={logout}
+            className="hidden md:flex p-1.5 rounded hover:bg-red-600/20 hover:text-red-300 transition-all duration-200 group"
+            aria-label="Sair"
+          >
+            <FiLogOut size={18} />
+          </button>
+        </div>
+        {/* Separador Visual */}
+        <div className="hidden md:block h-5 w-px bg-primary-dark/50 mx-1"></div>
+        {/* Menu Mobile */}
+        <button
+          className="md:hidden p-1.5 rounded hover:bg-primary-dark/50 transition-all duration-200"
+          aria-label="Abrir menu"
+          onClick={() => setIsMenuOpen(true)}
         >
-          <CgProfile size={24} />
-        </Link>
-        <Link
-          to="/account-settings"
-          className="hidden md:flex items-center gap-1 hover:text-accent transition"
-        >
-          <FiSettings size={24} />
-        </Link>
-        <Link
-          to="/login"
-          onClick={logout}
-          aria-label="Sair"
-          className="hidden md:flex hover:text-red-300 transition"
-        >
-          <FiLogOut size={24} />
-        </Link>
+          <FiMenu size={28} />{' '}
+          {/* ← Ajustei para 22 (equilibrado com o bell) */}
+        </button>
       </div>
 
-      {/* Mobile - menu hamburguer */}
-      <button
-        className="md:hidden"
-        aria-label="Abrir menu"
-        onClick={() => setIsMenuOpen(true)}
-      >
-        <FiMenu size={26} />
-      </button>
+      {/* Menu Mobile */}
       <MobileMenuFeed
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}

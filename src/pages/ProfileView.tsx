@@ -93,7 +93,6 @@ const ProfileView: React.FC = () => {
       addPost(sharedPostDTO);
     } catch (err) {
       console.error(err);
-      toast.error('Erro ao compartilhar o post');
     } finally {
       closeShareModal();
     }
