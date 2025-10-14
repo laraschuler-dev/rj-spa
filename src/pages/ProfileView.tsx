@@ -1,13 +1,14 @@
 // src/views/ProfileView.tsx
 import React, { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import Typography from '../components/ui/Typography';
-import { Link } from 'react-router-dom';
 import { CgProfile } from 'react-icons/cg';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 import { FiEdit2 } from 'react-icons/fi';
 import BackButton from '../components/ui/BackButton';
 import { useProfile } from '../hooks/useProfile';
-import { useProfilePosts } from '../hooks/useProfilePosts'; // ✅ NOVO HOOK
+import { useUserProfile, PublicUserData } from '../hooks/useUserProfile'; // 👈 Importe o tipo
+import { useProfilePosts } from '../hooks/useProfilePosts';
 import PostCard from '../components/PostCard';
 import PostModal from '../components/PostModal';
 import ShareModal from '../components/ShareModal';
@@ -19,9 +20,26 @@ import { likePost } from '../hooks/useLikePost';
 import { useDeletePost } from '../hooks/useDeletePost';
 import { toast } from 'react-toastify';
 import axios from '../services/api';
+import { useAuth } from '../hooks/useAuth';
+
+// 👇 Type Guard para verificar se é PrivateUserData (tem email)
+const hasEmail = (user: any): user is { email: string; fone?: string } => {
+  return user && 'email' in user;
+};
 
 const ProfileView: React.FC = () => {
-  const { user, profile, loading } = useProfile();
+  const { userId: urlUserId } = useParams<{ userId?: string }>();
+  const { user: currentUser } = useAuth();
+
+  const targetUserId = urlUserId ? parseInt(urlUserId) : currentUser?.id;
+  const isOwnProfile = !urlUserId || currentUser?.id === targetUserId;
+
+  // Hook para perfil próprio ou de outros usuários
+  const profileData = isOwnProfile
+    ? useProfile()
+    : useUserProfile(targetUserId);
+
+  const { user, profile, loading } = profileData;
   const apiBaseUrl = axios.defaults.baseURL || '';
 
   const {
@@ -30,16 +48,15 @@ const ProfileView: React.FC = () => {
     refreshPosts,
     hasMore,
     loading: postsLoading,
-  } = useProfilePosts(user?.id);
+  } = useProfilePosts(targetUserId);
 
   useEffect(() => {
-    if (user?.id) {
+    if (targetUserId) {
       refreshPosts();
     }
-  }, [user?.id, refreshPosts]);
+  }, [targetUserId, refreshPosts]);
 
   const { toggleLikePost, addPost, removePost, updatePost } = usePostStore();
-
   const { sharePost } = useSharePost();
   const { deletePost } = useDeletePost();
 
@@ -73,7 +90,7 @@ const ProfileView: React.FC = () => {
         ? postToShare.sharedBy.postId
         : postToShare.id;
       const sharedPostDTO = await sharePost(originalPostId, message);
-      addPost(sharedPostDTO); // ✅ store como única fonte da verdade
+      addPost(sharedPostDTO);
     } catch (err) {
       console.error(err);
       toast.error('Erro ao compartilhar o post');
@@ -84,7 +101,6 @@ const ProfileView: React.FC = () => {
 
   const handleDelete = async (postId: number, shareId?: number) => {
     try {
-      // Passa shareId só se for um compartilhamento
       if (shareId) {
         await deletePost(postId, shareId);
       } else {
@@ -99,17 +115,27 @@ const ProfileView: React.FC = () => {
     }
   };
 
+  // 👇 Função segura para edição
+  const handleEdit = isOwnProfile
+    ? (postId: number, shareId?: number) =>
+        setEditingPost({ id: postId, shareId })
+    : undefined;
+
   if (loading) {
-    return <div className="text-primary text-center">Carregando perfil...</div>;
+    return (
+      <div className="text-primary text-center mt-12">Carregando perfil...</div>
+    );
   }
 
   if (!profile || !user) {
     return (
       <div className="text-center mt-12">
-        <p>Perfil não encontrado.</p>
-        <Link to="/profile/edit" className="text-primary hover:underline">
-          Criar Perfil
-        </Link>
+        <p className="text-gray-600 mb-4">Perfil não encontrado.</p>
+        {isOwnProfile && (
+          <Link to="/profile/edit" className="text-primary hover:underline">
+            Criar Perfil
+          </Link>
+        )}
       </div>
     );
   }
@@ -117,6 +143,7 @@ const ProfileView: React.FC = () => {
   return (
     <main className="min-h-screen bg-background px-4 py-12">
       <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
+
       {/* Card de perfil */}
       <div className="w-full max-w-[600px] bg-white p-8 rounded-2xl shadow-lg text-center mx-auto">
         {profile.profile_photo ? (
@@ -155,80 +182,94 @@ const ProfileView: React.FC = () => {
           </p>
         )}
 
-        <div className="text-sm text-gray-600 mb-4">
-          <p>
-            <strong>Email:</strong> {user.email}
-          </p>
-          {user.fone && (
+        {/* 👇 VERIFICAÇÃO DE TIPO SEGURA */}
+        {hasEmail(user) && (
+          <div className="text-sm text-gray-600 mb-4">
             <p>
-              <strong>Telefone:</strong> {user.fone}
+              <strong>Email:</strong> {user.email}
             </p>
-          )}
-        </div>
-
-        <div className="flex justify-center">
-          <Link
-            to="/profile/edit"
-            className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
-          >
-            <FiEdit2 size={16} />
-            Editar
-          </Link>
-        </div>
-      </div>
-      <div className="mt-8 max-w-[600px] mx-auto w-full">
-        <div className="bg-white rounded-2xl shadow-lg p-6 text-center border border-gray-100">
-          <div className="w-16 h-16 mx-auto mb-3 bg-gradient-to-r from-primary to-primary-light rounded-full flex items-center justify-center">
-            <svg
-              className="w-8 h-8 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
+            {user.fone && (
+              <p>
+                <strong>Telefone:</strong> {user.fone}
+              </p>
+            )}
           </div>
+        )}
+
+        {/* 👇 MOSTRA EDITAR APENAS NO PRÓPRIO PERFIL */}
+        {isOwnProfile && (
+          <div className="flex justify-center">
+            <Link
+              to="/profile/edit"
+              className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+            >
+              <FiEdit2 size={16} />
+              Editar
+            </Link>
+          </div>
+        )}
+      </div>
+
+      {/* 👇 MOSTRA "CRIAR POST" APENAS NO PRÓPRIO PERFIL */}
+      {isOwnProfile && (
+        <div className="mt-8 max-w-[600px] mx-auto w-full">
+          <div className="bg-white rounded-2xl shadow-lg p-6 text-center border border-gray-100">
+            <div className="w-16 h-16 mx-auto mb-3 bg-gradient-to-r from-primary to-primary-light rounded-full flex items-center justify-center">
+              <svg
+                className="w-8 h-8 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+            </div>
+            <Typography
+              variant="h3"
+              className="text-lg font-semibold text-gray-800 mb-2"
+            >
+              Compartilhe algo novo
+            </Typography>
+            <Typography variant="p" className="text-gray-600 text-sm mb-4">
+              Conte novidades, ofereça ajuda ou inicie uma discussão
+            </Typography>
+            <Link
+              to="/posts/create/9"
+              className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-medium py-2.5 px-6 rounded-xl transition-colors duration-200"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Criar Post
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Lista de posts do usuário */}
+      {targetUserId && (
+        <div className="mt-8 max-w-[600px] mx-auto space-y-6 w-full">
           <Typography
             variant="h3"
-            className="text-lg font-semibold text-gray-800 mb-2"
+            className="text-lg font-semibold text-gray-800 mb-4"
           >
-            Compartilhe algo novo
+            {isOwnProfile ? 'Meus Posts' : `Posts de ${user.name}`}
           </Typography>
-          <Typography variant="p" className="text-gray-600 text-sm mb-4">
-            Conte novidades, ofereça ajuda ou inicie uma discussão
-          </Typography>
-          <Link
-            to="/posts/create/9"
-            className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-medium py-2.5 px-6 rounded-xl transition-colors duration-200"
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            Criar Post
-          </Link>
-        </div>
-      </div>
-      {/* Lista de posts do usuário - AGORA USA userPosts do useProfilePosts */}
-      {user.id && (
-        <div className="mt-8 max-w-[600px] mx-auto space-y-6 w-full">
-          {postsLoading && (
-            <p className="text-center text-gray-500">Carregando posts...</p>
-          )}
 
           {(userPosts || []).map((post) => {
             if (!post) return null;
@@ -280,22 +321,20 @@ const ProfileView: React.FC = () => {
                   }
                 }}
                 onShare={() => openShareModal(post)}
-                onDelete={handleDelete}
+                onDelete={isOwnProfile ? handleDelete : undefined}
                 onOpenDetails={() =>
                   setSelectedPost({
                     id: post.id,
                     shareId: post.sharedBy?.shareId,
                   })
                 }
-                onEdit={(postId, shareId) =>
-                  setEditingPost({ id: postId, shareId })
-                }
-                // 👇 USE AS FLAGS DA API (já calculadas corretamente)
+                onEdit={handleEdit}
                 isPostOwner={post.isPostOwner ?? false}
                 isShareOwner={post.isShareOwner ?? false}
               />
             );
           })}
+
           {hasMore && (
             <div className="text-center mt-4">
               <button
@@ -309,7 +348,8 @@ const ProfileView: React.FC = () => {
           )}
         </div>
       )}
-      {/* Modais (MESMO CÓDIGO DO FEED) */}
+
+      {/* Modais */}
       {selectedPost && (
         <PostModal
           postId={selectedPost.id}
@@ -328,13 +368,11 @@ const ProfileView: React.FC = () => {
 
             if (!post) return;
 
-            // ✅ CURTIDA OTIMISTA
             const currentLiked = post.liked ?? false;
             toggleLikePost(postIdToSend, !currentLiked, shareIdToSend);
 
             try {
               const { liked } = await likePost(postIdToSend, shareIdToSend);
-
               if (liked !== !currentLiked) {
                 toggleLikePost(postIdToSend, liked, shareIdToSend);
               }
@@ -351,10 +389,15 @@ const ProfileView: React.FC = () => {
             );
             if (post) openShareModal(post);
           }}
-          onDelete={handleDelete}
-          onEdit={(postId, shareId) => setEditingPost({ id: postId, shareId })}
+          onDelete={isOwnProfile ? handleDelete : undefined}
+          onEdit={
+            isOwnProfile
+              ? (postId, shareId) => setEditingPost({ id: postId, shareId })
+              : undefined
+          }
         />
       )}
+
       {postToShare && (
         <ShareModal
           isOpen={shareModalOpen}
@@ -367,6 +410,7 @@ const ProfileView: React.FC = () => {
           onShare={handleShare}
         />
       )}
+
       {editingPost &&
         (editingPost.shareId ? (
           <ShareEditModal
@@ -375,7 +419,7 @@ const ProfileView: React.FC = () => {
             postId={editingPost.id}
             shareId={editingPost.shareId}
             onSave={(updatedPost) => {
-              updatePost(updatedPost); // ✅ store como fonte da verdade
+              updatePost(updatedPost);
               setEditingPost(null);
             }}
           />
@@ -384,7 +428,7 @@ const ProfileView: React.FC = () => {
             postId={editingPost.id}
             onClose={() => setEditingPost(null)}
             onSuccess={(updatedPost) => {
-              updatePost(updatedPost); // ✅ store atualizada
+              updatePost(updatedPost);
               setEditingPost(null);
             }}
           />

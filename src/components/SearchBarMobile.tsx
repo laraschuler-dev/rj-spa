@@ -65,7 +65,7 @@ const SearchBarMobile: React.FC = () => {
         className="p-2 hover:bg-white/10 rounded-lg transition-colors"
         aria-label="Buscar usuários"
       >
-        <FiSearch size={20} />
+        <FiSearch size={24} />
       </button>
 
       {/* Modal de busca para mobile */}

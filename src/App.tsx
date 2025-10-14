@@ -37,6 +37,7 @@ const App = () => {
                 element={<CreatePostPage />}
               />
               <Route path="/profile" element={<ProfileView />} />
+              <Route path="/profile/:userId" element={<ProfileView />} />
               <Route path="/profile/edit" element={<ProfileEdit />} />
               <Route path="/account-settings" element={<AccountSettings />} />
             </Route>
