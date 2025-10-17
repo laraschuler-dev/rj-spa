@@ -8,8 +8,6 @@ import {
   FiBriefcase,
   FiLogOut,
   FiSettings,
-  FiHome,
-  FiCalendar,
 } from 'react-icons/fi';
 import {
   MdOutlineCampaign,
@@ -33,6 +31,8 @@ const MobileMenuFeed: React.FC<MobileMenuFeedProps> = ({ isOpen, onClose }) => {
     logout();
     onClose();
   };
+
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <motion.div
@@ -73,28 +73,44 @@ const MobileMenuFeed: React.FC<MobileMenuFeedProps> = ({ isOpen, onClose }) => {
           <Link
             to="/feed"
             onClick={onClose}
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-dark hover:text-accent transition-all duration-200"
+            className={`flex items-center gap-3 p-2 rounded-lg transition-all duration-200 ${
+              isActive('/feed')
+                ? 'bg-accent text-white shadow-md'
+                : 'hover:bg-primary-dark hover:text-accent'
+            }`}
           >
             <span>Feed</span>
           </Link>
           <Link
             to="/donations"
             onClick={onClose}
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-dark hover:text-accent transition-all duration-200"
+            className={`flex items-center gap-3 p-2 rounded-lg transition-all duration-200 ${
+              isActive('/donations')
+                ? 'bg-accent text-white shadow-md'
+                : 'hover:bg-primary-dark hover:text-accent'
+            }`}
           >
             <span>Doações</span>
           </Link>
           <Link
             to="/events"
             onClick={onClose}
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-dark hover:text-accent transition-all duration-200"
+            className={`flex items-center gap-3 p-2 rounded-lg transition-all duration-200 ${
+              isActive('/events')
+                ? 'bg-accent text-white shadow-md'
+                : 'hover:bg-primary-dark hover:text-accent'
+            }`}
           >
             <span>Eventos</span>
           </Link>
           <Link
             to="/services"
             onClick={onClose}
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-dark hover:text-accent transition-all duration-200"
+            className={`flex items-center gap-3 p-2 rounded-lg transition-all duration-200 ${
+              isActive('/services')
+                ? 'bg-accent text-white shadow-md'
+                : 'hover:bg-primary-dark hover:text-accent'
+            }`}
           >
             <span>Serviços</span>
           </Link>

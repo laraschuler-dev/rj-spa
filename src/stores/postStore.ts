@@ -244,7 +244,7 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
 
         return {
           posts: newPosts,
-          page: currentPage + 1, // ✅ Correto: incrementa APÓS usar a página atual
+          page: currentPage + 1,
           hasMore: pagination.hasNextPage,
           loading: false,
         };
@@ -277,7 +277,7 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
         params: {
           page: currentPage,
           limit: 10,
-          requestingUserId, // 👈 Envia para a API filtrar
+          requestingUserId,
         },
       });
 
