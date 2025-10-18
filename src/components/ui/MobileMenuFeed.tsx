@@ -6,8 +6,6 @@ import {
   FiAlertCircle,
   FiUsers,
   FiBriefcase,
-  FiLogOut,
-  FiSettings,
 } from 'react-icons/fi';
 import {
   MdOutlineCampaign,
@@ -15,9 +13,8 @@ import {
   MdOutlinePostAdd,
 } from 'react-icons/md';
 import { PiStudent } from 'react-icons/pi';
-import { CgProfile } from 'react-icons/cg';
 import { IoMdClose } from 'react-icons/io';
-import { useLogout } from '../../hooks/useLogout';
+import { UserDropdownMobile } from './UserDropdownMobile';
 
 interface MobileMenuFeedProps {
   isOpen: boolean;
@@ -25,13 +22,6 @@ interface MobileMenuFeedProps {
 }
 
 const MobileMenuFeed: React.FC<MobileMenuFeedProps> = ({ isOpen, onClose }) => {
-  const logout = useLogout();
-
-  const handleLogout = () => {
-    logout();
-    onClose();
-  };
-
   const isActive = (path: string) => location.pathname === path;
 
   return (
@@ -61,6 +51,11 @@ const MobileMenuFeed: React.FC<MobileMenuFeedProps> = ({ isOpen, onClose }) => {
       >
         Redefinindo Jornadas
       </h2>
+
+      {/* UserDropdownMobile - COMPONENTE PERSONALIZADO */}
+      <div className="mb-4">
+        <UserDropdownMobile />
+      </div>
 
       <hr className="border-background opacity-50 mb-4" />
 
@@ -197,37 +192,6 @@ const MobileMenuFeed: React.FC<MobileMenuFeedProps> = ({ isOpen, onClose }) => {
             <MdOutlinePostAdd size={18} />
             <span>Postar</span>
           </Link>
-        </nav>
-      </div>
-
-      <hr className="border-background opacity-50 my-4" />
-
-      {/* Configurações e Perfil */}
-      <div className="mt-auto">
-        <nav className="flex flex-col gap-2">
-          <Link
-            to="/profile"
-            onClick={onClose}
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-dark hover:text-accent transition-all duration-200"
-          >
-            <CgProfile size={18} />
-            <span>Meu Perfil</span>
-          </Link>
-          <Link
-            to="/account-settings"
-            onClick={onClose}
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-dark hover:text-accent transition-all duration-200"
-          >
-            <FiSettings size={18} />
-            <span>Configurações</span>
-          </Link>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-red-600/20 hover:text-red-300 transition-all duration-200 text-left w-full"
-          >
-            <FiLogOut size={18} />
-            <span>Sair</span>
-          </button>
         </nav>
       </div>
     </motion.div>

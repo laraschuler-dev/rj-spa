@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'; // ← Adicione useEffect
 import { Link as ScrollLink } from 'react-scroll';
-import { CgLogIn, CgProfile } from 'react-icons/cg';
+import { CgLogIn } from 'react-icons/cg';
 import { FiMenu } from 'react-icons/fi';
 import MobileMenu from '../ui/MobileMenu';
 import { Link } from 'react-router-dom';
 import useAuthStore from '../../stores/authStore';
+import { UserDropdownMenu } from '../ui/UserDropdownMenu';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -49,7 +50,6 @@ const Header: React.FC = () => {
           Redefinindo Jornadas
         </ScrollLink>
       )}
-
       {/* Navegação Desktop COM ESTADO ATIVO */}
       <nav className="hidden md:flex items-center gap-0 bg-primary-dark/20 rounded-lg p-1">
         {' '}
@@ -127,28 +127,23 @@ const Header: React.FC = () => {
           Contato
         </ScrollLink>
       </nav>
-
       {/* Botão Login / Perfil */}
       <div className="hidden md:flex">
         {isAuthenticated ? (
-          <Link
-            to="/feed"
-            className="flex items-center gap-2 px-3 py-2 rounded text-sm bg-primary-dark/20 hover:bg-primary-dark/50 hover:text-accent transition-all duration-200" // ← Estilo consistente
-          >
-            <CgProfile size={18} /> {/* ← Ícone menor */}
-            <span>Feed</span>
-          </Link>
+          <UserDropdownMenu
+            variant="header"
+            className="bg-primary-dark/20 rounded-lg"
+          />
         ) : (
           <Link
             to="/login"
-            className="flex items-center gap-2 px-3 py-2 rounded text-sm bg-primary-dark/20 hover:bg-primary-dark/50 hover:text-accent transition-all duration-200" // ← Estilo consistente
+            className="flex items-center gap-2 px-3 py-2 rounded text-sm bg-primary-dark/20 hover:bg-primary-dark/50 hover:text-accent transition-all duration-200"
           >
-            <CgLogIn size={18} /> {/* ← Ícone menor */}
+            <CgLogIn size={18} />
             <span>Entrar</span>
           </Link>
         )}
       </div>
-
       {/* Botão Menu Hambúrguer (Mobile) */}
       {!isMenuOpen && (
         <button
@@ -159,7 +154,6 @@ const Header: React.FC = () => {
           <FiMenu size={22} /> {/* ← Ícone menor */}
         </button>
       )}
-
       {/* Menu Mobile */}
       <MobileMenu
         isOpen={isMenuOpen}

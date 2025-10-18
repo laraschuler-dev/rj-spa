@@ -1,6 +1,7 @@
+// src/components/ui/MobileMenu.tsx
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { CgLogIn, CgProfile } from 'react-icons/cg';
+import { CgLogIn } from 'react-icons/cg';
 import {
   FiHeart,
   FiGift,
@@ -18,6 +19,7 @@ import {
 } from 'react-icons/md';
 import { PiStudent } from 'react-icons/pi';
 import { useState, useEffect } from 'react';
+import { UserDropdownMobile } from './UserDropdownMobile';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -149,6 +151,25 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
         Redefinindo Jornadas
       </h2>
 
+      {/* UserDropdownMobile - QUANDO AUTENTICADO */}
+      {isAuthenticated ? (
+        <div className="mb-4">
+          <UserDropdownMobile />
+        </div>
+      ) : (
+        /* Botão de Login - QUANDO NÃO AUTENTICADO */
+        <div className="mb-4">
+          <Link
+            to="/login"
+            className="flex items-center gap-3 p-3 rounded-lg bg-primary-dark/30 hover:bg-primary-dark/50 hover:text-accent transition-all duration-200 w-full"
+            onClick={onClose}
+          >
+            <CgLogIn size={20} />
+            <span className="font-medium">Fazer Login</span>
+          </Link>
+        </div>
+      )}
+
       <hr className="border-background opacity-50 mb-4" />
 
       {/* Navegação do Site COM ESTADO ATIVO CORRIGIDO */}
@@ -222,33 +243,14 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
 
       <hr className="border-background opacity-50 my-4" />
 
-      {/* Acesso à Plataforma */}
-      <div className="mb-4">
-        <h3 className="text-sm font-semibold text-background/70 uppercase tracking-wider mb-3">
-          Plataforma
-        </h3>
-        <nav className="flex flex-col gap-2">
-          <Link
-            to={isAuthenticated ? '/feed' : '/login'}
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-dark hover:text-accent transition-all duration-200"
-            onClick={onClose}
-          >
-            {isAuthenticated ? <CgProfile size={18} /> : <CgLogIn size={18} />}
-            <span>{isAuthenticated ? 'Ir para o Feed' : 'Fazer Login'}</span>
-          </Link>
-        </nav>
-      </div>
-
-      <hr className="border-background opacity-50 my-4" />
-
-      {/* Criar Conteúdo */}
+      {/* Ações Rápidas - DISPONÍVEL PARA TODOS (autenticados e não autenticados) */}
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-background/70 uppercase tracking-wider mb-3">
           Ações Rápidas
         </h3>
         <nav className="flex flex-col gap-2">
           <Link
-            to="/posts/create/9"
+            to={isAuthenticated ? '/posts/create/9' : '/login'}
             onClick={onClose}
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-dark hover:text-accent transition-all duration-200"
           >
@@ -256,7 +258,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <span>Postar</span>
           </Link>
           <Link
-            to="/posts/create/8"
+            to={isAuthenticated ? '/posts/create/8' : '/login'}
             onClick={onClose}
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-dark hover:text-accent transition-all duration-200"
           >
@@ -264,7 +266,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <span>Criar Evento</span>
           </Link>
           <Link
-            to="/posts/create/3"
+            to={isAuthenticated ? '/posts/create/3' : '/login'}
             onClick={onClose}
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-dark hover:text-accent transition-all duration-200"
           >
@@ -272,7 +274,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <span>Criar Campanha</span>
           </Link>
           <Link
-            to="/posts/create/6"
+            to={isAuthenticated ? '/posts/create/6' : '/login'}
             onClick={onClose}
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-dark hover:text-accent transition-all duration-200"
           >
@@ -280,7 +282,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <span>Oferecer Curso</span>
           </Link>
           <Link
-            to="/posts/create/1"
+            to={isAuthenticated ? '/posts/create/1' : '/login'}
             onClick={onClose}
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-dark hover:text-accent transition-all duration-200"
           >
@@ -288,7 +290,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <span>Quero Doar</span>
           </Link>
           <Link
-            to="/posts/create/5"
+            to={isAuthenticated ? '/posts/create/5' : '/login'}
             onClick={onClose}
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-dark hover:text-accent transition-all duration-200"
           >
@@ -296,7 +298,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <span>Quero Voluntariar</span>
           </Link>
           <Link
-            to="/posts/create/4"
+            to={isAuthenticated ? '/posts/create/4' : '/login'}
             onClick={onClose}
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-dark hover:text-accent transition-all duration-200"
           >
@@ -304,7 +306,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <span>Preciso de Ajuda</span>
           </Link>
           <Link
-            to="/posts/create/7"
+            to={isAuthenticated ? '/posts/create/7' : '/login'}
             onClick={onClose}
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-dark hover:text-accent transition-all duration-200"
           >
@@ -312,7 +314,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <span>Anunciar Vaga</span>
           </Link>
           <Link
-            to="/posts/complaint"
+            to={isAuthenticated ? '/posts/complaint' : '/login'}
             onClick={onClose}
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-dark hover:text-accent transition-all duration-200"
           >
