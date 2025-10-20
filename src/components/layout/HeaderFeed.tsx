@@ -10,7 +10,6 @@ import {
   FiGift,
 } from 'react-icons/fi';
 import MobileMenuFeed from '../ui/MobileMenuFeed';
-import { useProfile } from '../../hooks/useProfile';
 import SearchBar from '../SearchBar';
 import SearchBarMobile from '../SearchBarMobile';
 import NotificationDropdown from '../NotificationDropdown';
@@ -18,7 +17,6 @@ import { useNotifications } from '../../hooks/useNotifications';
 import { UserDropdownMenu } from '../ui/UserDropdownMenu';
 
 const HeaderFeed: React.FC = () => {
-  const { user, profile } = useProfile();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const location = useLocation();
   const { unreadCount, fetchUnreadCount } = useNotifications();

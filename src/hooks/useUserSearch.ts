@@ -16,7 +16,7 @@ export const useUserSearch = () => {
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [page, setPage] = useState(1);
-  const debounceRef = useRef<NodeJS.Timeout>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   const searchUsers = useCallback(
     async (searchTerm: string, isNewSearch: boolean = true) => {

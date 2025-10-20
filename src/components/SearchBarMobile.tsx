@@ -10,7 +10,16 @@ const SearchBarMobile: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const { users, loading, error, searchUsers, resetSearch } = useUserSearch();
-  const debounceRef = useRef<NodeJS.Timeout>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+
+  // ✅ Função para obter as duas iniciais do nome
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase())
+      .slice(0, 2)
+      .join('');
+  };
 
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,7 +90,7 @@ const SearchBarMobile: React.FC = () => {
             <div className="flex items-center gap-4 mb-4">
               <button
                 onClick={closeSearch}
-                className="p-2 text-white hover:bg-white/10 rounded-lg transition-colors z-10"
+                className="p-2 text-white hover:bg-white/10 rounded-lg transition-colors z-10 focus:outline-none"
               >
                 <FiX size={24} />
               </button>
@@ -141,19 +150,31 @@ const SearchBarMobile: React.FC = () => {
                   className="flex items-center gap-4 p-4 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 active:bg-gray-100 transition-colors"
                   onClick={handleResultClick}
                 >
+                  {/* ✅ Atualizado: Avatar com duas iniciais quando não tem imagem */}
                   {user.avatarUrl ? (
                     <img
                       src={resolveImageUrl(user.avatarUrl)}
                       alt={user.name}
                       className="w-12 h-12 rounded-full object-cover border"
+                      onError={(e) => {
+                        // Fallback para avatar quebrado - mostra iniciais
+                        e.currentTarget.style.display = 'none';
+                        const fallback = e.currentTarget.nextElementSibling;
+                        if (fallback) {
+                          fallback.classList.remove('hidden');
+                        }
+                      }}
                     />
-                  ) : (
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                      <span className="text-white font-semibold">
-                        {user.name.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                  )}
+                  ) : null}
+
+                  {/* ✅ Atualizado: Mostra duas iniciais (mesmo estilo do PostCard) */}
+                  <div
+                    className={`w-12 h-12 rounded-full bg-accent flex items-center justify-center border border-white ${user.avatarUrl ? 'hidden' : ''}`}
+                  >
+                    <span className="text-white font-semibold">
+                      {getInitials(user.name)}
+                    </span>
+                  </div>
 
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-gray-900 truncate">

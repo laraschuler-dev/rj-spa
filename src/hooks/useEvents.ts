@@ -1,4 +1,3 @@
-// hooks/useEvents.ts
 import { useEffect } from 'react';
 import { usePostStore } from '../stores/postStore';
 import axios from '../services/api';
@@ -6,8 +5,6 @@ import axios from '../services/api';
 export function useEvents() {
   const {
     posts,
-    fetchPosts,
-    refreshPosts,
     hasMore,
     loading,
     setPosts,
@@ -35,10 +32,8 @@ export function useEvents() {
       const pagination = res.data.pagination;
 
       if (isInitialLoad) {
-        // Substitui todos os posts por eventos
         setPosts(eventsFromApi);
       } else {
-        // Adiciona novos eventos aos posts existentes
         const currentPosts = usePostStore.getState().posts;
         const newPosts = [
           ...currentPosts,

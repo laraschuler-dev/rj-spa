@@ -146,7 +146,6 @@ const DonationsPage: React.FC = () => {
       {selectedPost && (
         <PostModal
           postId={selectedPost}
-          isOpen={!!selectedPost}
           onClose={() => setSelectedPost(null)}
           onLike={async () => {
             const donation = donations.find((d) => d.id === selectedPost);

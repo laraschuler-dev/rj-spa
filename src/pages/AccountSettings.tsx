@@ -380,7 +380,6 @@ const AccountSettings: React.FC = () => {
                     <SubmitButton
                       onClick={deleteAccount}
                       loading={isDeletingAccount}
-                      className="bg-red-600 hover:bg-red-700 focus:ring-red-500 w-full sm:w-auto"
                     >
                       Confirmar Exclusão
                     </SubmitButton>

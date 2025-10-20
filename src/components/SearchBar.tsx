@@ -10,7 +10,16 @@ const SearchBar: React.FC = () => {
   const [showResults, setShowResults] = useState(false);
   const { users, loading, error, searchUsers, resetSearch } = useUserSearch();
   const inputRef = useRef<HTMLInputElement>(null);
-  const debounceRef = useRef<NodeJS.Timeout>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+
+  // ✅ Função para obter as duas iniciais do nome
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase())
+      .slice(0, 2)
+      .join('');
+  };
 
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,7 +96,7 @@ const SearchBar: React.FC = () => {
         {searchTerm && (
           <button
             onClick={clearSearch}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-300 hover:text-white transition-colors z-10"
+            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-300 hover:text-white transition-colors z-10 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
           >
             <FiX size={16} />
           </button>
@@ -121,29 +130,31 @@ const SearchBar: React.FC = () => {
               className="flex items-center gap-2 p-2 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition-colors group"
               onClick={handleResultClick}
             >
+              {/* ✅ Atualizado: Avatar com duas iniciais quando não tem imagem */}
               {user.avatarUrl ? (
                 <img
                   src={resolveImageUrl(user.avatarUrl)}
                   alt={user.name}
                   className="w-8 h-8 rounded-full object-cover border border-gray-200 group-hover:border-accent transition-colors"
                   onError={(e) => {
-                    // Fallback para avatar quebrado
+                    // Fallback para avatar quebrado - mostra iniciais
                     e.currentTarget.style.display = 'none';
-                    e.currentTarget.nextElementSibling?.classList.remove(
-                      'hidden'
-                    );
+                    const fallback = e.currentTarget.nextElementSibling;
+                    if (fallback) {
+                      fallback.classList.remove('hidden');
+                    }
                   }}
                 />
               ) : null}
 
-              {/* Fallback avatar */}
-              {!user.avatarUrl && (
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center border border-gray-200 group-hover:border-accent transition-colors">
-                  <span className="text-white text-xs font-medium">
-                    {user.name.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-              )}
+              {/* ✅ Atualizado: Mostra duas iniciais (mesmo estilo do PostCard) */}
+              <div
+                className={`w-8 h-8 rounded-full bg-accent flex items-center justify-center border border-white group-hover:border-accent transition-colors ${user.avatarUrl ? 'hidden' : ''}`}
+              >
+                <span className="text-white font-semibold text-xs">
+                  {getInitials(user.name)}
+                </span>
+              </div>
 
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-gray-900 truncate text-sm group-hover:text-primary transition-colors">

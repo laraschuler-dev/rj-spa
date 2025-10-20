@@ -2,12 +2,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Typography from '../components/ui/Typography';
-import { CgProfile } from 'react-icons/cg';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 import { FiEdit2 } from 'react-icons/fi';
 import BackButton from '../components/ui/BackButton';
 import { useProfile } from '../hooks/useProfile';
-import { useUserProfile, PublicUserData } from '../hooks/useUserProfile'; // 👈 Importe o tipo
+import { useUserProfile } from '../hooks/useUserProfile';
 import { useProfilePosts } from '../hooks/useProfilePosts';
 import PostCard from '../components/PostCard';
 import PostModal from '../components/PostModal';
@@ -19,8 +18,8 @@ import { useSharePost } from '../hooks/useSharePost';
 import { likePost } from '../hooks/useLikePost';
 import { useDeletePost } from '../hooks/useDeletePost';
 import { toast } from 'react-toastify';
-import axios from '../services/api';
 import { useAuth } from '../hooks/useAuth';
+import { resolveImageUrl } from '../utils/resolveImageUrl';
 
 // 👇 Type Guard para verificar se é PrivateUserData (tem email)
 const hasEmail = (user: any): user is { email: string; fone?: string } => {
@@ -40,7 +39,6 @@ const ProfileView: React.FC = () => {
     : useUserProfile(targetUserId);
 
   const { user, profile, loading } = profileData;
-  const apiBaseUrl = axios.defaults.baseURL || '';
 
   const {
     posts: userPosts,
@@ -71,6 +69,15 @@ const ProfileView: React.FC = () => {
     id: number;
     shareId?: number;
   } | null>(null);
+
+  // ✅ Função para obter iniciais do nome (mesma lógica do PostCard)
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase())
+      .slice(0, 2)
+      .join('');
+  };
 
   const openShareModal = (post: any) => {
     setPostToShare(post);
@@ -114,7 +121,6 @@ const ProfileView: React.FC = () => {
     }
   };
 
-  // 👇 Função segura para edição
   const handleEdit = isOwnProfile
     ? (postId: number, shareId?: number) =>
         setEditingPost({ id: postId, shareId })
@@ -145,15 +151,19 @@ const ProfileView: React.FC = () => {
 
       {/* Card de perfil */}
       <div className="w-full max-w-[600px] bg-white p-8 rounded-2xl shadow-lg text-center mx-auto">
+        {/* ✅ Atualizado para mostrar iniciais quando não tem avatar */}
         {profile.profile_photo ? (
           <img
-            src={`${apiBaseUrl}${profile.profile_photo}`}
+            src={resolveImageUrl(profile.profile_photo)}
             alt="Foto de perfil"
             className="w-32 h-32 mx-auto rounded-full object-cover mb-4 border"
           />
         ) : (
-          <div className="w-32 h-32 mx-auto rounded-full bg-gray-200 flex items-center justify-center mb-4">
-            <CgProfile size={48} className="text-gray-500" />
+          // ✅ Substituído o ícone CgProfile pelas iniciais (mesmo estilo do PostCard)
+          <div className="w-32 h-32 mx-auto rounded-full bg-accent flex items-center justify-center mb-4 border border-white">
+            <span className="text-white font-semibold text-2xl">
+              {getInitials(user.name)}
+            </span>
           </div>
         )}
 

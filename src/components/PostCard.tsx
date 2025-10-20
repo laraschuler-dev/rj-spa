@@ -87,11 +87,80 @@ const PostCard: React.FC<PostCardProps> = ({
 
   const isOriginalDeleted = metadata?.isDeletedOriginal ?? false;
 
+  // ✅ Verifica se é post anônimo
+  const isAnonymousPost = categoryId === 2 && metadata?.isAnonymous;
+
+  // ✅ Função para obter iniciais do nome
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase())
+      .slice(0, 2)
+      .join('');
+  };
+
   // Garante que sempre seja Date válido
   const safeCreatedAt = createdAt ? new Date(createdAt) : new Date();
   const safeSharedAt = sharedBy?.sharedAt
     ? new Date(sharedBy.sharedAt)
     : new Date();
+
+  // ✅ Função para renderizar avatar do autor
+  const renderAuthorAvatar = () => {
+    const currentAuthor = expanded && sharedBy ? author : author;
+
+    if (isAnonymousPost) {
+      // ✅ Cenário 3: Post anônimo - mostra ícone
+      return (
+        <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center border">
+          <CgProfile size={18} className="text-gray-500" />
+        </div>
+      );
+    } else if (currentAuthor.avatarUrl) {
+      // ✅ Cenário 1: Com avatar - mostra imagem
+      return (
+        <img
+          src={resolveImageUrl(currentAuthor.avatarUrl)}
+          alt={currentAuthor.name}
+          className="w-10 h-10 rounded-full object-cover border"
+        />
+      );
+    } else {
+      // ✅ Cenário 2: Sem avatar - mostra iniciais
+      return (
+        <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center border border-white">
+          <span className="text-white font-semibold text-sm">
+            {getInitials(currentAuthor.name)}
+          </span>
+        </div>
+      );
+    }
+  };
+
+  // ✅ Função para renderizar avatar do compartilhador
+  const renderSharedByAvatar = () => {
+    if (!sharedBy) return null;
+
+    if (sharedBy.avatarUrl) {
+      // ✅ Com avatar - mostra imagem
+      return (
+        <img
+          src={resolveImageUrl(sharedBy.avatarUrl)}
+          alt={sharedBy.name}
+          className="w-8 h-8 rounded-full object-cover border"
+        />
+      );
+    } else {
+      // ✅ Sem avatar - mostra iniciais
+      return (
+        <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center border border-white">
+          <span className="text-white font-semibold text-xs">
+            {getInitials(sharedBy.name)}
+          </span>
+        </div>
+      );
+    }
+  };
 
   return (
     <div className="bg-white shadow-md rounded-2xl p-4 space-y-3 max-w-[600px] mx-auto w-full">
@@ -99,17 +168,7 @@ const PostCard: React.FC<PostCardProps> = ({
       {sharedBy && (
         <div className="relative flex flex-col gap-1 text-sm text-gray-500 mb-3 border-b pb-2">
           <div className="relative flex items-center gap-3">
-            {sharedBy.avatarUrl ? (
-              <img
-                src={resolveImageUrl(sharedBy.avatarUrl)}
-                alt={sharedBy.name}
-                className="w-8 h-8 rounded-full object-cover border"
-              />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center border">
-                <CgProfile size={16} className="text-gray-500" />
-              </div>
-            )}
+            {renderSharedByAvatar()}
             <span className="text-sm">
               Compartilhado por <strong>{sharedBy.name}</strong> •{' '}
               <span className="text-xs text-gray-400">
@@ -142,26 +201,18 @@ const PostCard: React.FC<PostCardProps> = ({
       {/* Cabeçalho do post original */}
       <div className="relative flex justify-between items-start">
         <div className="flex items-center gap-2">
-          {(expanded && sharedBy ? author : author).avatarUrl ? (
-            <img
-              src={resolveImageUrl(
-                expanded && sharedBy ? author.avatarUrl : author.avatarUrl
-              )}
-              alt={expanded && sharedBy ? author.name : author.name}
-              className="w-10 h-10 rounded-full object-cover border"
-            />
-          ) : (
-            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center border">
-              <CgProfile size={18} className="text-gray-500" />
-            </div>
-          )}
+          {renderAuthorAvatar()}
           <div>
             <Typography
               variant="h3"
               className="font-medium text-gray-800 text-sm"
             >
               <strong>
-                {expanded && sharedBy ? author.name : author.name}
+                {isAnonymousPost
+                  ? 'Anônimo'
+                  : expanded && sharedBy
+                    ? author.name
+                    : author.name}
               </strong>
             </Typography>
             <Typography variant="p" className="text-xs text-gray-500">

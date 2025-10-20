@@ -177,7 +177,6 @@ const ServicesPage: React.FC = () => {
       {selectedPost && (
         <PostModal
           postId={selectedPost}
-          isOpen={!!selectedPost}
           onClose={() => setSelectedPost(null)}
           onLike={async () => {
             const service = services.find((s) => s.id === selectedPost);

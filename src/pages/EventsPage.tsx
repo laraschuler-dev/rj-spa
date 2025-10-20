@@ -146,7 +146,6 @@ const EventsPage: React.FC = () => {
       {selectedPost && (
         <PostModal
           postId={selectedPost} // 👈 Apenas ID
-          isOpen={!!selectedPost}
           onClose={() => setSelectedPost(null)}
           onLike={async () => {
             const event = events.find((e) => e.id === selectedPost);
