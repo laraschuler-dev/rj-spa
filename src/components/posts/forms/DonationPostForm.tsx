@@ -7,6 +7,7 @@ import ImageUpload from '../../ui/ImageUpload';
 import { UploadImage } from '../../../types/upload';
 import { useDeletePostImage } from '../../../hooks/useDeletePostImage';
 import CancelButton from '../../ui/CancelButton';
+import { toast } from 'react-toastify';
 
 interface DonationPostFormProps {
   onSubmit: (data: FormData) => Promise<void>;
@@ -34,6 +35,9 @@ const DonationPostForm: React.FC<DonationPostFormProps> = ({
   const postId = initialData?.id;
   const { deleteImage } = useDeletePostImage(postId ?? 0);
 
+  // Estado para controlar o loading
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [formData, setFormData] = useState({
     title: initialData?.title ?? '',
     content: initialData?.content ?? '',
@@ -55,37 +59,57 @@ const DonationPostForm: React.FC<DonationPostFormProps> = ({
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    const postData = new FormData();
-    postData.append('categoria_idcategoria', '1'); // DONATION
-    postData.append('content', formData.content);
+    // Impede múltiplos envios
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
-    const metadata = {
-      title: formData.title,
-      itemType: formData.itemType,
-      condition:
-        formData.condition === 'outro'
-          ? formData.customCondition
-          : formData.condition,
-      location: formData.location,
-      availability: formData.availability,
-    };
+    try {
+      const postData = new FormData();
+      postData.append('categoria_idcategoria', '1'); // DONATION
+      postData.append('content', formData.content);
 
-    postData.append('metadata', JSON.stringify(metadata));
+      const metadata = {
+        title: formData.title,
+        itemType: formData.itemType,
+        condition:
+          formData.condition === 'outro'
+            ? formData.customCondition
+            : formData.condition,
+        location: formData.location,
+        availability: formData.availability,
+      };
 
-    // arquivos novos
-    formData.images
-      .filter((img): img is File => img instanceof File)
-      .forEach((file) => postData.append('images', file));
+      postData.append('metadata', JSON.stringify(metadata));
 
-    // IDs das imagens existentes
-    const existingIds = formData.images
-      .filter(
-        (img): img is { id: number; url: string } => !(img instanceof File)
-      )
-      .map((img) => img.id);
-    postData.append('existingImageIds', JSON.stringify(existingIds));
+      // arquivos novos
+      formData.images
+        .filter((img): img is File => img instanceof File)
+        .forEach((file) => postData.append('images', file));
 
-    await onSubmit(postData);
+      // IDs das imagens existentes
+      const existingIds = formData.images
+        .filter(
+          (img): img is { id: number; url: string } => !(img instanceof File)
+        )
+        .map((img) => img.id);
+      postData.append('existingImageIds', JSON.stringify(existingIds));
+
+      await onSubmit(postData);
+    } catch (err: any) {
+      // Tratamento de erro padronizado
+      if (err.response?.data?.error) {
+        toast.error(err.response.data.error);
+      } else if (err.request) {
+        toast.error('Erro de conexão com o servidor.');
+      } else {
+        toast.error(
+          `Erro inesperado ao ${mode === 'create' ? 'criar' : 'editar'} doação.`
+        );
+      }
+    } finally {
+      // Reativa o botão após o envio (sucesso ou erro)
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -199,7 +223,7 @@ const DonationPostForm: React.FC<DonationPostFormProps> = ({
             }}
           />
 
-          <SubmitButton>
+          <SubmitButton loading={isSubmitting}>
             {mode === 'create' ? 'Publicar' : 'Salvar Alterações'}
           </SubmitButton>
 

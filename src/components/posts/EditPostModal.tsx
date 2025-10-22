@@ -7,7 +7,6 @@ import { toast } from 'react-toastify';
 import { usePostStore } from '../../stores/postStore';
 import { PostListItem } from '../../types/Post';
 
-
 interface EditPostModalProps {
   postId: number;
   shareId?: number;
@@ -24,6 +23,7 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const { editPost, loading } = useEditPost({ postId, shareId });
   const { updatePost } = usePostStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -70,9 +70,18 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
             mode="edit"
             initialData={initialData}
             onSubmit={async (formData: FormData) => {
-              const updatedPost = await editPost(formData);
-              if (updatedPost) updatePost(updatedPost);
-              onClose();
+              if (isSubmitting) return;
+              setIsSubmitting(true);
+
+              try {
+                const updatedPost = await editPost(formData);
+                if (updatedPost) updatePost(updatedPost);
+                onClose();
+              } catch (error) {
+                console.error('Erro ao editar post:', error);
+              } finally {
+                setIsSubmitting(false);
+              }
             }}
             onClose={onClose}
             loading={loading}

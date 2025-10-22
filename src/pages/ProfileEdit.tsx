@@ -8,8 +8,8 @@ import { toast } from 'react-toastify';
 import CancelButton from '../components/ui/CancelButton';
 import { useProfileStore } from '../stores/profileStore';
 import { useEditProfile, ProfileFormData } from '../hooks/useEditProfile';
-import axios from '../services/api';
 import BackButton from '../components/ui/BackButton';
+import { resolveImageUrl } from '../utils/resolveImageUrl';
 
 const profileOptions = [
   { value: '', label: 'Perfil' },
@@ -45,7 +45,7 @@ const ProfileEdit: React.FC = () => {
       });
 
       if (profile.profile_photo) {
-        setPhotoPreview(`${axios.defaults.baseURL}${profile.profile_photo}`);
+        setPhotoPreview(resolveImageUrl(profile.profile_photo));
       }
     }
   }, [profile]);

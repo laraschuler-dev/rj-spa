@@ -4,14 +4,13 @@ import { usePostStore } from '../stores/postStore';
 import { PostListItem } from '../types/Post';
 import { useEventAttendance } from '../hooks/useEventAttendance';
 
-
 interface PostModalProps {
   postId: number;
   shareId?: number;
   onClose: () => void;
   onLike?: (postId: number, shareId?: number) => void;
   onShare: () => void;
-  onEdit: (postId: number, shareId?: number) => void;
+  onEdit?: (postId: number, shareId?: number) => void;
   onDelete?: (postId: number, shareId?: number) => Promise<void>;
 }
 
@@ -23,9 +22,8 @@ const PostModal: React.FC<PostModalProps> = ({
   onShare,
   onEdit,
 }) => {
-  const { posts, toggleLikePost } = usePostStore(); // ✅ Remova toggleAttendance não usado
+  const { posts, toggleLikePost } = usePostStore();
 
-  // ✅ Use apenas o necessário do hook
   const { status, toggleAttendance: toggleAttendanceHook } = useEventAttendance(
     postId,
     shareId
@@ -46,7 +44,6 @@ const PostModal: React.FC<PostModalProps> = ({
 
   const handleLike = async () => {
     try {
-      // ✅ Garanta que não está passando undefined para liked
       const currentLiked = modalPost.liked ?? false;
       toggleLikePost(postId, !currentLiked, shareId);
 
@@ -55,7 +52,6 @@ const PostModal: React.FC<PostModalProps> = ({
       }
     } catch (err) {
       console.error('Erro ao curtir/descurtir post:', err);
-      // ✅ Reverte com valor seguro
       const currentLiked = modalPost.liked ?? false;
       toggleLikePost(postId, currentLiked, shareId);
     }
@@ -69,21 +65,18 @@ const PostModal: React.FC<PostModalProps> = ({
     }
   };
 
-  const author =
-    modalPost.categoria_idcategoria === 2 && modalPost.metadata?.isAnonymous
-      ? {
-          id: 0,
-          name: 'Anônimo',
-          avatarUrl: undefined,
-        }
-      : {
-          id: modalPost.user?.id || modalPost.author?.id,
-          name:
-            modalPost.user?.name ||
-            modalPost.author?.name ||
-            'Usuário desconhecido',
-          avatarUrl: modalPost.user?.avatarUrl || modalPost.author?.avatarUrl,
-        };
+  // ✅ CORREÇÃO: Simplificar a lógica do author para deixar o PostCard cuidar dos avatares
+  const author = {
+    id: modalPost.user?.id || modalPost.author?.id || 0,
+    name:
+      modalPost.categoria_idcategoria === 2 && modalPost.metadata?.isAnonymous
+        ? 'Anônimo'
+        : modalPost.user?.name ||
+          modalPost.author?.name ||
+          'Usuário desconhecido',
+    avatarUrl: modalPost.user?.avatarUrl || modalPost.author?.avatarUrl,
+    profileType: modalPost.user?.profileType || modalPost.author?.profileType,
+  };
 
   return (
     <div

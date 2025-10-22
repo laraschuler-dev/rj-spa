@@ -6,6 +6,7 @@ import ImageUpload from '../../ui/ImageUpload';
 import { UploadImage } from '../../../types/upload';
 import { useDeletePostImage } from '../../../hooks/useDeletePostImage';
 import CancelButton from '../../ui/CancelButton';
+import { toast } from 'react-toastify';
 
 interface ComplaintPostFormProps {
   onSubmit: (data: FormData) => Promise<void>;
@@ -29,6 +30,8 @@ const ComplaintPostForm: React.FC<ComplaintPostFormProps> = ({
   const postId = initialData?.id;
   const { deleteImage } = useDeletePostImage(postId ?? 0);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [formData, setFormData] = useState({
     title: initialData?.title ?? '',
     description: initialData?.description ?? '',
@@ -50,31 +53,52 @@ const ComplaintPostForm: React.FC<ComplaintPostFormProps> = ({
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    const postData = new FormData();
-    postData.append('categoria_idcategoria', '2'); // Complaint
-    postData.append('content', formData.description);
+    // Impede múltiplos envios
+    if (isSubmitting) return;
 
-    const metadata = {
-      title: formData.title,
-      description: formData.description,
-      isAnonymous: formData.isAnonymous,
-    };
-    postData.append('metadata', JSON.stringify(metadata));
+    setIsSubmitting(true);
 
-    // arquivos novos
-    formData.images
-      .filter((img): img is File => img instanceof File)
-      .forEach((file) => postData.append('images', file));
+    try {
+      const postData = new FormData();
+      postData.append('categoria_idcategoria', '2'); // Complaint
+      postData.append('content', formData.description);
 
-    // IDs das imagens existentes
-    const existingIds = formData.images
-      .filter(
-        (img): img is { id: number; url: string } => !(img instanceof File)
-      )
-      .map((img) => img.id);
-    postData.append('existingImageIds', JSON.stringify(existingIds));
+      const metadata = {
+        title: formData.title,
+        description: formData.description,
+        isAnonymous: formData.isAnonymous,
+      };
+      postData.append('metadata', JSON.stringify(metadata));
 
-    await onSubmit(postData);
+      // arquivos novos
+      formData.images
+        .filter((img): img is File => img instanceof File)
+        .forEach((file) => postData.append('images', file));
+
+      // IDs das imagens existentes
+      const existingIds = formData.images
+        .filter(
+          (img): img is { id: number; url: string } => !(img instanceof File)
+        )
+        .map((img) => img.id);
+      postData.append('existingImageIds', JSON.stringify(existingIds));
+
+      await onSubmit(postData);
+    } catch (err: any) {
+      // Tratamento de erro similar ao Login
+      if (err.response?.data?.error) {
+        toast.error(err.response.data.error);
+      } else if (err.request) {
+        toast.error('Erro de conexão com o servidor.');
+      } else {
+        toast.error(
+          `Erro inesperado ao ${mode === 'create' ? 'criar' : 'editar'} denúncia.`
+        );
+      }
+    } finally {
+      // Reativa o botão após o envio (sucesso ou erro)
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -144,7 +168,7 @@ const ComplaintPostForm: React.FC<ComplaintPostFormProps> = ({
             }}
           />
 
-          <SubmitButton>
+          <SubmitButton loading={isSubmitting}>
             {mode === 'create' ? 'Enviar Denúncia' : 'Salvar Alterações'}
           </SubmitButton>
 

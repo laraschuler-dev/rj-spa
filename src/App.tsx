@@ -14,6 +14,10 @@ import ProfileView from './pages/ProfileView';
 import ProfileEdit from './pages/ProfileEdit';
 import AccountSettings from './pages/AccountSettings';
 import CreatePostPage from './pages/posts/CreatePostPage';
+import EventsPage from './pages/EventsPage';
+import DonationsPage from './pages/DonationsPage';
+import ServicesPage from './pages/ServicesPage';
+import PostDetailsPage from './pages/PostDetailsPage';
 
 const App = () => {
   return (
@@ -36,8 +40,16 @@ const App = () => {
                 path="posts/create/:categoryId"
                 element={<CreatePostPage />}
               />
+              <Route path="/events" element={<EventsPage />} />
+              <Route path="/donations" element={<DonationsPage />} />
+              <Route path="/services" element={<ServicesPage />} />
+              <Route path="/posts/:postId" element={<PostDetailsPage />} />
+              <Route
+                path="/posts/:postId/share/:shareId"
+                element={<PostDetailsPage />}
+              />
               <Route path="/profile" element={<ProfileView />} />
-              <Route path="/profile/edit" element={<ProfileEdit />} />
+              <Route path="/profile/:userId" element={<ProfileView />} />
               <Route path="/profile/edit" element={<ProfileEdit />} />
               <Route path="/account-settings" element={<AccountSettings />} />
             </Route>
