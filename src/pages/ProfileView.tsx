@@ -280,69 +280,77 @@ const ProfileView: React.FC = () => {
             {isOwnProfile ? 'Meus Posts' : `Posts de ${user.name}`}
           </Typography>
 
-          {(userPosts || []).map((post) => {
-            if (!post) return null;
+          {(!userPosts || userPosts.length === 0) && !postsLoading ? (
+            <div className="text-center py-12 text-gray-500">
+              {isOwnProfile
+                ? 'Você ainda não criou nenhum post. Compartilhe algo novo!'
+                : `${user.name} ainda não publicou posts.`}
+            </div>
+          ) : (
+            (userPosts || []).map((post) => {
+              if (!post) return null;
 
-            return (
-              <PostCard
-                key={post.uniqueKey || `post-${post.id}`}
-                id={post.id}
-                title={post.metadata?.title || ''}
-                content={post.content}
-                images={post.images || []}
-                createdAt={post.createdAt}
-                categoryId={post.categoria_idcategoria}
-                metadata={post.metadata}
-                author={
-                  post.user?.id === 0
-                    ? {
-                        id: 0,
-                        name: 'Usuário Anônimo',
-                        avatarUrl: undefined,
-                      }
-                    : {
-                        id: post.user?.id,
-                        name: post.user?.name || 'Usuário desconhecido',
-                        avatarUrl: post.user?.avatarUrl,
-                        profileType: post.user?.profileType,
-                      }
-                }
-                isLiked={post.liked}
-                sharedBy={post.sharedBy}
-                onLike={async () => {
-                  const postIdToSend = post.sharedBy?.postId || post.id;
-                  const shareIdToSend = post.sharedBy?.shareId;
-                  const currentLiked = post.liked ?? false;
-                  toggleLikePost(postIdToSend, !currentLiked, shareIdToSend);
-
-                  try {
-                    const { liked } = await likePost(
-                      postIdToSend,
-                      shareIdToSend
-                    );
-                    if (liked !== !currentLiked) {
-                      toggleLikePost(postIdToSend, liked, shareIdToSend);
-                    }
-                  } catch (err) {
-                    toggleLikePost(postIdToSend, currentLiked, shareIdToSend);
-                    console.error('Erro ao curtir/descurtir post:', err);
-                    toast.error('Erro ao curtir o post');
+              return (
+                <PostCard
+                  key={post.uniqueKey || `post-${post.id}`}
+                  id={post.id}
+                  title={post.metadata?.title || ''}
+                  content={post.content}
+                  images={post.images || []}
+                  createdAt={post.createdAt}
+                  categoryId={post.categoria_idcategoria}
+                  metadata={post.metadata}
+                  author={
+                    post.user?.id === 0
+                      ? {
+                          id: 0,
+                          name: 'Usuário Anônimo',
+                          avatarUrl: undefined,
+                        }
+                      : {
+                          id: post.user?.id,
+                          name: post.user?.name || 'Usuário desconhecido',
+                          avatarUrl: post.user?.avatarUrl,
+                          profileType: post.user?.profileType,
+                        }
                   }
-                }}
-                onShare={() => openShareModal(post)}
-                onDelete={isOwnProfile ? handleDelete : undefined}
-                onOpenDetails={() =>
-                  setSelectedPost({
-                    id: post.id,
-                    shareId: post.sharedBy?.shareId,
-                  })
-                }
-                onEdit={handleEdit}
-                isPostOwner={post.isPostOwner ?? false}
-                isShareOwner={post.isShareOwner ?? false}
-              />
-            );
-          })}
+                  isLiked={post.liked}
+                  sharedBy={post.sharedBy}
+                  onLike={async () => {
+                    const postIdToSend = post.sharedBy?.postId || post.id;
+                    const shareIdToSend = post.sharedBy?.shareId;
+                    const currentLiked = post.liked ?? false;
+                    toggleLikePost(postIdToSend, !currentLiked, shareIdToSend);
+
+                    try {
+                      const { liked } = await likePost(
+                        postIdToSend,
+                        shareIdToSend
+                      );
+                      if (liked !== !currentLiked) {
+                        toggleLikePost(postIdToSend, liked, shareIdToSend);
+                      }
+                    } catch (err) {
+                      toggleLikePost(postIdToSend, currentLiked, shareIdToSend);
+                      console.error('Erro ao curtir/descurtir post:', err);
+                      toast.error('Erro ao curtir o post');
+                    }
+                  }}
+                  onShare={() => openShareModal(post)}
+                  onDelete={isOwnProfile ? handleDelete : undefined}
+                  onOpenDetails={() =>
+                    setSelectedPost({
+                      id: post.id,
+                      shareId: post.sharedBy?.shareId,
+                    })
+                  }
+                  onEdit={handleEdit}
+                  isPostOwner={post.isPostOwner ?? false}
+                  isShareOwner={post.isShareOwner ?? false}
+                />
+              );
+            })
+          )}
 
           {hasMore && (
             <div className="text-center mt-4">
