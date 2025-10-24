@@ -6,6 +6,7 @@ import SubmitButton from '../components/ui/SubmitButton';
 import api from '../services/api';
 import { toast } from 'react-toastify';
 import useAuthStore from '../stores/authStore';
+import PasswordInput from '../components/ui/PasswordInput';
 
 const ResetPassword: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -77,36 +78,24 @@ const ResetPassword: React.FC = () => {
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label
-              htmlFor="new-password"
-              className="block mb-1 text-sm font-medium"
-            >
-              Nova Senha
-            </label>
-            <input
+            <PasswordInput
               type="password"
               id="new-password"
+              label="Nova Senha"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Digite sua nova senha"
               required
             />
           </div>
 
           <div>
-            <label
-              htmlFor="confirm-password"
-              className="block mb-1 text-sm font-medium"
-            >
-              Confirmar Nova Senha
-            </label>
-            <input
+            <PasswordInput
               type="password"
               id="confirm-password"
+              label="Confirmar Nova Senha"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Confirme sua nova senha"
               required
             />

@@ -93,7 +93,9 @@ const HelpRequestPostForm: React.FC<HelpRequestPostFormProps> = ({
       } else if (err.request) {
         toast.error('Erro de conexão com o servidor.');
       } else {
-        toast.error(`Erro inesperado ao ${mode === 'create' ? 'criar' : 'editar'} pedido de ajuda.`);
+        toast.error(
+          `Erro inesperado ao ${mode === 'create' ? 'criar' : 'editar'} pedido de ajuda.`
+        );
       }
     } finally {
       // Reativa o botão após o envio (sucesso ou erro)
@@ -108,8 +110,8 @@ const HelpRequestPostForm: React.FC<HelpRequestPostFormProps> = ({
       }`}
     >
       <div
-        className={`w-full bg-white p-8 rounded-2xl shadow-lg 
-    ${mode === 'create' ? 'max-w-xs sm:max-w-md' : 'max-w-md'}`}
+        className={`w-full bg-white p-6 sm:p-8 rounded-2xl shadow-lg 
+  ${mode === 'create' ? 'max-w-sm sm:max-w-md' : 'max-w-md'} mx-4 sm:mx-0`}
       >
         <Typography variant="h2" className="text-primary text-center mb-6">
           {mode === 'create'

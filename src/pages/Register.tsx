@@ -6,6 +6,7 @@ import { FaFacebook } from 'react-icons/fa';
 import SubmitButton from '../components/ui/SubmitButton';
 import api from '../services/api';
 import { toast } from 'react-toastify';
+import PasswordInput from '../components/ui/PasswordInput';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -70,7 +71,7 @@ const Register = () => {
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
-      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
+      <div className="w-full max-w-sm sm:max-w-md lg:max-w-lg bg-white p-6 sm:p-8 rounded-2xl shadow-lg mx-4 sm:mx-0">
         {/* Título */}
         <Typography variant="h2" className="text-primary text-center mb-6">
           Criar Conta
@@ -85,7 +86,10 @@ const Register = () => {
         {/* Formulário de Registro */}
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="name" className="block mb-1 text-sm font-medium">
+            <label
+              htmlFor="name"
+              className="block mb-1 text-sm font-medium text-gray-700"
+            >
               Nome completo
             </label>
             <input
@@ -100,7 +104,10 @@ const Register = () => {
           </div>
 
           <div>
-            <label htmlFor="email" className="block mb-1 text-sm font-medium">
+            <label
+              htmlFor="email"
+              className="block mb-1 text-sm font-medium text-gray-700"
+            >
               E-mail
             </label>
             <input
@@ -115,7 +122,10 @@ const Register = () => {
           </div>
 
           <div>
-            <label htmlFor="phone" className="block mb-1 text-sm font-medium">
+            <label
+              htmlFor="phone"
+              className="block mb-1 text-sm font-medium text-gray-700"
+            >
               Telefone
             </label>
             <input
@@ -130,35 +140,23 @@ const Register = () => {
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="block mb-1 text-sm font-medium"
-            >
-              Senha
-            </label>
-            <input
+            <PasswordInput
               type="password"
               id="password"
+              label="Senha"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Digite sua senha"
               required
             />
           </div>
           <div>
-            <label
-              htmlFor="confirmPassword"
-              className="block mb-1 text-sm font-medium"
-            >
-              Confirmar Senha
-            </label>
-            <input
+            <PasswordInput
               type="password"
               id="confirmPassword"
+              label="Confirmar Senha"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Confirme sua senha"
               required
             />
@@ -170,27 +168,6 @@ const Register = () => {
           {/* Botão de Criar Conta */}
           <SubmitButton loading={isSubmitting}>Criar Conta</SubmitButton>
         </form>
-
-        {/* Divisor */}
-        <div className="flex items-center my-6">
-          <hr className="flex-grow border-t border-gray-300" />
-          <span className="mx-4 text-gray-500 text-sm">Ou</span>
-          <hr className="flex-grow border-t border-gray-300" />
-        </div>
-
-        <div className="flex flex-col items-center justify-center max-w-md">
-          {/* Botão de login com Facebook */}
-          <button className="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-100 transition">
-            <FaFacebook size={22} className="text-[#1877F2]" />
-            <span className="font-medium">Entrar com Facebook</span>
-          </button>
-
-          {/* Botão de login com Google */}
-          <button className="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-100 transition">
-            <FcGoogle size={22} />
-            <span className="font-medium">Entrar com Google</span>
-          </button>
-        </div>
 
         {/* Link para login */}
         <p className="text-center text-sm text-gray-600 mt-6">

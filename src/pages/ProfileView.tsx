@@ -71,7 +71,8 @@ const ProfileView: React.FC = () => {
   } | null>(null);
 
   // ✅ Função para obter iniciais do nome (mesma lógica do PostCard)
-  const getInitials = (name: string) => {
+  const getInitials = (name?: string) => {
+    if (!name) return '?';
     return name
       .split(' ')
       .map((word) => word.charAt(0).toUpperCase())

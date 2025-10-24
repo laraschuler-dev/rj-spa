@@ -94,16 +94,26 @@ export default function Services() {
       <div className="mt-8 max-w-4xl mx-auto relative">
         <Swiper
           modules={[Pagination, Navigation]}
-          spaceBetween={16}
+          spaceBetween={12}
           slidesPerView={1}
+          centeredSlides={true}
+          centeredSlidesBounds={true}
           pagination={{ clickable: true }}
           navigation={{
             nextEl: '.swiper-button-next',
             prevEl: '.swiper-button-prev',
           }}
           breakpoints={{
-            640: { slidesPerView: 2 },
-            1024: { slidesPerView: 3 },
+            640: {
+              slidesPerView: 2,
+              centeredSlides: true,
+              centeredSlidesBounds: true,
+            },
+            1024: {
+              slidesPerView: 3,
+              centeredSlides: false,
+              centeredSlidesBounds: false,
+            },
           }}
         >
           {services.map((service) => (

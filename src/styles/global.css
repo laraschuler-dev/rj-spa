@@ -52,3 +52,19 @@ button {
   all: unset;
   cursor: pointer;
 }
+/* Apenas o botão principal - seletor mais específico */
+/* Apenas o botão principal - seletor mais específico */
+div.relative > button[id*="headlessui-listbox-button-"] {
+  border: 1px solid #D1D5DB !important; /* gray-300 */
+  border-radius: 0.5rem !important;
+}
+
+div.relative > button[id*="headlessui-listbox-button-"]:hover {
+  border-color: #D1D5DB  !important; /* gray-300 */
+}
+
+/* Usando a cor primary do seu tema */
+div.relative > button[id*="headlessui-listbox-button-"]:focus {
+  border-color: #D1D5DB !important; /* Mantém borda cinza */
+  box-shadow: 0 0 0 2px var(--primary-color) !important; /* focus:ring-primary */
+}

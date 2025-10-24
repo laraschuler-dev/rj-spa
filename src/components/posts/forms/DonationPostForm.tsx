@@ -119,8 +119,8 @@ const DonationPostForm: React.FC<DonationPostFormProps> = ({
       }`}
     >
       <div
-        className={`w-full bg-white p-8 rounded-2xl shadow-lg 
-    ${mode === 'create' ? 'max-w-xs sm:max-w-md' : 'max-w-md'}`}
+        className={`w-full bg-white p-6 sm:p-8 rounded-2xl shadow-lg 
+  ${mode === 'create' ? 'max-w-sm sm:max-w-md' : 'max-w-md'} mx-4 sm:mx-0`}
       >
         <Typography variant="h2" className="text-primary text-center mb-6">
           {mode === 'create' ? 'Nova Doação' : 'Editar Doação'}

@@ -142,18 +142,16 @@ const PostCard: React.FC<PostCardProps> = ({
     if (!sharedBy) return null;
 
     if (sharedBy.avatarUrl) {
-      // ✅ Com avatar - mostra imagem
       return (
         <img
           src={resolveImageUrl(sharedBy.avatarUrl)}
           alt={sharedBy.name}
-          className="w-8 h-8 rounded-full object-cover border"
+          className="w-8 h-8 aspect-square rounded-full object-cover border"
         />
       );
     } else {
-      // ✅ Sem avatar - mostra iniciais
       return (
-        <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center border border-white">
+        <div className="w-8 h-8 aspect-square rounded-full bg-accent flex items-center justify-center border border-white">
           <span className="text-white font-semibold text-xs">
             {getInitials(sharedBy.name)}
           </span>
