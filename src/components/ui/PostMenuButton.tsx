@@ -33,7 +33,8 @@ const PostMenuButton: React.FC<PostMenuButtonProps> = ({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md py-1 z-20">
+        <Menu.Items className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md py-1 z-20 overflow-hidden">
+          {' '}
           {onEdit && (
             <Menu.Item>
               {({ active }) => (
