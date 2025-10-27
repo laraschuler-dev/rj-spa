@@ -14,15 +14,16 @@ export function useServices() {
     loading,
   } = usePostStore();
 
-  // 👇 Filtra apenas serviços ORIGINAIS (categorias 5, 6, 7)
   const services = posts.filter(
-    (post) =>
-      [5, 6, 7].includes(post.categoria_idcategoria) && // VOLUNTEER, COURSE, JOB_OFFER
-      !post.sharedBy
+    (post) => [5, 6, 7].includes(post.categoria_idcategoria) && !post.sharedBy
   );
 
   const fetchServices = async (isInitialLoad: boolean = false) => {
+    // ⚠️ aqui usa só o loading do store
     if (loading) return;
+
+    // 🔹 força loading = true na store antes da fetch
+    usePostStore.setState({ loading: true });
 
     try {
       const currentPage = isInitialLoad ? 1 : usePostStore.getState().page;
@@ -34,29 +35,21 @@ export function useServices() {
       const servicesFromApi = res.data.posts || res.data.services || [];
       const pagination = res.data.pagination;
 
-      console.log('📄 Paginação Serviços:', {
-        page: currentPage,
-        servicesReceived: servicesFromApi.length,
-        hasMore: pagination?.hasNextPage,
-        total: pagination?.totalItems,
-        categories: servicesFromApi.map((s: any) => s.categoria_idcategoria),
-      });
+      const currentPosts = usePostStore.getState().posts;
 
-      if (isInitialLoad) {
-        setPosts(servicesFromApi);
-      } else {
-        const currentPosts = usePostStore.getState().posts;
-        const newPosts = [
-          ...currentPosts,
-          ...servicesFromApi.filter(
-            (s: any) =>
-              !currentPosts.some(
-                (existing: any) => existing.uniqueKey === s.uniqueKey
-              )
-          ),
-        ];
-        setPosts(newPosts);
-      }
+      const newPosts = isInitialLoad
+        ? servicesFromApi
+        : [
+            ...currentPosts,
+            ...servicesFromApi.filter(
+              (s: any) =>
+                !currentPosts.some(
+                  (existing: any) => existing.uniqueKey === s.uniqueKey
+                )
+            ),
+          ];
+
+      setPosts(newPosts);
 
       usePostStore.setState({
         page: currentPage + 1,
@@ -86,7 +79,7 @@ export function useServices() {
     loadMoreServices,
     refreshServices,
     hasMore,
-    loading,
+    loading, // usa apenas loading da store
     updateService: updatePost,
     removeService: removePost,
     toggleLikeService: toggleLikePost,

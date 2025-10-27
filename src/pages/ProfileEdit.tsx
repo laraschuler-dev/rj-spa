@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CustomSelect from '../components/ui/CustomSelect';
 import Typography from '../components/ui/Typography';
-import { CgProfile } from 'react-icons/cg';
 import SubmitButton from '../components/ui/SubmitButton';
 import { toast } from 'react-toastify';
 import CancelButton from '../components/ui/CancelButton';
@@ -11,6 +10,7 @@ import { useEditProfile, ProfileFormData } from '../hooks/useEditProfile';
 import BackButton from '../components/ui/BackButton';
 import { resolveImageUrl } from '../utils/resolveImageUrl';
 import { useAuth } from '../hooks/useAuth';
+import AvatarInitials from '../components/ui/AvatarInitials';
 
 const profileOptions = [
   { value: '', label: 'Perfil' },
@@ -85,15 +85,6 @@ const ProfileEdit: React.FC = () => {
     }
   };
 
-  const getInitials = (name?: string) => {
-    if (!name) return '?';
-    return name
-      .split(' ')
-      .map((word) => word.charAt(0).toUpperCase())
-      .slice(0, 2)
-      .join('');
-  };
-
   return (
     <main className="max-w-xl mx-auto mt-12 bg-white p-8 rounded-xl shadow-lg">
       <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
@@ -111,9 +102,11 @@ const ProfileEdit: React.FC = () => {
             />
           ) : (
             <div className="w-32 h-32 mx-auto rounded-full bg-accent flex items-center justify-center mb-4 border border-white">
-              <span className="text-white font-semibold text-2xl">
-                {getInitials(currentUser?.name)}
-              </span>
+              {' '}
+              <AvatarInitials
+                name={currentUser?.name}
+                className="w-20 h-20 text-4xl"
+              />
             </div>
           )}
           <label className="mt-2 cursor-pointer text-sm text-primary hover:underline">

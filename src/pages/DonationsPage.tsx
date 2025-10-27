@@ -66,7 +66,7 @@ const DonationsPage: React.FC = () => {
 
   return (
     <Layout variant="feed">
-      <div className="mt-4 mb-6">
+      <div className="mt-6 mb-6">
         <Typography variant="h1" className="text-primary text-center mb-6">
           Doações
         </Typography>
@@ -118,7 +118,8 @@ const DonationsPage: React.FC = () => {
           />
         ))}
 
-        {donations.length === 0 && !loading && (
+        {/* Mostrar mensagem apenas se não estiver carregando */}
+        {!loading && donations.length === 0 && (
           <div className="text-center py-12">
             <Typography variant="p" className="text-gray-500">
               Nenhuma doação encontrada
@@ -129,6 +130,7 @@ const DonationsPage: React.FC = () => {
           </div>
         )}
 
+        {/* Botão de carregar mais */}
         {hasMore && (
           <div className="text-center mt-4">
             <button

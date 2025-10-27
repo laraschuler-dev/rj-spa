@@ -1,5 +1,5 @@
 // src/hooks/useUserSearch.ts
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import axios from '../services/api';
 
 export interface SearchedUser {
@@ -16,7 +16,6 @@ export const useUserSearch = () => {
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [page, setPage] = useState(1);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   const searchUsers = useCallback(
     async (searchTerm: string, isNewSearch: boolean = true) => {
@@ -27,37 +26,30 @@ export const useUserSearch = () => {
         return;
       }
 
-      // Debounce para evitar muitas requisições
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
+      try {
+        setLoading(true);
+        setError(null);
+
+        const currentPage = isNewSearch ? 1 : page;
+        const response = await axios.get('/users/search', {
+          params: {
+            q: searchTerm.trim(),
+            page: currentPage,
+            limit: 10,
+          },
+        });
+
+        const newUsers = response.data.data.users;
+
+        setUsers((prev) => (isNewSearch ? newUsers : [...prev, ...newUsers]));
+        setHasMore(response.data.pagination.hasNextPage);
+        setPage(currentPage + 1);
+      } catch (err: any) {
+        setError(err.response?.data?.error || 'Erro ao buscar usuários');
+        console.error('Erro na busca de usuários:', err);
+      } finally {
+        setLoading(false);
       }
-
-      debounceRef.current = setTimeout(async () => {
-        try {
-          setLoading(true);
-          setError(null);
-
-          const currentPage = isNewSearch ? 1 : page;
-          const response = await axios.get('/users/search', {
-            params: {
-              q: searchTerm.trim(),
-              page: currentPage,
-              limit: 10,
-            },
-          });
-
-          const newUsers = response.data.data.users;
-
-          setUsers((prev) => (isNewSearch ? newUsers : [...prev, ...newUsers]));
-          setHasMore(response.data.pagination.hasNextPage);
-          setPage(currentPage + 1);
-        } catch (err: any) {
-          setError(err.response?.data?.error || 'Erro ao buscar usuários');
-          console.error('Erro na busca de usuários:', err);
-        } finally {
-          setLoading(false);
-        }
-      }, 300);
     },
     [page]
   );
@@ -67,9 +59,6 @@ export const useUserSearch = () => {
     setPage(1);
     setHasMore(false);
     setError(null);
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
-    }
   }, []);
 
   const loadMore = useCallback(() => {

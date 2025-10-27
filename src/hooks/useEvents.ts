@@ -21,6 +21,9 @@ export function useEvents() {
   const fetchEvents = async (isInitialLoad: boolean = false) => {
     if (loading) return;
 
+    // marca loading imediatamente
+    usePostStore.setState({ loading: true });
+
     try {
       const currentPage = isInitialLoad ? 1 : usePostStore.getState().page;
 
@@ -31,21 +34,21 @@ export function useEvents() {
       const eventsFromApi = res.data.posts || res.data.events || [];
       const pagination = res.data.pagination;
 
-      if (isInitialLoad) {
-        setPosts(eventsFromApi);
-      } else {
-        const currentPosts = usePostStore.getState().posts;
-        const newPosts = [
-          ...currentPosts,
-          ...eventsFromApi.filter(
-            (e: any) =>
-              !currentPosts.some(
-                (existing: any) => existing.uniqueKey === e.uniqueKey
-              )
-          ),
-        ];
-        setPosts(newPosts);
-      }
+      const currentPosts = usePostStore.getState().posts;
+
+      const newPosts = isInitialLoad
+        ? eventsFromApi
+        : [
+            ...currentPosts,
+            ...eventsFromApi.filter(
+              (e: any) =>
+                !currentPosts.some(
+                  (existing: any) => existing.uniqueKey === e.uniqueKey
+                )
+            ),
+          ];
+
+      setPosts(newPosts);
 
       usePostStore.setState({
         page: currentPage + 1,

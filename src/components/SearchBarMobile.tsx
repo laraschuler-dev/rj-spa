@@ -5,36 +5,42 @@ import { Link } from 'react-router-dom';
 import { resolveImageUrl } from '../utils/resolveImageUrl';
 import { FiSearch, FiX } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
+import { translateProfileType } from '../utils/translateProfileType';
+import AvatarInitials from './ui/AvatarInitials';
 
 const SearchBarMobile: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [hasSearched, setHasSearched] = useState(false);
+  const [isDebouncing, setIsDebouncing] = useState(false); // <-- novo estado
   const { users, loading, error, searchUsers, resetSearch } = useUserSearch();
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
-  // ✅ Função para obter as duas iniciais do nome
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((word) => word.charAt(0).toUpperCase())
-      .slice(0, 2)
-      .join('');
-  };
+  // Função para obter as duas iniciais do nome
 
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
       setSearchTerm(value);
 
-      // Debounce para melhor performance
+      // Start debouncing
       if (debounceRef.current) {
         clearTimeout(debounceRef.current);
       }
 
+      if (value.length >= 2) {
+        setIsDebouncing(true); // sinaliza que estamos no debounce esperando
+      } else {
+        setIsDebouncing(false);
+      }
+
       debounceRef.current = setTimeout(() => {
+        setIsDebouncing(false); // debounce terminou (vamos executar a busca agora)
         if (value.length >= 2) {
+          setHasSearched(true);
           searchUsers(value, true);
         } else {
+          setHasSearched(false);
           resetSearch();
         }
       }, 300);
@@ -45,7 +51,10 @@ const SearchBarMobile: React.FC = () => {
   const handleResultClick = useCallback(() => {
     setIsOpen(false);
     setSearchTerm('');
+    setHasSearched(false);
+    setIsDebouncing(false);
     resetSearch();
+    if (debounceRef.current) clearTimeout(debounceRef.current);
   }, [resetSearch]);
 
   const openSearch = useCallback(() => {
@@ -55,6 +64,8 @@ const SearchBarMobile: React.FC = () => {
   const closeSearch = useCallback(() => {
     setIsOpen(false);
     setSearchTerm('');
+    setHasSearched(false);
+    setIsDebouncing(false);
     resetSearch();
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
@@ -63,8 +74,16 @@ const SearchBarMobile: React.FC = () => {
 
   const clearSearch = useCallback(() => {
     setSearchTerm('');
+    setHasSearched(false);
+    setIsDebouncing(false);
     resetSearch();
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
   }, [resetSearch]);
+
+  // consideramos que estamos "procurando" se estiver no debounce ou se o hook reportar loading
+  const isSearching = isDebouncing || loading;
 
   return (
     <>
@@ -122,7 +141,7 @@ const SearchBarMobile: React.FC = () => {
                 </button>
               )}
 
-              {loading && (
+              {isSearching && (
                 <div className="absolute inset-y-0 right-0 pr-4 flex items-center z-20">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                 </div>
@@ -137,7 +156,8 @@ const SearchBarMobile: React.FC = () => {
                 </div>
               )}
 
-              {users.length === 0 && !loading && searchTerm.length >= 2 && (
+              {/* Só mostra "Nenhum usuário encontrado" quando já houve busca, não estamos procurando e não há resultados */}
+              {hasSearched && !isSearching && users.length === 0 && (
                 <div className="p-6 text-gray-500 text-center">
                   Nenhum usuário encontrado
                 </div>
@@ -150,14 +170,13 @@ const SearchBarMobile: React.FC = () => {
                   className="flex items-center gap-4 p-4 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 active:bg-gray-100 transition-colors"
                   onClick={handleResultClick}
                 >
-                  {/* ✅ Atualizado: Avatar com duas iniciais quando não tem imagem */}
+                  {/* Avatar com fallback para iniciais */}
                   {user.avatarUrl ? (
                     <img
                       src={resolveImageUrl(user.avatarUrl)}
                       alt={user.name}
                       className="w-12 h-12 rounded-full object-cover border"
                       onError={(e) => {
-                        // Fallback para avatar quebrado - mostra iniciais
                         e.currentTarget.style.display = 'none';
                         const fallback = e.currentTarget.nextElementSibling;
                         if (fallback) {
@@ -167,13 +186,10 @@ const SearchBarMobile: React.FC = () => {
                     />
                   ) : null}
 
-                  {/* ✅ Atualizado: Mostra duas iniciais (mesmo estilo do PostCard) */}
                   <div
                     className={`w-12 h-12 rounded-full bg-accent flex items-center justify-center border border-white ${user.avatarUrl ? 'hidden' : ''}`}
                   >
-                    <span className="text-white font-semibold">
-                      {getInitials(user.name)}
-                    </span>
+                    <AvatarInitials name={user?.name} />
                   </div>
 
                   <div className="flex-1 min-w-0">
@@ -181,16 +197,16 @@ const SearchBarMobile: React.FC = () => {
                       {user.name}
                     </p>
                     {user.profileType && (
-                      <p className="text-sm text-gray-500 truncate">
-                        {user.profileType}
+                      <p className="text-xs text-gray-500 truncate">
+                        {translateProfileType(user.profileType)}
                       </p>
                     )}
                   </div>
                 </Link>
               ))}
 
-              {/* Loading durante busca */}
-              {loading && users.length === 0 && searchTerm.length >= 2 && (
+              {/* Loading durante busca (mostra se estamos debouncing ou loading e ainda não temos resultados) */}
+              {isSearching && users.length === 0 && (
                 <div className="p-6 text-center">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
                   <p className="text-gray-500 text-sm mt-2">
