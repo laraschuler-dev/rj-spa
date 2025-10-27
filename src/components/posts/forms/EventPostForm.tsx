@@ -101,8 +101,10 @@ const EventPostForm: React.FC<EventPostFormProps> = ({
 
   return (
     <main
-      className={`flex justify-center bg-background ${
-        mode === 'edit' ? 'min-h-0 py-2' : 'min-h-screen py-12 items-center'
+      className={`flex justify-center ${
+        mode === 'edit'
+          ? 'min-h-0 py-2 bg-transparent'
+          : 'min-h-screen py-12 items-center bg-background'
       }`}
     >
       <div

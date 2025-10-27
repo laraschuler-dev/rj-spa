@@ -91,15 +91,6 @@ const PostCard: React.FC<PostCardProps> = ({
   // ✅ Verifica se é post anônimo
   const isAnonymousPost = categoryId === 2 && metadata?.isAnonymous;
 
-  // ✅ Função para obter iniciais do nome
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((word) => word.charAt(0).toUpperCase())
-      .slice(0, 2)
-      .join('');
-  };
-
   // Garante que sempre seja Date válido
   const safeCreatedAt = createdAt ? new Date(createdAt) : new Date();
   const safeSharedAt = sharedBy?.sharedAt

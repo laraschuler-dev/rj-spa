@@ -7,7 +7,7 @@ import CardButton from './ui/CardButton';
 import { useHomeEvents } from '../hooks/useHomeData';
 import { resolveImageUrl } from '../utils/resolveImageUrl';
 import formatDateBR from '../utils/formatDateBR';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 export default function Eventos() {
   const { events, loading, error } = useHomeEvents(6);
