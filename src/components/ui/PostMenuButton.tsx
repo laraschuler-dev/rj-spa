@@ -20,7 +20,7 @@ const PostMenuButton: React.FC<PostMenuButtonProps> = ({
 }) => {
   return (
     <Menu as="div" className={`relative ${className || ''}`}>
-      <Menu.Button className="text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-0">
+      <Menu.Button className="text-gray-600 hover:text-gray-800 focus:outline-none">
         <BsThreeDots size={18} />
       </Menu.Button>
 
@@ -33,7 +33,8 @@ const PostMenuButton: React.FC<PostMenuButtonProps> = ({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md py-1 z-20">
+        <Menu.Items className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md py-1 z-20 overflow-hidden">
+          {' '}
           {onEdit && (
             <Menu.Item>
               {({ active }) => (

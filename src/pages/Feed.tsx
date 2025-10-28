@@ -90,7 +90,7 @@ const Feed: React.FC = () => {
 
   return (
     <Layout variant="feed">
-      <div className="mb-8"></div>
+      <div className="mb-12"></div>
       <div className="space-y-6">
         {(!posts || posts.length === 0) && !loading ? (
           <div className="text-center py-12 text-gray-500">

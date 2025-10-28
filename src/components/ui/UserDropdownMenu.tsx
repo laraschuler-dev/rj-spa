@@ -6,6 +6,7 @@ import { CgProfile } from 'react-icons/cg';
 import { useLogout } from '../../hooks/useLogout';
 import { useProfile } from '../../hooks/useProfile';
 import { resolveImageUrl } from '../../utils/resolveImageUrl';
+import AvatarInitials from './AvatarInitials';
 
 interface UserDropdownMenuProps {
   variant?: 'header' | 'standalone';
@@ -46,20 +47,14 @@ export const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({
     if (action) action();
   };
 
-  // Função para obter as iniciais do usuário
-  const getUserInitials = () => {
-    if (!user?.name) return 'U';
-    return user.name
-      .split(' ')
-      .map((word) => word.charAt(0).toUpperCase())
-      .slice(0, 2)
-      .join('');
-  };
+  // ✅ Se o usuário tem foto
+  const hasProfilePhoto = Boolean(profile?.profile_photo);
 
   // Função para obter a foto de perfil ou mostrar as iniciais (PEQUENA)
+  // — agora usa isUserMenuOpen e hasProfilePhoto para ajustar só o avatar quando necessário
   const renderUserAvatar = () => {
-    if (profile?.profile_photo) {
-      const imageUrl = resolveImageUrl(profile.profile_photo);
+    if (hasProfilePhoto) {
+      const imageUrl = resolveImageUrl(profile!.profile_photo);
       return (
         <img
           src={imageUrl}
@@ -73,17 +68,24 @@ export const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({
       );
     }
 
+    // Avatar genérico: adiciona ring/border quando menu está aberto para separá-lo do bg do botão
+    const baseClasses =
+      'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold';
+    const openStateClasses = isUserMenuOpen
+      ? 'ring-2 ring-white/70 shadow-sm' // separação clara quando o botão fica bg-accent
+      : '';
+
     return (
-      <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center text-white text-sm font-semibold">
-        {getUserInitials()}
+      <div className={`${baseClasses} bg-accent ${openStateClasses}`}>
+        <AvatarInitials name={user?.name} />
       </div>
     );
   };
 
   // Versão maior do avatar para o dropdown
   const renderLargeUserAvatar = () => {
-    if (profile?.profile_photo) {
-      const imageUrl = resolveImageUrl(profile.profile_photo);
+    if (hasProfilePhoto) {
+      const imageUrl = resolveImageUrl(profile!.profile_photo);
       return (
         <img
           src={imageUrl}
@@ -97,9 +99,16 @@ export const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({
       );
     }
 
+    // Avatar genérico grande: também ganha ring quando o menu estiver aberto
+    const baseClasses =
+      'w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold';
+    const openStateClasses = isUserMenuOpen
+      ? 'ring-2 ring-white/70 shadow-sm'
+      : '';
+
     return (
-      <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center text-white font-semibold">
-        {getUserInitials()}
+      <div className={`${baseClasses} bg-accent ${openStateClasses}`}>
+        <AvatarInitials name={user?.name} />
       </div>
     );
   };
@@ -127,17 +136,21 @@ export const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({
 
   const navItem = getNavigationItem();
 
-  // Estilos baseados na variante
+  // Estilos baseados na variante (mantive a tua lógica)
   const buttonStyles = {
     header: `flex items-center gap-2 p-2 rounded transition-all duration-200 group focus:outline-none ${
       isUserMenuOpen
         ? 'bg-accent text-white shadow-md'
-        : 'hover:bg-primary-dark/50 hover:text-accent'
+        : hasProfilePhoto
+          ? 'hover:bg-primary-dark/50 hover:text-accent'
+          : 'hover:bg-primary-dark/30 hover:text-accent hover:border-accent/20'
     }`,
     standalone: `flex items-center gap-2 p-2 rounded-lg transition-all duration-200 group border border-gray-200 focus:outline-none ${
       isUserMenuOpen
         ? 'bg-accent text-white shadow-md'
-        : 'hover:bg-gray-50 hover:border-gray-300'
+        : hasProfilePhoto
+          ? 'hover:bg-gray-50 hover:border-gray-300'
+          : 'hover:bg-gray-100 hover:border-gray-300 hover:border-accent/20'
     }`,
   };
 
@@ -156,7 +169,10 @@ export const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({
               {user?.name?.split(' ')[0] || 'Usuário'}
             </p>
             <p className="text-xs text-background/70 leading-none mt-1">
-              {profile?.translated_type || 'Membro'}
+              {profile?.translated_type &&
+              profile.translated_type !== 'Não informado'
+                ? profile.translated_type
+                : ''}
             </p>
           </div>
         </div>
@@ -181,11 +197,12 @@ export const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({
                 <p className="text-xs text-gray-500 truncate">
                   {user?.email || ''}
                 </p>
-                {profile?.translated_type && (
-                  <p className="text-xs text-accent font-medium mt-1">
-                    {profile.translated_type}
-                  </p>
-                )}
+                {profile?.translated_type &&
+                  profile.translated_type !== 'Não informado' && (
+                    <p className="text-xs text-accent font-medium mt-1">
+                      {profile.translated_type}
+                    </p>
+                  )}
               </div>
             </div>
           </div>

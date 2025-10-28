@@ -6,9 +6,16 @@ import Typography from './ui/Typography';
 import CardButton from './ui/CardButton';
 import { useHomeServices } from '../hooks/useHomeData';
 import { resolveImageUrl } from '../utils/resolveImageUrl';
+import { useState } from 'react';
 
 export default function Services() {
   const { services, loading, error } = useHomeServices(6);
+  const [imageErrors, setImageErrors] = useState<{ [key: string]: boolean }>(
+    {}
+  );
+  const handleImageError = (id: string) => {
+    setImageErrors((prev) => ({ ...prev, [id]: true }));
+  };
 
   if (loading) {
     return (
@@ -94,33 +101,48 @@ export default function Services() {
       <div className="mt-8 max-w-4xl mx-auto relative">
         <Swiper
           modules={[Pagination, Navigation]}
-          spaceBetween={16}
+          spaceBetween={12}
           slidesPerView={1}
+          centeredSlides={true}
+          centeredSlidesBounds={true}
           pagination={{ clickable: true }}
           navigation={{
             nextEl: '.swiper-button-next',
             prevEl: '.swiper-button-prev',
           }}
           breakpoints={{
-            640: { slidesPerView: 2 },
-            1024: { slidesPerView: 3 },
+            640: {
+              slidesPerView: 2,
+              centeredSlides: true,
+              centeredSlidesBounds: true,
+            },
+            1024: {
+              slidesPerView: 3,
+              centeredSlides: false,
+              centeredSlidesBounds: false,
+            },
           }}
         >
           {services.map((service) => (
             <SwiperSlide key={service.id}>
               <div className="bg-white border rounded-lg shadow-md overflow-hidden flex flex-col h-full">
                 {/* Container da imagem com altura fixa mas proporção preservada */}
-                <div className="w-full h-40 flex-shrink-0 overflow-hidden">
+                <div
+                  className={`w-full aspect-[4/3] flex items-center justify-center rounded-t-lg overflow-hidden ${
+                    !service.image || imageErrors[String(service.id)]
+                      ? 'bg-[#f0f9ff]'
+                      : 'bg-gradient-to-b from-gray-50 to-gray-100'
+                  }`}
+                >
                   <img
                     src={
-                      resolveImageUrl(service.image) ||
-                      '/img/servico-solidario.png'
+                      service.image && !imageErrors[String(service.id)]
+                        ? resolveImageUrl(service.image)
+                        : '/img/servico-solidario2.png'
                     }
                     alt={service.title}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src = '/img/servico-solidario.png';
-                    }}
+                    className="object-contain w-full h-full transition-transform duration-300"
+                    onError={() => handleImageError(String(service.id))}
                   />
                 </div>
 

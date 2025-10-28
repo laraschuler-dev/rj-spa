@@ -20,6 +20,7 @@ import { useDeletePost } from '../hooks/useDeletePost';
 import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
 import { resolveImageUrl } from '../utils/resolveImageUrl';
+import AvatarInitials from '../components/ui/AvatarInitials';
 
 // 👇 Type Guard para verificar se é PrivateUserData (tem email)
 const hasEmail = (user: any): user is { email: string; fone?: string } => {
@@ -69,15 +70,6 @@ const ProfileView: React.FC = () => {
     id: number;
     shareId?: number;
   } | null>(null);
-
-  // ✅ Função para obter iniciais do nome (mesma lógica do PostCard)
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((word) => word.charAt(0).toUpperCase())
-      .slice(0, 2)
-      .join('');
-  };
 
   const openShareModal = (post: any) => {
     setPostToShare(post);
@@ -159,11 +151,8 @@ const ProfileView: React.FC = () => {
             className="w-32 h-32 mx-auto rounded-full object-cover mb-4 border"
           />
         ) : (
-          // ✅ Substituído o ícone CgProfile pelas iniciais (mesmo estilo do PostCard)
           <div className="w-32 h-32 mx-auto rounded-full bg-accent flex items-center justify-center mb-4 border border-white">
-            <span className="text-white font-semibold text-2xl">
-              {getInitials(user.name)}
-            </span>
+            <AvatarInitials name={user?.name} className="w-20 h-20 text-4xl" />
           </div>
         )}
 

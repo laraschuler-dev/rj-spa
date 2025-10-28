@@ -22,6 +22,7 @@
     "react-icons": "^5.4.0",
     "react-router-dom": "^7.1.5",
     "react-scroll": "^1.9.3",
+    "react-select": "^5.10.2",
     "react-swiper": "^0.1.5",
     "react-toastify": "^11.0.5",
     "recharts": "^2.15.1",

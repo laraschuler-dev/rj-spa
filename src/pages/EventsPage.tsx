@@ -66,7 +66,7 @@ const EventsPage: React.FC = () => {
 
   return (
     <Layout variant="feed">
-      <div className="mt-4 mb-6">
+      <div className="mt-6 mb-6">
         <Typography variant="h1" className="text-primary text-center mb-6">
           Eventos
         </Typography>
@@ -99,7 +99,6 @@ const EventsPage: React.FC = () => {
 
               try {
                 const { liked } = await likePost(event.id);
-
                 if (liked !== !currentLiked) {
                   toggleLikeEvent(event.id, liked);
                 }
@@ -114,11 +113,12 @@ const EventsPage: React.FC = () => {
             onOpenDetails={() => setSelectedPost(event.id)}
             onEdit={(postId) => setEditingPost(postId)}
             isPostOwner={event.isPostOwner}
-            isShareOwner={false} // 👈 SEMPRE false (não há compartilhamentos)
+            isShareOwner={false}
           />
         ))}
 
-        {events.length === 0 && !loading && (
+        {/* Mostrar mensagem apenas se não estiver carregando */}
+        {!loading && events.length === 0 && (
           <div className="text-center py-12">
             <Typography variant="p" className="text-gray-500 text-lg">
               Nenhum evento encontrado.
@@ -145,7 +145,7 @@ const EventsPage: React.FC = () => {
       {/* Modais Simplificados */}
       {selectedPost && (
         <PostModal
-          postId={selectedPost} // 👈 Apenas ID
+          postId={selectedPost}
           onClose={() => setSelectedPost(null)}
           onLike={async () => {
             const event = events.find((e) => e.id === selectedPost);

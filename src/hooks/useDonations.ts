@@ -20,8 +20,7 @@ export function useDonations() {
   );
 
   const fetchDonations = async (isInitialLoad: boolean = false) => {
-    if (loading) return;
-
+    usePostStore.setState({ loading: true }); // ✅ garante que loading seja true antes de buscar
     try {
       const currentPage = isInitialLoad ? 1 : usePostStore.getState().page;
 
@@ -31,13 +30,6 @@ export function useDonations() {
 
       const donationsFromApi = res.data.posts || res.data.donations || [];
       const pagination = res.data.pagination;
-
-      console.log('📄 Paginação Doações:', {
-        page: currentPage,
-        donationsReceived: donationsFromApi.length,
-        hasMore: pagination?.hasNextPage,
-        total: pagination?.totalItems,
-      });
 
       if (isInitialLoad) {
         setPosts(donationsFromApi);

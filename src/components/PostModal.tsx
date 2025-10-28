@@ -3,6 +3,7 @@ import PostCard from './PostCard';
 import { usePostStore } from '../stores/postStore';
 import { PostListItem } from '../types/Post';
 import { useEventAttendance } from '../hooks/useEventAttendance';
+import { FiX } from 'react-icons/fi';
 
 interface PostModalProps {
   postId: number;
@@ -80,18 +81,18 @@ const PostModal: React.FC<PostModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-start pt-20 overflow-auto"
+      className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex justify-center items-start pt-20 overflow-auto"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl w-full max-w-[92vw] sm:max-w-[480px] md:max-w-[520px] mx-3 p-4 relative"
+        className="bg-white rounded-2xl w-full max-w-[92vw] sm:max-w-[500px] md:max-w-[550px] mx-3 p-4 relative"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 font-bold text-3xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors z-10 focus:outline-none"
         >
-          ×
+          <FiX size={18} className="text-gray-500" />
         </button>
 
         <PostCard

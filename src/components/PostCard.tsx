@@ -10,6 +10,7 @@ import { formatTimeAgo } from '../utils/formatTimeAgo';
 import formatDateBR from '../utils/formatDateBR';
 import PostMenuButton from './ui/PostMenuButton';
 import { useEventAttendance } from '../hooks/useEventAttendance';
+import AvatarInitials from './ui/AvatarInitials';
 
 interface PostCardProps {
   id: number;
@@ -90,15 +91,6 @@ const PostCard: React.FC<PostCardProps> = ({
   // ✅ Verifica se é post anônimo
   const isAnonymousPost = categoryId === 2 && metadata?.isAnonymous;
 
-  // ✅ Função para obter iniciais do nome
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((word) => word.charAt(0).toUpperCase())
-      .slice(0, 2)
-      .join('');
-  };
-
   // Garante que sempre seja Date válido
   const safeCreatedAt = createdAt ? new Date(createdAt) : new Date();
   const safeSharedAt = sharedBy?.sharedAt
@@ -129,9 +121,7 @@ const PostCard: React.FC<PostCardProps> = ({
       // ✅ Cenário 2: Sem avatar - mostra iniciais
       return (
         <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center border border-white">
-          <span className="text-white font-semibold text-sm">
-            {getInitials(currentAuthor.name)}
-          </span>
+          <AvatarInitials name={currentAuthor.name} />
         </div>
       );
     }
@@ -142,21 +132,17 @@ const PostCard: React.FC<PostCardProps> = ({
     if (!sharedBy) return null;
 
     if (sharedBy.avatarUrl) {
-      // ✅ Com avatar - mostra imagem
       return (
         <img
           src={resolveImageUrl(sharedBy.avatarUrl)}
           alt={sharedBy.name}
-          className="w-8 h-8 rounded-full object-cover border"
+          className="w-8 h-8 aspect-square rounded-full object-cover border"
         />
       );
     } else {
-      // ✅ Sem avatar - mostra iniciais
       return (
         <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center border border-white">
-          <span className="text-white font-semibold text-xs">
-            {getInitials(sharedBy.name)}
-          </span>
+          <AvatarInitials name={sharedBy.name} />
         </div>
       );
     }
@@ -366,20 +352,19 @@ const PostCard: React.FC<PostCardProps> = ({
           )}
         </>
       )}
-      {/* Carrossel de imagens */}
-      {!isOriginalDeleted && images.length > 0 && (
-        <Swiper spaceBetween={8} slidesPerView={1} className="rounded-xl">
-          {images.map((url, index) => (
-            <SwiperSlide key={`${id}-img-${index}`}>
+      <Swiper spaceBetween={8} slidesPerView={1} className="rounded-xl">
+        {images.map((url, index) => (
+          <SwiperSlide key={`${id}-img-${index}`}>
+            <div className="w-full aspect-[4/3] flex items-center justify-center bg-gray-100 rounded-xl overflow-hidden">
               <img
                 src={resolveImageUrl(url)}
                 alt={`Imagem ${index + 1}`}
-                className="w-full max-h-96 object-contain rounded-xl bg-gray-100"
+                className="object-contain w-full h-full transition-transform duration-300"
               />
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      )}
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
 
       {/* Ver mais */}
       {!isOriginalDeleted && (
@@ -405,7 +390,7 @@ const PostCard: React.FC<PostCardProps> = ({
               ? { shareId: sharedBy.shareId }
               : undefined,
           }}
-          isLiked={isLiked ?? false} // ⚠️ garante boolean
+          isLiked={isLiked ?? false}
           onLike={onLike}
           onComment={() => setShowComments((prev) => !prev)}
           onShare={onShare}

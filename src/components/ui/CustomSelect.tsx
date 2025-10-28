@@ -35,10 +35,15 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         {({ open }) => (
           <div className="relative">
             <ListboxButton
-              className="block w-full px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-primary appearance-none"
-              style={{ boxSizing: 'border-box' }}
+              className="relative w-full px-4 py-2 text-sm text-gray-900 bg-white border-[3px] border-red-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{
+                boxSizing: 'border-box',
+                minHeight: '40px',
+                display: 'flex',
+                alignItems: 'center',
+              }}
             >
-              <span className="block truncate">
+              <span className="block truncate text-left">
                 {selectedOption
                   ? selectedOption.label
                   : placeholder || 'Selecione'}

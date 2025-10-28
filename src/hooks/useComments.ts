@@ -71,7 +71,7 @@ export function useComments(postId: number, shareId?: number) {
   return {
     comments: currentComments,
     loading, // 👈 exporta loading
-    fetchComments: fetchWithLoading, // 👈 usa wrapper com loading
+    fetchComments: fetchWithLoading,
     createComment,
     editComment,
     deleteComment,

@@ -6,6 +6,7 @@ import { useEditPost } from '../../hooks/useEditPost';
 import { toast } from 'react-toastify';
 import { usePostStore } from '../../stores/postStore';
 import { PostListItem } from '../../types/Post';
+import { FiX } from 'react-icons/fi';
 
 interface EditPostModalProps {
   postId: number;
@@ -54,7 +55,7 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl w-full max-w-[700px] my-8"
+        className="bg-white rounded-2xl w-full max-w-[500px] my-8"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-6 relative">
@@ -62,7 +63,7 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
             onClick={onClose}
             className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 font-bold text-3xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors z-10 focus:outline-none"
           >
-            ×
+            <FiX size={18} className="text-gray-500" />
           </button>
 
           <PostFormFactory
@@ -75,8 +76,12 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
 
               try {
                 const updatedPost = await editPost(formData);
-                if (updatedPost) updatePost(updatedPost);
-                onClose();
+                console.log('✅ Resposta da API após editar:', updatedPost);
+
+                if (updatedPost) {
+                  updatePost(updatedPost);
+                  onClose();
+                }
               } catch (error) {
                 console.error('Erro ao editar post:', error);
               } finally {

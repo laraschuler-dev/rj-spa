@@ -4,6 +4,7 @@ import Typography from '../components/ui/Typography';
 import { toast } from 'react-toastify';
 import SubmitButton from '../components/ui/SubmitButton';
 import BackButton from '../components/ui/BackButton';
+import PasswordInput from '../components/ui/PasswordInput';
 
 const AccountSettings: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -181,7 +182,9 @@ const AccountSettings: React.FC = () => {
           {openSections.account && (
             <div className="px-6 py-4 space-y-4">
               <div>
-                <label className="text-sm text-gray-600 block mb-1">Nome</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Nome
+                </label>
                 <input
                   type="text"
                   name="name"
@@ -191,7 +194,7 @@ const AccountSettings: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="text-sm text-gray-600 block mb-1">
+                <label className="text-sm font-medium text-gray-700">
                   Email
                 </label>
                 <input
@@ -203,7 +206,7 @@ const AccountSettings: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="text-sm text-gray-600 block mb-1">
+                <label className="text-sm font-medium text-gray-700">
                   Telefone
                 </label>
                 <input
@@ -256,10 +259,8 @@ const AccountSettings: React.FC = () => {
             <div className="px-6 py-4 space-y-4">
               <form autoComplete="off">
                 <div>
-                  <label className="text-sm text-gray-600 block mb-1">
-                    Senha Atual
-                  </label>
-                  <input
+                  <PasswordInput
+                    label="Senha Atual"
                     type="password"
                     name="currentPassword"
                     autoComplete="current-password"
@@ -270,16 +271,13 @@ const AccountSettings: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="text-sm text-gray-600 block mb-1">
-                    Nova Senha
-                  </label>
-                  <input
+                  <PasswordInput
+                    label="Nova Senha"
                     type="password"
                     name="newPassword"
                     autoComplete="new-password"
                     value={passwordData.newPassword}
                     onChange={handlePasswordChange}
-                    className="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-primary focus:outline-none"
                   />
                 </div>
               </form>

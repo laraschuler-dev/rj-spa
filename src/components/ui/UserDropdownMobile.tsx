@@ -6,6 +6,7 @@ import { CgProfile } from 'react-icons/cg';
 import { useLogout } from '../../hooks/useLogout';
 import { useProfile } from '../../hooks/useProfile';
 import { resolveImageUrl } from '../../utils/resolveImageUrl';
+import AvatarInitials from './AvatarInitials';
 
 export const UserDropdownMobile: React.FC = () => {
   const logout = useLogout();
@@ -37,15 +38,6 @@ export const UserDropdownMobile: React.FC = () => {
     if (action) action();
   };
 
-  const getUserInitials = () => {
-    if (!user?.name) return 'U';
-    return user.name
-      .split(' ')
-      .map((word) => word.charAt(0).toUpperCase())
-      .slice(0, 2)
-      .join('');
-  };
-
   const renderUserAvatar = () => {
     if (profile?.profile_photo) {
       const imageUrl = resolveImageUrl(profile.profile_photo);
@@ -64,7 +56,7 @@ export const UserDropdownMobile: React.FC = () => {
 
     return (
       <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center text-white text-sm font-semibold">
-        {getUserInitials()}
+        <AvatarInitials name={user?.name} />
       </div>
     );
   };
@@ -105,8 +97,11 @@ export const UserDropdownMobile: React.FC = () => {
             <p className="text-sm font-medium text-background">
               {user?.name?.split(' ')[0] || 'Usuário'}
             </p>
-            <p className="text-xs text-background/70">
-              {profile?.translated_type || 'Membro'}
+            <p className="text-xs text-background/70 leading-none mt-1">
+              {profile?.translated_type &&
+              profile.translated_type !== 'Não informado'
+                ? profile.translated_type
+                : ''}
             </p>
           </div>
         </div>

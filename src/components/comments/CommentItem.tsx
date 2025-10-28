@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { CgProfile } from 'react-icons/cg';
 import Typography from '../ui/Typography';
 import { resolveImageUrl } from '../../utils/resolveImageUrl';
 import { useAuth } from '../../hooks/useAuth';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
 import { PostComment } from '../../types/Comment';
+import AvatarInitials from '../ui/AvatarInitials';
 
 interface CommentItemProps {
   comment: PostComment; // <-- ajuste aqui
@@ -49,7 +49,12 @@ const CommentItem: React.FC<CommentItemProps> = ({
         />
       ) : (
         <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center border">
-          <CgProfile className="text-gray-500" size={16} />
+          <AvatarInitials
+            name={comment.author.name}
+            className="w-8 h-8"
+            fontScale={0.4}
+            minFontSize={8}
+          />
         </div>
       )}
 

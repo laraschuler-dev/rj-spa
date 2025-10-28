@@ -7,62 +7,28 @@ import CardButton from './ui/CardButton';
 import { useHomeEvents } from '../hooks/useHomeData';
 import { resolveImageUrl } from '../utils/resolveImageUrl';
 import formatDateBR from '../utils/formatDateBR';
+import { useState } from 'react';
 
 export default function Eventos() {
   const { events, loading, error } = useHomeEvents(6);
+  const [imageErrors, setImageErrors] = useState<{ [key: string]: boolean }>(
+    {}
+  );
+
+  const handleImageError = (id: string) => {
+    setImageErrors((prev) => ({ ...prev, [id]: true }));
+  };
 
   if (loading) {
-    return (
-      <section id="events" className="w-full py-12 px-4 md:px-8 bg-white mb-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <Typography
-            variant="h1"
-            className="text-3xl md:text-5xl font-bold text-primary"
-          >
-            Eventos
-          </Typography>
-          <Typography variant="p" className="text-gray-600 mt-2">
-            Carregando eventos...
-          </Typography>
-        </div>
-      </section>
-    );
+    return <section>...Carregando...</section>;
   }
 
   if (error) {
-    return (
-      <section id="events" className="w-full py-12 px-4 md:px-8 bg-white mb-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <Typography
-            variant="h1"
-            className="text-3xl md:text-5xl font-bold text-primary"
-          >
-            Eventos
-          </Typography>
-          <Typography variant="p" className="text-red-600 mt-2">
-            {error}
-          </Typography>
-        </div>
-      </section>
-    );
+    return <section>...Erro...</section>;
   }
 
   if (events.length === 0) {
-    return (
-      <section id="events" className="w-full py-12 px-4 md:px-8 bg-white mb-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <Typography
-            variant="h1"
-            className="text-3xl md:text-5xl font-bold text-primary"
-          >
-            Eventos
-          </Typography>
-          <Typography variant="p" className="text-gray-600 mt-2">
-            Nenhum evento disponível no momento.
-          </Typography>
-        </div>
-      </section>
-    );
+    return <section>...Nenhum evento...</section>;
   }
 
   return (
@@ -108,21 +74,27 @@ export default function Eventos() {
           {events.map((event) => (
             <SwiperSlide key={event.id}>
               <div className="bg-white border rounded-lg shadow-md overflow-hidden flex flex-col h-full">
-                {/* Imagem - mais compacta */}
-                <img
-                  src={
-                    resolveImageUrl(event.image) || '/img/evento-solidario.png'
-                  }
-                  alt={event.title}
-                  className="w-full h-40 object-cover flex-shrink-0"
-                  onError={(e) => {
-                    e.currentTarget.src = '/img/evento-solidario.png';
-                  }}
-                />
+                <div
+                  className={`w-full aspect-[4/3] flex items-center justify-center rounded-t-lg overflow-hidden ${
+                    !event.image || imageErrors[String(event.id)]
+                      ? 'bg-[#f0f9ff]'
+                      : 'bg-gradient-to-b from-gray-50 to-gray-100'
+                  }`}
+                >
+                  <img
+                    src={
+                      event.image && !imageErrors[String(event.id)]
+                        ? resolveImageUrl(event.image)
+                        : '/img/evento-solidario.png'
+                    }
+                    alt={event.title}
+                    className="object-contain w-full h-full transition-transform duration-300"
+                    onError={() => handleImageError(String(event.id))}
+                  />
+                </div>
 
-                {/* Conteúdo - mais compacto */}
+                {/* Conteúdo */}
                 <div className="p-3 flex flex-col flex-1">
-                  {/* Título - mais compacto */}
                   <div className="h-10 mb-1">
                     <Typography
                       variant="h3"
@@ -132,24 +104,23 @@ export default function Eventos() {
                     </Typography>
                   </div>
 
-                  {/* Informações - mais compacto */}
                   <div className="h-14 mb-2">
                     <Typography
                       variant="p"
                       className="text-sm text-gray-600 space-y-1"
                     >
-                      <div>
+                      <span>
                         <strong>Data:</strong> {formatDateBR(event.date)}
-                      </div>
-                      <div className="flex">
+                      </span>
+                      <span className="flex">
                         <strong className="flex-shrink-0">Local:</strong>
                         <span className="line-clamp-2 ml-1">
                           {event.location}
                         </span>
-                      </div>
+                      </span>
                     </Typography>
                   </div>
-                  {/* Botão - mais compacto */}
+
                   <div className="mt-2">
                     <CardButton>Saiba Mais</CardButton>
                   </div>
