@@ -7,6 +7,7 @@ import { useEditPost } from '../../hooks/useEditPost';
 import SubmitButton from '../ui/SubmitButton';
 import CancelButton from '../ui/CancelButton';
 import { usePostStore } from '../../stores/postStore';
+import { FiX } from 'react-icons/fi';
 
 interface ShareEditModalProps {
   isOpen: boolean;
@@ -66,7 +67,7 @@ const ShareEditModal: React.FC<ShareEditModalProps> = ({
             onClick={onClose}
             className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 font-bold text-3xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors z-10 focus:outline-none"
           >
-            ×
+            <FiX size={18} className="text-gray-500" />
           </button>
 
           <Typography variant="h2" className="text-primary text-center mb-4">
