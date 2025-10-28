@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import Typography from './ui/Typography';
 import Button from './ui/Button';
+import { Link } from 'react-router-dom';
 
 const AboutUs = () => {
   return (
@@ -8,8 +9,9 @@ const AboutUs = () => {
       id="about"
       className="relative min-h-screen flex flex-col justify-center items-center text-center px-6 md:px-12 lg:px-24 pt-20 pb-20 mb-6"
     >
-      {/* Imagem de fundo com overlay */}
-      <div className="absolute inset-0 bg-[url('/img/about.jpg')] bg-cover bg-center brightness-50"></div>
+      {/* Imagem de fundo com overlay - CAMINHO CORRIGIDO */}
+      <div className="absolute inset-0 bg-[url('/img/about2.png')] bg-cover bg-center"></div>
+      <div className="absolute inset-0 bg-black/50"></div>
 
       {/* Conteúdo da seção */}
       <motion.div
@@ -73,7 +75,9 @@ const AboutUs = () => {
 
         {/* Botão de Ação */}
         <div className="mt-8 text-center">
-          <Button variant="primary">Junte-se a Nós</Button>
+          <Link to="/login">
+            <Button variant="primary">Junte-se a Nós</Button>
+          </Link>
         </div>
       </motion.div>
     </section>

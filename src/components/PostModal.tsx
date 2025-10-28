@@ -3,7 +3,7 @@ import PostCard from './PostCard';
 import { usePostStore } from '../stores/postStore';
 import { PostListItem } from '../types/Post';
 import { useEventAttendance } from '../hooks/useEventAttendance';
-
+import { FiX } from 'react-icons/fi';
 
 interface PostModalProps {
   postId: number;
@@ -11,7 +11,7 @@ interface PostModalProps {
   onClose: () => void;
   onLike?: (postId: number, shareId?: number) => void;
   onShare: () => void;
-  onEdit: (postId: number, shareId?: number) => void;
+  onEdit?: (postId: number, shareId?: number) => void;
   onDelete?: (postId: number, shareId?: number) => Promise<void>;
 }
 
@@ -23,9 +23,8 @@ const PostModal: React.FC<PostModalProps> = ({
   onShare,
   onEdit,
 }) => {
-  const { posts, toggleLikePost } = usePostStore(); // ✅ Remova toggleAttendance não usado
+  const { posts, toggleLikePost } = usePostStore();
 
-  // ✅ Use apenas o necessário do hook
   const { status, toggleAttendance: toggleAttendanceHook } = useEventAttendance(
     postId,
     shareId
@@ -46,7 +45,6 @@ const PostModal: React.FC<PostModalProps> = ({
 
   const handleLike = async () => {
     try {
-      // ✅ Garanta que não está passando undefined para liked
       const currentLiked = modalPost.liked ?? false;
       toggleLikePost(postId, !currentLiked, shareId);
 
@@ -55,7 +53,6 @@ const PostModal: React.FC<PostModalProps> = ({
       }
     } catch (err) {
       console.error('Erro ao curtir/descurtir post:', err);
-      // ✅ Reverte com valor seguro
       const currentLiked = modalPost.liked ?? false;
       toggleLikePost(postId, currentLiked, shareId);
     }
@@ -69,36 +66,33 @@ const PostModal: React.FC<PostModalProps> = ({
     }
   };
 
-  const author =
-    modalPost.categoria_idcategoria === 2 && modalPost.metadata?.isAnonymous
-      ? {
-          id: 0,
-          name: 'Anônimo',
-          avatarUrl: undefined,
-        }
-      : {
-          id: modalPost.user?.id || modalPost.author?.id,
-          name:
-            modalPost.user?.name ||
-            modalPost.author?.name ||
-            'Usuário desconhecido',
-          avatarUrl: modalPost.user?.avatarUrl || modalPost.author?.avatarUrl,
-        };
+  // ✅ CORREÇÃO: Simplificar a lógica do author para deixar o PostCard cuidar dos avatares
+  const author = {
+    id: modalPost.user?.id || modalPost.author?.id || 0,
+    name:
+      modalPost.categoria_idcategoria === 2 && modalPost.metadata?.isAnonymous
+        ? 'Anônimo'
+        : modalPost.user?.name ||
+          modalPost.author?.name ||
+          'Usuário desconhecido',
+    avatarUrl: modalPost.user?.avatarUrl || modalPost.author?.avatarUrl,
+    profileType: modalPost.user?.profileType || modalPost.author?.profileType,
+  };
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-start pt-20 overflow-auto"
+      className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex justify-center items-start pt-20 overflow-auto"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl w-full max-w-[92vw] sm:max-w-[480px] md:max-w-[520px] mx-3 p-4 relative"
+        className="bg-white rounded-2xl w-full max-w-[92vw] sm:max-w-[500px] md:max-w-[550px] mx-3 p-4 relative"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 font-bold text-3xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors z-10 focus:outline-none"
         >
-          ×
+          <FiX size={18} className="text-gray-500" />
         </button>
 
         <PostCard

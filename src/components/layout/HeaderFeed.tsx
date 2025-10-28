@@ -1,91 +1,145 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { FiBell, FiMail, FiMenu, FiLogOut } from 'react-icons/fi';
-import { CgProfile } from 'react-icons/cg';
+// src/components/HeaderFeed.tsx - VERSÃO SIMPLIFICADA
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import {
+  FiBell,
+  FiMenu,
+  FiHome,
+  FiBriefcase,
+  FiCalendar,
+  FiGift,
+} from 'react-icons/fi';
 import MobileMenuFeed from '../ui/MobileMenuFeed';
-import { useLogout } from '../../hooks/useLogout';
-import { FiSettings } from 'react-icons/fi';
+import SearchBar from '../SearchBar';
+import SearchBarMobile from '../SearchBarMobile';
+import NotificationDropdown from '../NotificationDropdown';
+import { useNotifications } from '../../hooks/useNotifications';
+import { UserDropdownMenu } from '../ui/UserDropdownMenu';
 
 const HeaderFeed: React.FC = () => {
-  const logout = useLogout();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const location = useLocation();
+  const { unreadCount, fetchUnreadCount } = useNotifications();
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   return (
-    <header className="bg-primary text-background py-4 px-6 shadow-md flex items-center justify-between fixed top-0 left-0 w-full z-50">
-      {/* Logo / Home */}
-      <Link to="/" className="text-xl md:text-2xl font-heading cursor-pointer">
-        Redefinindo Jornadas
-      </Link>
-
-      {/* Acoes principais - oculto no mobile */}
-      <nav className="hidden md:flex items-center gap-6">
+    <header className="bg-primary text-background py-4 px-4 md:px-6 flex items-center justify-between fixed top-0 left-0 w-full z-50">
+      {/* Logo + Navegação Principal */}
+      <div className="flex items-center gap-2 md:gap-10 flex-shrink-0">
+        {/* Logo */}
         <Link
-          to="/posts/create/9"
-          className="hover:text-accent transition-colors cursor-pointer"
+          to="/"
+          className="text-lg md:text-xl font-heading font-bold cursor-pointer hover:text-accent transition-colors whitespace-nowrap"
         >
-          Criar Post
-        </Link>
-        <Link
-          to="/meus-posts"
-          className="hover:text-accent transition-colors cursor-pointer"
-        >
-          Doações
-        </Link>
-        <Link
-          to="/eventos"
-          className="hover:text-accent transition-colors cursor-pointer"
-        >
-          Eventos
-        </Link>
-        <Link
-          to="/eventos"
-          className="hover:text-accent transition-colors cursor-pointer"
-        >
-          Serviços
-        </Link>
-      </nav>
-
-      {/* Ícones e Perfil */}
-      <div className="flex items-center gap-4">
-        {/* Ícones visíveis em todas as telas */}
-        <Link to="/mensagens" aria-label="Mensagens">
-          <FiMail size={24} className="hover:text-accent transition" />
-        </Link>
-        <Link to="/notificacoes" aria-label="Notificações">
-          <FiBell size={24} className="hover:text-accent transition" />
+          Redefinindo Jornadas
         </Link>
 
-        {/* Só visível no desktop */}
-        <Link
-          to="/profile"
-          className="hidden md:flex items-center gap-1 hover:text-accent transition"
-        >
-          <CgProfile size={24} />
-        </Link>
-        <Link
-          to="/account-settings"
-          className="hidden md:flex items-center gap-1 hover:text-accent transition"
-        >
-          <FiSettings size={24} />
-        </Link>
-        <Link
-          to="/login"
-          onClick={logout}
-          aria-label="Sair"
-          className="hidden md:flex hover:text-red-300 transition"
-        >
-          <FiLogOut size={24} />
-        </Link>
+        {/* Navegação Desktop */}
+        <nav className="hidden md:flex items-center gap-0 bg-primary-dark/20 rounded-lg p-1">
+          <Link
+            to="/feed"
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded text-sm transition-all duration-200 ${
+              location.pathname === '/feed'
+                ? 'bg-accent text-white shadow-md hover:bg-accent/90'
+                : 'hover:bg-primary-dark/50 hover:text-accent'
+            }`}
+          >
+            <FiHome size={16} />
+            <span>Feed</span>
+          </Link>
+          <Link
+            to="/donations"
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded text-sm transition-all duration-200 ${
+              location.pathname === '/donations'
+                ? 'bg-accent text-white shadow-md hover:bg-accent/90'
+                : 'hover:bg-primary-dark/50 hover:text-accent'
+            }`}
+          >
+            <FiGift size={16} />
+            <span>Doações</span>
+          </Link>
+          <Link
+            to="/events"
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded text-sm transition-all duration-200 ${
+              location.pathname === '/events'
+                ? 'bg-accent text-white shadow-md hover:bg-accent/90'
+                : 'hover:bg-primary-dark/50 hover:text-accent'
+            }`}
+          >
+            <FiCalendar size={16} />
+            <span>Eventos</span>
+          </Link>
+          <Link
+            to="/services"
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded text-sm transition-all duration-200 ${
+              location.pathname === '/services'
+                ? 'bg-accent text-white shadow-md hover:bg-accent/90'
+                : 'hover:bg-primary-dark/50 hover:text-accent'
+            }`}
+          >
+            <FiBriefcase size={16} />
+            <span>Serviços</span>
+          </Link>
+        </nav>
       </div>
 
-      {/* Mobile - menu hamburguer */}
-      <button
-        className="md:hidden"
-        aria-label="Abrir menu"
-        onClick={() => setIsMenuOpen(true)}
-      >
-        <FiMenu size={26} />
-      </button>
+      {/* SearchBar - Centralizado com mais espaço */}
+      <div className="hidden md:flex flex-1 max-w-2xl mx-10">
+        <SearchBar />
+      </div>
+
+      {/* Área do Usuário COM UserDropdownMenu */}
+      <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
+        <div className="md:hidden">
+          <SearchBarMobile />
+        </div>
+
+        {/* Ícones de Ação */}
+        <div className="flex items-center gap-1 md:gap-2 bg-primary-dark/20 rounded-lg p-1">
+          {/* Notificações - MANTIDO ORIGINAL */}
+          <div className="relative">
+            <button
+              onClick={() => {
+                setIsNotificationsOpen(!isNotificationsOpen);
+                fetchUnreadCount();
+              }}
+              className="relative p-2 rounded-md hover:bg-primary-dark hover:text-accent transition-all duration-200 group focus:outline-none"
+              aria-label="Notificações"
+            >
+              <FiBell size={20} />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-accent text-white text-xs rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </button>
+
+            <NotificationDropdown
+              isOpen={isNotificationsOpen}
+              onClose={() => setIsNotificationsOpen(false)}
+            />
+          </div>
+
+          {/* UserDropdownMenu - NOVA VERSÃO */}
+          <div className="hidden md:block">
+            <UserDropdownMenu variant="header" />
+          </div>
+        </div>
+
+        {/* Separador Visual */}
+        <div className="hidden md:block h-5 w-px bg-primary-dark/50 mx-1"></div>
+
+        {/* Menu Mobile */}
+        <button
+          className="md:hidden p-1.5 rounded hover:bg-primary-dark/50 transition-all duration-200"
+          aria-label="Abrir menu"
+          onClick={() => setIsMenuOpen(true)}
+        >
+          <FiMenu size={22} />
+        </button>
+      </div>
+
+      {/* Menu Mobile */}
       <MobileMenuFeed
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}

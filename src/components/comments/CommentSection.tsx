@@ -43,7 +43,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId, shareId }) => {
 
   const handleEdit = async (commentId: number, content: string) => {
     try {
-      await editComment(commentId, content); // o hook já usa o shareId passado ao useComments
+      await editComment(commentId, content);
       toast.success('Comentário atualizado!');
     } catch {
       toast.error('Erro ao atualizar comentário');
@@ -83,13 +83,15 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId, shareId }) => {
         </button>
       </div>
 
-      {loading && comments.length === 0 ? (
+      {loading ? (
         <p>Carregando comentários...</p>
+      ) : comments.length === 0 ? (
+        <p className="text-gray-500 text-sm">Nenhum comentário ainda</p>
       ) : (
         comments.map((comment) =>
           comment ? (
             <CommentItem
-              key={`post-${postId}-comment-${comment.id}`} // chave única e estável
+              key={`post-${postId}-comment-${comment.id}`}
               comment={comment}
               onUpdate={handleEdit}
               onDelete={handleDelete}

@@ -4,9 +4,14 @@ import { resolveImageUrl } from '../../utils/resolveImageUrl';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
+import { CgProfile } from 'react-icons/cg';
 
 interface PostPreviewCardProps {
-  author: { name: string; avatarUrl?: string };
+  author: {
+    name: string;
+    avatarUrl?: string;
+    id?: number; // 👈 ADICIONE ESTA LINHA
+  };
   createdAt: string;
   metadata?: { title?: string };
   content?: string;
@@ -24,12 +29,16 @@ const PostPreviewCard: React.FC<PostPreviewCardProps> = ({
     <div className="bg-white rounded-2xl border shadow-sm p-4">
       {/* Cabeçalho (autor + data) */}
       <div className="flex items-center gap-3 mb-3">
-        {author.avatarUrl && (
+        {author.avatarUrl ? (
           <img
             src={resolveImageUrl(author.avatarUrl)}
             alt={author.name}
             className="w-10 h-10 rounded-full object-cover"
           />
+        ) : (
+          <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+            <CgProfile size={16} className="text-gray-500" />
+          </div>
         )}
         <div>
           <Typography variant="p" className="text-sm font-semibold">

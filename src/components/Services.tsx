@@ -4,39 +4,82 @@ import 'swiper/css/pagination';
 import { Pagination, Navigation } from 'swiper/modules';
 import Typography from './ui/Typography';
 import CardButton from './ui/CardButton';
-
-const services = [
-  {
-    id: 1,
-    title: 'Distribuição de Alimentação',
-    description:
-      'Apoio com alimentos para pessoas em situação de rua, promovendo o bem-estar e dignidade.',
-    image: '/img/servico.jpg',
-  },
-  {
-    id: 2,
-    title: 'Atendimento Psicológico',
-    description:
-      'Apoio psicológico para pessoas em situação de risco, oferecendo suporte emocional e orientação.',
-    image: '/img/servico.jpg',
-  },
-  {
-    id: 3,
-    title: 'Apoio Jurídico',
-    description:
-      'Assistência jurídica gratuita para resolução de questões legais, garantindo direitos essenciais.',
-    image: '/img/servico.jpg',
-  },
-  {
-    id: 4,
-    title: 'Oficinas de Empoderamento',
-    description:
-      'Oficinas educativas e de capacitação para promover a autonomia e reintegração social.',
-    image: '/img/servico.jpg',
-  },
-];
+import { useHomeServices } from '../hooks/useHomeData';
+import { resolveImageUrl } from '../utils/resolveImageUrl';
+import { useState } from 'react';
 
 export default function Services() {
+  const { services, loading, error } = useHomeServices(6);
+  const [imageErrors, setImageErrors] = useState<{ [key: string]: boolean }>(
+    {}
+  );
+  const handleImageError = (id: string) => {
+    setImageErrors((prev) => ({ ...prev, [id]: true }));
+  };
+
+  if (loading) {
+    return (
+      <section
+        id="services"
+        className="w-full py-12 px-4 md:px-8 bg-gray-50 mb-6"
+      >
+        <div className="max-w-3xl mx-auto text-center">
+          <Typography
+            variant="h1"
+            className="text-3xl md:text-5xl font-bold text-primary"
+          >
+            Serviços Disponíveis
+          </Typography>
+          <Typography variant="p" className="text-gray-600 mt-2">
+            Carregando serviços...
+          </Typography>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section
+        id="services"
+        className="w-full py-12 px-4 md:px-8 bg-gray-50 mb-6"
+      >
+        <div className="max-w-3xl mx-auto text-center">
+          <Typography
+            variant="h1"
+            className="text-3xl md:text-5xl font-bold text-primary"
+          >
+            Serviços Disponíveis
+          </Typography>
+          <Typography variant="p" className="text-red-600 mt-2">
+            {error}
+          </Typography>
+        </div>
+      </section>
+    );
+  }
+
+  if (services.length === 0) {
+    return (
+      <section
+        id="services"
+        className="w-full py-12 px-4 md:px-8 bg-gray-50 mb-6"
+      >
+        <div className="max-w-3xl mx-auto text-center">
+          <Typography
+            variant="h1"
+            className="text-3xl md:text-5xl font-bold text-primary"
+          >
+            Serviços Disponíveis
+          </Typography>
+          <Typography variant="p" className="text-gray-600 mt-2">
+            Nenhum serviço disponível no momento.
+          </Typography>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section
       id="services"
@@ -58,37 +101,74 @@ export default function Services() {
       <div className="mt-8 max-w-4xl mx-auto relative">
         <Swiper
           modules={[Pagination, Navigation]}
-          spaceBetween={16}
+          spaceBetween={12}
           slidesPerView={1}
+          centeredSlides={true}
+          centeredSlidesBounds={true}
           pagination={{ clickable: true }}
           navigation={{
             nextEl: '.swiper-button-next',
             prevEl: '.swiper-button-prev',
           }}
           breakpoints={{
-            640: { slidesPerView: 2 },
-            1024: { slidesPerView: 3 },
+            640: {
+              slidesPerView: 2,
+              centeredSlides: true,
+              centeredSlidesBounds: true,
+            },
+            1024: {
+              slidesPerView: 3,
+              centeredSlides: false,
+              centeredSlidesBounds: false,
+            },
           }}
         >
           {services.map((service) => (
             <SwiperSlide key={service.id}>
-              <div className="bg-white border rounded-lg shadow-md overflow-hidden">
-                <img
-                  src={service.image}
-                  alt={service.title}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-4">
-                  <Typography variant="h3" className="text-lg text-gray-900">
-                    {service.title}
-                  </Typography>
-                  <Typography
-                    variant="p"
-                    className="text-sm text-gray-600 mt-2"
-                  >
-                    {service.description}
-                  </Typography>
-                  <CardButton>Saiba Mais</CardButton>
+              <div className="bg-white border rounded-lg shadow-md overflow-hidden flex flex-col h-full">
+                {/* Container da imagem com altura fixa mas proporção preservada */}
+                <div
+                  className={`w-full aspect-[4/3] flex items-center justify-center rounded-t-lg overflow-hidden ${
+                    !service.image || imageErrors[String(service.id)]
+                      ? 'bg-[#f0f9ff]'
+                      : 'bg-gradient-to-b from-gray-50 to-gray-100'
+                  }`}
+                >
+                  <img
+                    src={
+                      service.image && !imageErrors[String(service.id)]
+                        ? resolveImageUrl(service.image)
+                        : '/img/servico-solidario2.png'
+                    }
+                    alt={service.title}
+                    className="object-contain w-full h-full transition-transform duration-300"
+                    onError={() => handleImageError(String(service.id))}
+                  />
+                </div>
+
+                {/* Resto do conteúdo permanece igual */}
+                <div className="p-3 flex flex-col flex-1">
+                  <div className="h-10 mb-1">
+                    <Typography
+                      variant="h3"
+                      className="text-base text-gray-900 line-clamp-2"
+                    >
+                      {service.title}
+                    </Typography>
+                  </div>
+
+                  <div className="h-20 mb-2 flex-1">
+                    <Typography
+                      variant="p"
+                      className="text-sm text-gray-600 line-clamp-3"
+                    >
+                      {service.description}
+                    </Typography>
+                  </div>
+
+                  <div className="mt-2">
+                    <CardButton>Saiba Mais</CardButton>
+                  </div>
                 </div>
               </div>
             </SwiperSlide>

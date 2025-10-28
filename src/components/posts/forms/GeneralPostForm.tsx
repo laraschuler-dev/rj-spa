@@ -6,6 +6,7 @@ import ImageUpload from '../../ui/ImageUpload';
 import { UploadImage } from '../../../types/upload';
 import { useDeletePostImage } from '../../../hooks/useDeletePostImage';
 import CancelButton from '../../ui/CancelButton';
+import { toast } from 'react-toastify';
 
 interface GeneralPostFormProps {
   onSubmit: (data: FormData) => Promise<void>;
@@ -28,6 +29,9 @@ const GeneralPostForm: React.FC<GeneralPostFormProps> = ({
   const postId = initialData?.id;
   const { deleteImage } = useDeletePostImage(postId ?? 0);
 
+  // Estado para controlar o loading
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [formData, setFormData] = useState({
     title: initialData?.title ?? '',
     content: initialData?.content ?? '',
@@ -44,40 +48,62 @@ const GeneralPostForm: React.FC<GeneralPostFormProps> = ({
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    const postData = new FormData();
-    postData.append('categoria_idcategoria', '9'); // GENERAL
-    postData.append('content', formData.content || formData.title);
+    // Impede múltiplos envios
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
-    const metadata = {
-      title: formData.title,
-    };
-    postData.append('metadata', JSON.stringify(metadata));
+    try {
+      const postData = new FormData();
+      postData.append('categoria_idcategoria', '9'); // GENERAL
+      postData.append('content', formData.content || formData.title);
 
-    // arquivos novos
-    formData.images
-      .filter((img): img is File => img instanceof File)
-      .forEach((file) => postData.append('images', file));
+      const metadata = {
+        title: formData.title,
+      };
+      postData.append('metadata', JSON.stringify(metadata));
 
-    // IDs das imagens existentes
-    const existingIds = formData.images
-      .filter(
-        (img): img is { id: number; url: string } => !(img instanceof File)
-      )
-      .map((img) => img.id);
-    postData.append('existingImageIds', JSON.stringify(existingIds));
+      // arquivos novos
+      formData.images
+        .filter((img): img is File => img instanceof File)
+        .forEach((file) => postData.append('images', file));
 
-    await onSubmit(postData);
+      // IDs das imagens existentes
+      const existingIds = formData.images
+        .filter(
+          (img): img is { id: number; url: string } => !(img instanceof File)
+        )
+        .map((img) => img.id);
+      postData.append('existingImageIds', JSON.stringify(existingIds));
+
+      await onSubmit(postData);
+    } catch (err: any) {
+      // Tratamento de erro padronizado
+      if (err.response?.data?.error) {
+        toast.error(err.response.data.error);
+      } else if (err.request) {
+        toast.error('Erro de conexão com o servidor.');
+      } else {
+        toast.error(
+          `Erro inesperado ao ${mode === 'create' ? 'publicar' : 'editar'} informação geral.`
+        );
+      }
+    } finally {
+      // Reativa o botão após o envio (sucesso ou erro)
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <main
-      className={`flex justify-center bg-background ${
-        mode === 'edit' ? 'min-h-0 py-2' : 'min-h-screen py-12 items-center'
+      className={`flex justify-center ${
+        mode === 'edit'
+          ? 'min-h-0 py-2 bg-transparent'
+          : 'min-h-screen py-12 items-center bg-background'
       }`}
     >
       <div
-        className={`w-full bg-white p-8 rounded-2xl shadow-lg 
-    ${mode === 'create' ? 'max-w-xs sm:max-w-md' : 'max-w-md'}`}
+        className={`w-full bg-white p-6 sm:p-8 rounded-2xl shadow-lg 
+  ${mode === 'create' ? 'max-w-sm sm:max-w-md' : 'max-w-md'} mx-4 sm:mx-0`}
       >
         <Typography variant="h2" className="text-primary text-center mb-6">
           {mode === 'create'
@@ -127,7 +153,7 @@ const GeneralPostForm: React.FC<GeneralPostFormProps> = ({
             }}
           />
 
-          <SubmitButton>
+          <SubmitButton loading={isSubmitting}>
             {mode === 'create' ? 'Publicar' : 'Salvar Alterações'}
           </SubmitButton>
           <CancelButton mode={mode} onCloseModal={onClose} />

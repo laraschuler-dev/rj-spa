@@ -7,6 +7,7 @@ import { FaFacebook } from 'react-icons/fa';
 import api from '../services/api';
 import { toast } from 'react-toastify';
 import useAuthStore from '../stores/authStore';
+import PasswordInput from '../components/ui/PasswordInput';
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({ emailOrPhone: '', password: '' });
@@ -18,6 +19,8 @@ const Login: React.FC = () => {
   const validateToken = useAuthStore((state) => state.validateToken);
   const user = useAuthStore((state) => state.user);
   const token = useAuthStore((state) => state.token);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // ✅ Redireciona só quando o usuário estiver disponível
   useEffect(() => {
@@ -32,12 +35,15 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+
     try {
       const response = await api.post('/auth/session', formData);
-
       setToken(response.data.token);
       localStorage.setItem('token', response.data.token);
-
       await validateToken();
       toast.success('Login realizado com sucesso!');
     } catch (err: any) {
@@ -48,6 +54,8 @@ const Login: React.FC = () => {
       } else {
         toast.error('Erro inesperado ao fazer login.');
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -64,7 +72,7 @@ const Login: React.FC = () => {
           <div>
             <label
               htmlFor="emailOrPhone"
-              className="block mb-1 text-sm font-medium"
+              className="block mb-1 text-sm font-medium text-gray-700"
             >
               E-mail ou Telefone
             </label>
@@ -80,18 +88,12 @@ const Login: React.FC = () => {
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="block mb-1 text-sm font-medium"
-            >
-              Senha
-            </label>
-            <input
+            <PasswordInput
               type="password"
               id="password"
+              label="Senha"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="••••••••"
               required
             />
@@ -108,7 +110,7 @@ const Login: React.FC = () => {
           </div>
 
           {/* Botão de Entrar */}
-          <SubmitButton>Entrar</SubmitButton>
+          <SubmitButton loading={isSubmitting}>Entrar</SubmitButton>
         </form>
 
         {/* Divisor */}

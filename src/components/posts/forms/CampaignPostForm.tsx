@@ -6,6 +6,7 @@ import ImageUpload from '../../../components/ui/ImageUpload';
 import { UploadImage } from '../../../types/upload';
 import { useDeletePostImage } from '../../../hooks/useDeletePostImage';
 import CancelButton from '../../ui/CancelButton';
+import { toast } from 'react-toastify';
 
 interface CampaignPostFormProps {
   onSubmit: (data: FormData) => Promise<void>;
@@ -32,6 +33,8 @@ const CampaignPostForm: React.FC<CampaignPostFormProps> = ({
 
   const { deleteImage } = useDeletePostImage(postId ?? 0);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [formData, setFormData] = useState({
     title: initialData?.title ?? '',
     goal: initialData?.goal ?? '',
@@ -51,44 +54,65 @@ const CampaignPostForm: React.FC<CampaignPostFormProps> = ({
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    const postData = new FormData();
-    postData.append('categoria_idcategoria', '3'); // Campaign
-    postData.append('content', formData.content);
+    // Impede múltiplos envios
+    if (isSubmitting) return;
 
-    const metadata = {
-      title: formData.title,
-      goal: formData.goal,
-      deadline: formData.deadline,
-      organizer: formData.organizer,
-    };
-    postData.append('metadata', JSON.stringify(metadata));
+    setIsSubmitting(true);
 
-    // arquivos novos
-    formData.images
-      .filter((img): img is File => img instanceof File)
-      .forEach((file) => postData.append('images', file));
+    try {
+      const postData = new FormData();
+      postData.append('categoria_idcategoria', '3');
+      postData.append('content', formData.content);
 
-    // IDs das imagens existentes
-    const existingIds = formData.images
-      .filter(
-        (img): img is { id: number; url: string } => !(img instanceof File)
-      )
-      .map((img) => img.id);
-    postData.append('existingImageIds', JSON.stringify(existingIds));
+      const metadata = {
+        title: formData.title,
+        goal: formData.goal,
+        deadline: formData.deadline,
+        organizer: formData.organizer,
+      };
+      postData.append('metadata', JSON.stringify(metadata));
 
-    console.log('Submitting post data:', postData);
-    await onSubmit(postData);
+      formData.images
+        .filter((img): img is File => img instanceof File)
+        .forEach((file) => postData.append('images', file));
+
+      const existingIds = formData.images
+        .filter(
+          (img): img is { id: number; url: string } => !(img instanceof File)
+        )
+        .map((img) => img.id);
+      postData.append('existingImageIds', JSON.stringify(existingIds));
+
+      console.log('Submitting post data:', postData);
+      await onSubmit(postData);
+    } catch (err: any) {
+      // Tratamento de erro padronizado
+      if (err.response?.data?.error) {
+        toast.error(err.response.data.error);
+      } else if (err.request) {
+        toast.error('Erro de conexão com o servidor.');
+      } else {
+        toast.error(
+          `Erro inesperado ao ${mode === 'create' ? 'criar' : 'editar'} campanha.`
+        );
+      }
+    } finally {
+      // Reativa o botão após o envio (sucesso ou erro)
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <main
-      className={`flex justify-center bg-background ${
-        mode === 'edit' ? 'min-h-0 py-2' : 'min-h-screen py-12 items-center'
+      className={`flex justify-center ${
+        mode === 'edit'
+          ? 'min-h-0 py-2 bg-transparent'
+          : 'min-h-screen py-12 items-center bg-background'
       }`}
     >
       <div
-        className={`w-full bg-white p-8 rounded-2xl shadow-lg 
-    ${mode === 'create' ? 'max-w-xs sm:max-w-md' : 'max-w-md'}`}
+        className={`w-full bg-white p-6 sm:p-8 rounded-2xl shadow-lg 
+  ${mode === 'create' ? 'max-w-sm sm:max-w-md' : 'max-w-md'} mx-4 sm:mx-0`}
       >
         <Typography variant="h2" className="text-primary text-center mb-6">
           {mode === 'create' ? 'Nova Campanha' : 'Editar Campanha'}
@@ -174,7 +198,7 @@ const CampaignPostForm: React.FC<CampaignPostFormProps> = ({
             }}
           />
 
-          <SubmitButton>
+          <SubmitButton loading={isSubmitting}>
             {mode === 'create' ? 'Publicar' : 'Salvar alterações'}
           </SubmitButton>
 

@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 
 const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado de loading
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -15,12 +16,17 @@ const ForgotPassword: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Impede múltiplos envios
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
     try {
       // Envia o e-mail para o backend
       await api.post('/auth/forgot', { email });
       toast.success(
         'Se o e-mail estiver cadastrado, você receberá um link para redefinir sua senha.'
       );
+      setEmail(''); // Limpa o campo após envio bem-sucedido
     } catch (err: any) {
       if (err.response && err.response.data) {
         const backendMessage =
@@ -34,6 +40,9 @@ const ForgotPassword: React.FC = () => {
       } else {
         toast.error('Ocorreu um erro inesperado. Tente novamente.');
       }
+    } finally {
+      // Reativa o botão após o envio (sucesso ou erro)
+      setIsSubmitting(false);
     }
   };
 
@@ -69,7 +78,7 @@ const ForgotPassword: React.FC = () => {
           </div>
 
           {/* Botão de Enviar */}
-          <SubmitButton>Enviar</SubmitButton>
+          <SubmitButton loading={isSubmitting}>Enviar</SubmitButton>
         </form>
 
         {/* Link para voltar ao login */}

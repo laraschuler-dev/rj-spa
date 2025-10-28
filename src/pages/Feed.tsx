@@ -90,57 +90,69 @@ const Feed: React.FC = () => {
 
   return (
     <Layout variant="feed">
+      <div className="mb-12"></div>
       <div className="space-y-6">
-        {posts.map((post) => (
-          <PostCard
-            key={post.uniqueKey || `post-${post.id}`}
-            id={post.id}
-            title={post.metadata?.title || ''}
-            content={post.content}
-            images={post.images || []}
-            createdAt={post.createdAt}
-            categoryId={post.categoria_idcategoria}
-            metadata={post.metadata}
-            author={
-              post.categoria_idcategoria === 2 && post.metadata?.isAnonymous
-                ? {
-                    id: 0,
-                    name: 'Anônimo',
-                    avatarUrl: undefined,
-                  }
-                : {
-                    id: post.user?.id,
-                    name: post.user?.name || 'Usuário desconhecido',
-                    avatarUrl: post.user?.avatarUrl,
-                  }
-            }
-            isLiked={post.liked}
-            sharedBy={post.sharedBy}
-            onLike={async () => {
-              const postIdToSend = post.sharedBy?.postId || post.id;
-              const shareIdToSend = post.sharedBy?.shareId;
-              try {
-                const { liked } = await likePost(postIdToSend, shareIdToSend);
-                toggleLikePost(postIdToSend, liked, shareIdToSend);
-              } catch (err) {
-                console.error('Erro ao curtir/descurtir post:', err);
+        {(!posts || posts.length === 0) && !loading ? (
+          <div className="text-center py-12 text-gray-500">
+            Nenhum post disponível no momento. Volte mais tarde ou seja o
+            primeiro a compartilhar!
+          </div>
+        ) : (
+          (posts || []).map((post) => (
+            <PostCard
+              key={post.uniqueKey || `post-${post.id}`}
+              id={post.id}
+              title={post.metadata?.title || ''}
+              content={post.content}
+              images={post.images || []}
+              createdAt={post.createdAt}
+              categoryId={post.categoria_idcategoria}
+              metadata={post.metadata}
+              author={
+                post.categoria_idcategoria === 2 && post.metadata?.isAnonymous
+                  ? { id: 0, name: 'Anônimo', avatarUrl: undefined }
+                  : {
+                      id: post.user?.id,
+                      name: post.user?.name || 'Usuário desconhecido',
+                      avatarUrl: post.user?.avatarUrl,
+                    }
               }
-            }}
-            onShare={() => openShareModal(post)}
-            onDelete={handleDelete}
-            onOpenDetails={() =>
-              setSelectedPost({
-                id: post.id,
-                shareId: post.sharedBy?.shareId,
-              })
-            }
-            onEdit={(postId, shareId) =>
-              setEditingPost({ id: postId, shareId })
-            }
-            isPostOwner={post.isPostOwner}
-            isShareOwner={post.isShareOwner}
-          />
-        ))}
+              isLiked={post.liked}
+              sharedBy={post.sharedBy}
+              onLike={async () => {
+                const postIdToSend = post.sharedBy?.postId || post.id;
+                const shareIdToSend = post.sharedBy?.shareId;
+
+                const currentLiked = post.liked ?? false;
+                toggleLikePost(postIdToSend, !currentLiked, shareIdToSend);
+
+                try {
+                  const { liked } = await likePost(postIdToSend, shareIdToSend);
+                  if (liked !== !currentLiked) {
+                    toggleLikePost(postIdToSend, liked, shareIdToSend);
+                  }
+                } catch (err) {
+                  toggleLikePost(postIdToSend, currentLiked, shareIdToSend);
+                  console.error('Erro ao curtir/descurtir post:', err);
+                  toast.error('Erro ao curtir o post');
+                }
+              }}
+              onShare={() => openShareModal(post)}
+              onDelete={handleDelete}
+              onOpenDetails={() =>
+                setSelectedPost({
+                  id: post.id,
+                  shareId: post.sharedBy?.shareId,
+                })
+              }
+              onEdit={(postId, shareId) =>
+                setEditingPost({ id: postId, shareId })
+              }
+              isPostOwner={post.isPostOwner}
+              isShareOwner={post.isShareOwner}
+            />
+          ))
+        )}
 
         {hasMore && (
           <div className="text-center mt-4">
@@ -165,10 +177,28 @@ const Feed: React.FC = () => {
             if (!selectedPost) return;
             const postIdToSend = selectedPost.id;
             const shareIdToSend = selectedPost.shareId;
+
+            const post = posts.find((p) =>
+              selectedPost.shareId
+                ? p.sharedBy?.shareId === selectedPost.shareId
+                : p.id === selectedPost.id && !p.sharedBy
+            );
+
+            if (!post) return;
+
+            // ✅ CORREÇÃO: Garantir que currentLiked seja boolean
+            const currentLiked = post.liked ?? false; // ← Use false como padrão se for undefined
+            toggleLikePost(postIdToSend, !currentLiked, shareIdToSend);
+
             try {
               const { liked } = await likePost(postIdToSend, shareIdToSend);
-              toggleLikePost(postIdToSend, liked, shareIdToSend);
+
+              if (liked !== !currentLiked) {
+                toggleLikePost(postIdToSend, liked, shareIdToSend);
+              }
             } catch (err) {
+              // ✅ CORREÇÃO: Usar o mesmo currentLiked garantido como boolean
+              toggleLikePost(postIdToSend, currentLiked, shareIdToSend);
               console.error('Erro ao curtir/descurtir post:', err);
             }
           }}

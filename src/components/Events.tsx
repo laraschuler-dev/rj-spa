@@ -4,32 +4,33 @@ import 'swiper/css/pagination';
 import { Pagination, Navigation } from 'swiper/modules';
 import Typography from './ui/Typography';
 import CardButton from './ui/CardButton';
-
-const events = [
-  {
-    id: 1,
-    title: 'Mutirão Solidário',
-    date: '25 Fev, 14h',
-    location: 'Centro Comunitário',
-    image: '/img/psr_7.jpg',
-  },
-  {
-    id: 2,
-    title: 'Doação de Roupas',
-    date: '10 Mar, 10h',
-    location: 'Praça Central',
-    image: '/img/psr_7.jpg',
-  },
-  {
-    id: 3,
-    title: 'Ação Alimentação',
-    date: '15 Mar, 12h',
-    location: 'Igreja Solidária',
-    image: '/img/psr_7.jpg',
-  },
-];
+import { useHomeEvents } from '../hooks/useHomeData';
+import { resolveImageUrl } from '../utils/resolveImageUrl';
+import formatDateBR from '../utils/formatDateBR';
+import { useState } from 'react';
 
 export default function Eventos() {
+  const { events, loading, error } = useHomeEvents(6);
+  const [imageErrors, setImageErrors] = useState<{ [key: string]: boolean }>(
+    {}
+  );
+
+  const handleImageError = (id: string) => {
+    setImageErrors((prev) => ({ ...prev, [id]: true }));
+  };
+
+  if (loading) {
+    return <section>...Carregando...</section>;
+  }
+
+  if (error) {
+    return <section>...Erro...</section>;
+  }
+
+  if (events.length === 0) {
+    return <section>...Nenhum evento...</section>;
+  }
+
   return (
     <section id="events" className="w-full py-12 px-4 md:px-8 bg-white mb-6">
       <div className="max-w-3xl mx-auto text-center">
@@ -47,43 +48,89 @@ export default function Eventos() {
 
       <div className="mt-8 max-w-4xl mx-auto relative">
         <Swiper
-          modules={[Pagination, Navigation]} // Aqui foi adicionado Navigation para os botões de navegação
-          spaceBetween={16}
+          modules={[Pagination, Navigation]}
+          spaceBetween={12}
           slidesPerView={1}
+          centeredSlides={true}
+          centeredSlidesBounds={true}
           pagination={{ clickable: true }}
           navigation={{
             nextEl: '.swiper-button-next',
             prevEl: '.swiper-button-prev',
           }}
           breakpoints={{
-            640: { slidesPerView: 2 },
-            1024: { slidesPerView: 3 },
+            640: {
+              slidesPerView: 2,
+              centeredSlides: true,
+              centeredSlidesBounds: true,
+            },
+            1024: {
+              slidesPerView: 3,
+              centeredSlides: false,
+              centeredSlidesBounds: false,
+            },
           }}
         >
           {events.map((event) => (
             <SwiperSlide key={event.id}>
-              <div className="bg-white border rounded-lg shadow-md overflow-hidden">
-                <img
-                  src={event.image}
-                  alt={event.title}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-4">
-                  <Typography variant="h3" className="text-lg text-gray-900">
-                    {event.title}
-                  </Typography>
-                  <Typography variant="p" className="text-sm text-gray-600">
-                    <strong>Data:</strong> {event.date} <br />
-                    <strong>Local:</strong> {event.location}
-                  </Typography>
-                  <CardButton>Saiba Mais</CardButton>
+              <div className="bg-white border rounded-lg shadow-md overflow-hidden flex flex-col h-full">
+                <div
+                  className={`w-full aspect-[4/3] flex items-center justify-center rounded-t-lg overflow-hidden ${
+                    !event.image || imageErrors[String(event.id)]
+                      ? 'bg-[#f0f9ff]'
+                      : 'bg-gradient-to-b from-gray-50 to-gray-100'
+                  }`}
+                >
+                  <img
+                    src={
+                      event.image && !imageErrors[String(event.id)]
+                        ? resolveImageUrl(event.image)
+                        : '/img/evento-solidario.png'
+                    }
+                    alt={event.title}
+                    className="object-contain w-full h-full transition-transform duration-300"
+                    onError={() => handleImageError(String(event.id))}
+                  />
+                </div>
+
+                {/* Conteúdo */}
+                <div className="p-3 flex flex-col flex-1">
+                  <div className="h-10 mb-1">
+                    <Typography
+                      variant="h3"
+                      className="text-base text-gray-900 line-clamp-2"
+                    >
+                      {event.title}
+                    </Typography>
+                  </div>
+
+                  <div className="h-14 mb-2">
+                    <Typography
+                      variant="p"
+                      className="text-sm text-gray-600 space-y-1"
+                    >
+                      <span>
+                        <strong>Data:</strong> {formatDateBR(event.date)}
+                      </span>
+                      <span className="flex">
+                        <strong className="flex-shrink-0">Local:</strong>
+                        <span className="line-clamp-2 ml-1">
+                          {event.location}
+                        </span>
+                      </span>
+                    </Typography>
+                  </div>
+
+                  <div className="mt-2">
+                    <CardButton>Saiba Mais</CardButton>
+                  </div>
                 </div>
               </div>
             </SwiperSlide>
           ))}
         </Swiper>
 
-        {/* Botões de navegação - posicionados fora do card */}
+        {/* Botões de navegação */}
         <div className="swiper-button-prev text-3xl absolute left-0 top-1/2 transform -translate-y-1/2 text-gray-700 hover:text-blue-600"></div>
         <div className="swiper-button-next text-3xl absolute right-0 top-1/2 transform -translate-y-1/2 text-gray-700 hover:text-blue-600"></div>
       </div>

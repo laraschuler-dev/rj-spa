@@ -1,3 +1,4 @@
+// Sidebar.tsx - VERSÃO COM ESPAÇAMENTO AJUSTADO
 import { Link } from 'react-router-dom';
 import {
   FiHeart,
@@ -13,76 +14,82 @@ import {
 } from 'react-icons/md';
 import { PiStudent } from 'react-icons/pi';
 
-/**
- * Componente Sidebar
- *
- * Este componente representa a barra lateral de navegação do aplicativo,
- * destacando ações importantes que podem ser realizadas.
- *
- * @returns {JSX.Element} A barra lateral de navegação.
- */
 function Sidebar() {
   return (
-    <aside className="hidden md:flex flex-col w-64 bg-sidebar text-white h-screen p-6 shadow-lg sticky top-16">
-      <h2 className="text-2xl mb-6">Ações</h2>
-      {/* Links de Navegação */}
-      <nav className="flex flex-col gap-4">
-        <Link
-          to="/posts/create/5"
-          className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
-        >
-          <FiHeart size={20} /> Quero Voluntariar
-        </Link>
-        <Link
-          to="/posts/create/1"
-          className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
-        >
-          <FiGift size={20} /> Quero Doar
-        </Link>
-        <Link
-          to="/posts/create/4"
-          className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
-        >
-          <FiUsers size={20} /> Solicitar Ajuda
-        </Link>
-        <Link
-          to="/posts/create/7"
-          className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
-        >
-          <FiBriefcase size={20} /> Anunciar Vaga
-        </Link>
-        <Link
-          to="/posts/create/2"
-          className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
-        >
-          <FiAlertCircle size={20} /> Denunciar Violência
-        </Link>
-        <Link
-          to="/posts/create/3"
-          className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
-        >
-          <MdOutlineCampaign size={20} /> Criar Campanha
-        </Link>
-        <Link
-          to="/posts/create/6"
-          className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
-        >
-          <PiStudent size={20} /> Oferecer Curso
-        </Link>
-        <Link
-          to="/posts/create/8"
-          className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
-        >
-          <MdEventAvailable size={20} /> Criar Evento
-        </Link>
-        <Link
-          to="/posts/create/9"
-          className="flex items-center gap-2 text-lg hover:text-accent transition-colors"
-        >
-          <MdOutlinePostAdd size={20} /> Postar
-        </Link>
-      </nav>
-    </aside>
+    <div className="hidden md:flex">
+      {/* Container fixo que sempre ocupa a altura da tela */}
+      <div
+        className="sticky top-16"
+        style={{
+          height: 'calc(100vh - 64px)',
+          width: '256px', // 64 * 4
+        }}
+      >
+        <aside className="w-64 bg-sidebar text-white h-full p-6 shadow-lg flex flex-col">
+          <h2 className="text-2xl mt-6 mb-6">Ações</h2>{' '}
+          {/* ← Reduzi o mb-6 para mb-4 */}
+          <nav className="flex flex-col gap-2 flex-1">
+            {' '}
+            {/* ← Reduzi o gap-4 para gap-2 */}
+            <Link
+              to="/posts/create/5"
+              className="flex items-center gap-2 text-lg hover:text-accent transition-colors py-1.5"
+            >
+              <FiHeart size={18} /> Quero Voluntariar{' '}
+              {/* ← Reduzi size 20 para 18 */}
+            </Link>
+            <Link
+              to="/posts/create/1"
+              className="flex items-center gap-2 text-lg hover:text-accent transition-colors py-1.5"
+            >
+              <FiGift size={18} /> Quero Doar
+            </Link>
+            <Link
+              to="/posts/create/4"
+              className="flex items-center gap-2 text-lg hover:text-accent transition-colors py-1.5"
+            >
+              <FiUsers size={18} /> Solicitar Ajuda
+            </Link>
+            <Link
+              to="/posts/create/7"
+              className="flex items-center gap-2 text-lg hover:text-accent transition-colors py-1.5"
+            >
+              <FiBriefcase size={18} /> Anunciar Vaga
+            </Link>
+            <Link
+              to="/posts/create/2"
+              className="flex items-center gap-2 text-lg hover:text-accent transition-colors py-1.5"
+            >
+              <FiAlertCircle size={18} /> Denunciar Violência
+            </Link>
+            <Link
+              to="/posts/create/3"
+              className="flex items-center gap-2 text-lg hover:text-accent transition-colors py-1.5"
+            >
+              <MdOutlineCampaign size={18} /> Criar Campanha
+            </Link>
+            <Link
+              to="/posts/create/6"
+              className="flex items-center gap-2 text-lg hover:text-accent transition-colors py-1.5"
+            >
+              <PiStudent size={18} /> Oferecer Curso
+            </Link>
+            <Link
+              to="/posts/create/8"
+              className="flex items-center gap-2 text-lg hover:text-accent transition-colors py-1.5"
+            >
+              <MdEventAvailable size={18} /> Criar Evento
+            </Link>
+            <Link
+              to="/posts/create/9"
+              className="flex items-center gap-2 text-lg hover:text-accent transition-colors py-1.5"
+            >
+              <MdOutlinePostAdd size={18} /> Postar
+            </Link>
+          </nav>
+        </aside>
+      </div>
+    </div>
   );
 }
 

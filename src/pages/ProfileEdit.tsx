@@ -2,14 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CustomSelect from '../components/ui/CustomSelect';
 import Typography from '../components/ui/Typography';
-import { CgProfile } from 'react-icons/cg';
 import SubmitButton from '../components/ui/SubmitButton';
 import { toast } from 'react-toastify';
 import CancelButton from '../components/ui/CancelButton';
 import { useProfileStore } from '../stores/profileStore';
 import { useEditProfile, ProfileFormData } from '../hooks/useEditProfile';
-import axios from '../services/api';
 import BackButton from '../components/ui/BackButton';
+import { resolveImageUrl } from '../utils/resolveImageUrl';
+import { useAuth } from '../hooks/useAuth';
+import AvatarInitials from '../components/ui/AvatarInitials';
+import CitySelect from '../components/ui/CitySelect';
+import StateSelect from '../components/ui/StateSelect';
 
 const profileOptions = [
   { value: '', label: 'Perfil' },
@@ -33,6 +36,7 @@ const ProfileEdit: React.FC = () => {
   });
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const { user: currentUser } = useAuth();
 
   // Atualiza form quando profile muda na store
   useEffect(() => {
@@ -45,7 +49,7 @@ const ProfileEdit: React.FC = () => {
       });
 
       if (profile.profile_photo) {
-        setPhotoPreview(`${axios.defaults.baseURL}${profile.profile_photo}`);
+        setPhotoPreview(resolveImageUrl(profile.profile_photo));
       }
     }
   }, [profile]);
@@ -84,76 +88,75 @@ const ProfileEdit: React.FC = () => {
   };
 
   return (
-    <main className="max-w-xl mx-auto mt-12 bg-white p-8 rounded-xl shadow-lg">
+    <main className="min-h-screen bg-background px-4 py-12">
       <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
-      <Typography variant="h1" className="text-center text-primary mb-6">
-        Editar Perfil
-      </Typography>
+      <div className="w-full max-w-[600px] bg-white p-8 rounded-2xl shadow-lg text-center mx-auto">
+        <Typography variant="h1" className="text-center text-primary mb-6">
+          Editar Perfil
+        </Typography>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="flex flex-col items-center gap-2">
-          {photoPreview ? (
-            <img
-              src={photoPreview}
-              alt="Preview"
-              className="w-28 h-28 rounded-full object-cover border shadow"
-            />
-          ) : (
-            <div className="w-28 h-28 rounded-full bg-gray-200 flex items-center justify-center">
-              <CgProfile size={36} className="text-gray-500" />
-            </div>
-          )}
-          <label className="mt-2 cursor-pointer text-sm text-primary hover:underline">
-            Alterar Foto
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-          </label>
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="flex flex-col items-center gap-2">
+            {photoPreview ? (
+              <img
+                src={photoPreview}
+                alt="Preview"
+                className="w-28 h-28 rounded-full object-cover border shadow"
+              />
+            ) : (
+              <div className="w-32 h-32 mx-auto rounded-full bg-accent flex items-center justify-center mb-4 border border-white">
+                {' '}
+                <AvatarInitials
+                  name={currentUser?.name}
+                  className="w-20 h-20 text-4xl"
+                />
+              </div>
+            )}
+            <label className="mt-2 cursor-pointer text-sm text-primary hover:underline">
+              Alterar Foto
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </label>
+          </div>
 
-        <CustomSelect
-          options={profileOptions}
-          value={form.profile_type}
-          onChange={handleSelect}
-        />
-
-        <textarea
-          name="bio"
-          placeholder="Sua bio..."
-          value={form.bio}
-          onChange={handleChange}
-          className="w-full border rounded-lg px-4 py-2"
-        />
-
-        <div className="grid grid-cols-2 gap-4">
-          <input
-            type="text"
-            name="city"
-            placeholder="Cidade"
-            value={form.city}
-            onChange={handleChange}
-            className="w-full border rounded-lg px-4 py-2"
+          <CustomSelect
+            options={profileOptions}
+            value={form.profile_type}
+            onChange={handleSelect}
           />
-          <input
-            type="text"
-            name="state"
-            placeholder="Estado"
-            value={form.state}
-            onChange={handleChange}
-            className="w-full border rounded-lg px-4 py-2"
-          />
-        </div>
 
-        <div className="flex flex-col items-center gap-2">
-          <SubmitButton disabled={loading}>
-            {loading ? 'Salvando...' : 'Salvar'}
-          </SubmitButton>
-          <CancelButton mode="edit" className="mx-auto block" />
-        </div>
-      </form>
+          <textarea
+            name="bio"
+            placeholder="Sua bio..."
+            value={form.bio}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+
+          <div className="grid grid-cols-2 gap-4">
+            <StateSelect
+              value={form.state}
+              onChange={(value) => setForm({ ...form, state: value })}
+            />
+            <CitySelect
+              state={form.state}
+              value={form.city}
+              onChange={(value) => setForm({ ...form, city: value })}
+            />
+          </div>
+
+          <div className="flex flex-col items-center gap-2">
+            <SubmitButton disabled={loading}>
+              {loading ? 'Salvando...' : 'Salvar'}
+            </SubmitButton>
+            <CancelButton mode="edit" className="mx-auto block" />
+          </div>
+        </form>
+      </div>
     </main>
   );
 };
