@@ -84,7 +84,7 @@ const PostModal: React.FC<PostModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl w-full max-w-[92vw] sm:max-w-[480px] md:max-w-[520px] mx-3 p-4 relative"
+        className="bg-white rounded-2xl w-full max-w-[92vw] sm:max-w-[500px] md:max-w-[550px] mx-3 p-4 relative"
         onClick={(e) => e.stopPropagation()}
       >
         <button

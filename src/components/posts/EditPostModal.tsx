@@ -54,7 +54,7 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl w-full max-w-[700px] my-8"
+        className="bg-white rounded-2xl w-full max-w-[500px] my-8"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-6 relative">
@@ -75,8 +75,12 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
 
               try {
                 const updatedPost = await editPost(formData);
-                if (updatedPost) updatePost(updatedPost);
-                onClose();
+                console.log('✅ Resposta da API após editar:', updatedPost);
+
+                if (updatedPost) {
+                  updatePost(updatedPost);
+                  onClose();
+                }
               } catch (error) {
                 console.error('Erro ao editar post:', error);
               } finally {

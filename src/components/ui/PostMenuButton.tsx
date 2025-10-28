@@ -20,7 +20,7 @@ const PostMenuButton: React.FC<PostMenuButtonProps> = ({
 }) => {
   return (
     <Menu as="div" className={`relative ${className || ''}`}>
-      <Menu.Button className="text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-0">
+      <Menu.Button className="text-gray-600 hover:text-gray-800 focus:outline-none">
         <BsThreeDots size={18} />
       </Menu.Button>
 

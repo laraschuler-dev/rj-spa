@@ -47,6 +47,9 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
   setPosts: (posts) => set({ posts }),
 
   updatePost: (updatedPost: PostListItem, addIfNotExists = false) => {
+    console.log('📝 updatePost chamado com:', updatedPost);
+    console.log('🔄 Autor do post atualizado:', updatedPost.author);
+
     set((state) => {
       const key = updatedPost.sharedBy?.shareId
         ? `share-${updatedPost.sharedBy.shareId}`
@@ -65,14 +68,35 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
             const pKey = p.sharedBy?.shareId
               ? `share-${p.sharedBy.shareId}`
               : `post-${p.id}`;
-            if (pKey === key) return { ...p, ...updatedPost };
+            if (pKey === key) {
+              console.log('📋 Post atual encontrado:', p);
+              console.log('👤 User do post atual:', p.user);
+
+              // NORMALIZAÇÃO: Se o post atualizado veio com 'author' mas o atual tem 'user'
+              // Ou se precisamos manter compatibilidade
+              const normalizedPost = {
+                ...updatedPost,
+                // Garante que ambas as propriedades existam para compatibilidade
+                author: updatedPost.author || p.author,
+                user: updatedPost.author || p.user, // Se 'user' for usado em outros lugares
+              };
+
+              return {
+                ...p, // mantém tudo do post atual (incluindo 'user')
+                ...normalizedPost, // sobrescreve com dados normalizados
+                // Preserva estado local importante
+                liked: p.liked,
+                attending: p.attending,
+                likeCount: p.likeCount,
+              };
+            }
             return p;
           }),
         };
       } else if (addIfNotExists) {
         return { posts: [updatedPost, ...state.posts] };
       } else {
-        return {}; // não faz nada
+        return {};
       }
     });
   },

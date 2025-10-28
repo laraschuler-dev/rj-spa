@@ -56,13 +56,13 @@ const ShareModal: React.FC<ShareModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl w-full max-w-[700px] p-6 relative"
+        className="bg-white rounded-2xl w-full max-w-[95vw] sm:max-w-[400px] md:max-w-[500px] p-6 relative my-8 mx-4"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Botão fechar */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 font-bold text-xl"
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 font-bold text-xl focus:outline-none"
         >
           ×
         </button>
