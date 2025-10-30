@@ -15,6 +15,7 @@ import SearchBarMobile from '../SearchBarMobile';
 import NotificationDropdown from '../NotificationDropdown';
 import { useNotifications } from '../../hooks/useNotifications';
 import { UserDropdownMenu } from '../ui/UserDropdownMenu';
+import { Sparkles } from 'lucide-react';
 
 const HeaderFeed: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -29,8 +30,9 @@ const HeaderFeed: React.FC = () => {
         {/* Logo */}
         <Link
           to="/"
-          className="text-lg md:text-xl font-heading font-bold cursor-pointer hover:text-accent transition-colors whitespace-nowrap"
+          className="flex items-center gap-1.5 text-lg md:text-2xl font-heading font-bold cursor-pointer text-white bg-primary hover:bg-gradient-to-r hover:from-primary hover:to-accent/30 transition-all duration-300 whitespace-nowrap px-3 py-1.5 md:px-4 md:py-2 rounded-lg border-2 border-accent shadow-lg hover:shadow-xl"
         >
+          <Sparkles className="w-4 h-4 md:w-5 md:h-5" />
           Redefinindo Jornadas
         </Link>
 

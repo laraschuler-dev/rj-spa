@@ -20,6 +20,7 @@ import {
 import { PiStudent } from 'react-icons/pi';
 import { useState, useEffect } from 'react';
 import { UserDropdownMobile } from './UserDropdownMobile';
+import { Sparkles } from 'lucide-react';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -143,13 +144,16 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
         <IoMdClose />
       </button>
 
-      {/* Logo */}
-      <h2
-        className="text-xl font-heading font-bold hover:text-accent transition-colors mb-4 mt-8 cursor-pointer"
-        onClick={handleLogoClick}
-      >
-        Redefinindo Jornadas
-      </h2>
+      <div className="flex justify-center mt-6 mb-4">
+        <Link
+          to="/"
+          onClick={handleLogoClick}
+          className="flex items-center gap-1.5 text-base font-heading font-bold cursor-pointer text-white bg-primary hover:bg-gradient-to-r hover:from-primary hover:to-accent/30 transition-all duration-300 whitespace-nowrap px-2 py-1.5 rounded-lg border border-accent shadow-md hover:shadow-lg"
+        >
+          <Sparkles className="w-3 h-3" />
+          Redefinindo Jornadas
+        </Link>
+      </div>
 
       {/* UserDropdownMobile - QUANDO AUTENTICADO */}
       {isAuthenticated ? (

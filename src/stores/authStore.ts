@@ -24,8 +24,13 @@ const useAuthStore = create<AuthState>()(
       token: null,
       user: null,
 
-      setToken: (token) => set({ token }),
-      setUser: (user) => set({ user }),
+      setToken: (token) => {
+        set({ token });
+      },
+
+      setUser: (user) => {
+        set({ user });
+      },
 
       clearAuth: () => {
         set({ token: null, user: null });
@@ -38,13 +43,14 @@ const useAuthStore = create<AuthState>()(
 
         try {
           const response = await api.get('/auth/me', {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           });
           get().setUser(response.data);
         } catch (error) {
-          console.warn('Token inválido ou expirado. Limpando sessão.');
+          console.warn(
+            '🔴 Token inválido ou expirado. Limpando sessão.',
+            error
+          );
           get().clearAuth();
           throw error;
         }
@@ -52,6 +58,9 @@ const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
+      onRehydrateStorage: () => (state) => {
+        console.log('[AuthStore] Rehidratando auth-storage', state);
+      },
     }
   )
 );

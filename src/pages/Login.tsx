@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Typography from '../components/ui/Typography';
-import { FcGoogle } from 'react-icons/fc';
 import SubmitButton from '../components/ui/SubmitButton';
 import { FaFacebook } from 'react-icons/fa';
 import api from '../services/api';
 import { toast } from 'react-toastify';
 import useAuthStore from '../stores/authStore';
 import PasswordInput from '../components/ui/PasswordInput';
+import GoogleLoginButton from '../components/ui/GoogleLoginButton';
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({ emailOrPhone: '', password: '' });
@@ -128,10 +128,7 @@ const Login: React.FC = () => {
           </button>
 
           {/* Botão de login com Google */}
-          <button className="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-100 transition">
-            <FcGoogle size={22} />
-            <span className="font-medium">Entrar com Google</span>
-          </button>
+          <GoogleLoginButton />
         </div>
 
         {/* Link para cadastro */}

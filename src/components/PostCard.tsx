@@ -105,7 +105,7 @@ const PostCard: React.FC<PostCardProps> = ({
       // ✅ Cenário 3: Post anônimo - mostra ícone
       return (
         <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center border">
-          <CgProfile size={18} className="text-gray-500" />
+          <CgProfile size={40} className="text-gray-500" />
         </div>
       );
     } else if (currentAuthor.avatarUrl) {
