@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import SubmitButton from '../components/ui/SubmitButton';
 import BackButton from '../components/ui/BackButton';
 import PasswordInput from '../components/ui/PasswordInput';
+import useAuthStore from '../stores/authStore';
 
 const AccountSettings: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -27,6 +28,7 @@ const AccountSettings: React.FC = () => {
   const [isUpdatingAccount, setIsUpdatingAccount] = useState(false);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const { user } = useAuthStore();
 
   // Estados para controlar as abas abertas
   const [openSections, setOpenSections] = useState({
@@ -116,7 +118,6 @@ const AccountSettings: React.FC = () => {
   const deleteAccount = async () => {
     if (isDeletingAccount) return;
 
-    // Validação do campo de confirmação
     if (deleteData.confirmation.toLowerCase() !== 'deletar minha conta') {
       toast.error(
         'Por favor, digite exatamente "deletar minha conta" para confirmar.'
@@ -128,14 +129,13 @@ const AccountSettings: React.FC = () => {
 
     try {
       await axios.delete('/auth/account', {
-        data: { password: deleteData.password },
+        data: user?.isSocialLogin
+          ? {} // ✅ social não precisa de senha
+          : { password: deleteData.password },
       });
-      toast.success('Sua conta foi excluída com sucesso.');
 
-      // Redirecionar para a página inicial ou login após exclusão
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 2000);
+      toast.success('Sua conta foi excluída com sucesso.');
+      setTimeout(() => (window.location.href = '/'), 2000);
     } catch (err: any) {
       const backendMessage =
         err.response?.data?.error || 'Erro ao excluir conta.';
@@ -193,6 +193,7 @@ const AccountSettings: React.FC = () => {
                   className="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-primary focus:outline-none"
                 />
               </div>
+              {/* EMAIL - Condicional */}
               <div>
                 <label className="text-sm font-medium text-gray-700">
                   Email
@@ -202,8 +203,18 @@ const AccountSettings: React.FC = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-primary focus:outline-none"
+                  disabled={user?.isSocialLogin} // ← BLOQUEADO para social
+                  className={`w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-primary focus:outline-none ${
+                    user?.isSocialLogin
+                      ? 'bg-gray-100 cursor-not-allowed opacity-70'
+                      : ''
+                  }`}
                 />
+                {user?.isSocialLogin && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Email não pode ser alterado em contas vinculadas ao Google
+                  </p>
+                )}
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-700">
@@ -230,68 +241,92 @@ const AccountSettings: React.FC = () => {
         </div>
 
         {/* Seção 2: Alterar Senha */}
-        <div className="border border-gray-200 rounded-xl overflow-hidden">
-          <button
-            onClick={() => toggleSection('password')}
-            className="w-full px-6 py-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left flex justify-between items-center focus:outline-none"
-          >
-            <Typography variant="h3" className="text-gray-800 font-semibold">
-              Alterar Senha
-            </Typography>
-            <svg
-              className={`w-5 h-5 text-gray-600 transform transition-transform ${
-                openSections.password ? 'rotate-180' : ''
-              }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+        {!user?.isSocialLogin && (
+          <div className="border border-gray-200 rounded-xl overflow-hidden">
+            <button
+              onClick={() => toggleSection('password')}
+              className="w-full px-6 py-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left flex justify-between items-center focus:outline-none"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </button>
+              <Typography variant="h3" className="text-gray-800 font-semibold">
+                Alterar Senha
+              </Typography>
+              <svg
+                className={`w-5 h-5 text-gray-600 transform transition-transform ${
+                  openSections.password ? 'rotate-180' : ''
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
 
-          {openSections.password && (
-            <div className="px-6 py-4 space-y-4">
-              <form autoComplete="off">
-                <div>
-                  <PasswordInput
-                    label="Senha Atual"
-                    type="password"
-                    name="currentPassword"
-                    autoComplete="current-password"
-                    value={passwordData.currentPassword}
-                    onChange={handlePasswordChange}
-                    className="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-primary focus:outline-none"
-                  />
-                </div>
+            {openSections.password && (
+              <div className="px-6 py-4 space-y-4">
+                <form autoComplete="off">
+                  <div>
+                    <PasswordInput
+                      label="Senha Atual"
+                      type="password"
+                      name="currentPassword"
+                      autoComplete="current-password"
+                      value={passwordData.currentPassword}
+                      onChange={handlePasswordChange}
+                      className="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-primary focus:outline-none"
+                    />
+                  </div>
 
-                <div>
-                  <PasswordInput
-                    label="Nova Senha"
-                    type="password"
-                    name="newPassword"
-                    autoComplete="new-password"
-                    value={passwordData.newPassword}
-                    onChange={handlePasswordChange}
-                  />
+                  <div>
+                    <PasswordInput
+                      label="Nova Senha"
+                      type="password"
+                      name="newPassword"
+                      autoComplete="new-password"
+                      value={passwordData.newPassword}
+                      onChange={handlePasswordChange}
+                    />
+                  </div>
+                </form>
+                <div className="text-right pt-2">
+                  <SubmitButton
+                    onClick={updatePassword}
+                    loading={isUpdatingPassword}
+                  >
+                    Alterar Senha
+                  </SubmitButton>
                 </div>
-              </form>
-              <div className="text-right pt-2">
-                <SubmitButton
-                  onClick={updatePassword}
-                  loading={isUpdatingPassword}
-                >
-                  Alterar Senha
-                </SubmitButton>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
+
+        {/* Caso o usuário seja social, mostra aviso no lugar */}
+        {user?.isSocialLogin && (
+          <div className="p-6 border border-gray-200 rounded-xl bg-gray-50">
+            <Typography
+              variant="h3"
+              className="text-gray-700 font-semibold mb-2"
+            >
+              Login com Google
+            </Typography>
+            <Typography
+              variant="p"
+              className="text-gray-500 text-sm leading-relaxed"
+            >
+              Sua conta foi criada usando o login do Google. Por isso, não há
+              senha para alterar.
+              <br />
+              No futuro, você poderá vincular outros métodos de login nas
+              configurações da conta.
+            </Typography>
+          </div>
+        )}
 
         {/* Seção 3: Zona de Perigo */}
         <div className="border border-red-200 rounded-xl overflow-hidden">
@@ -331,31 +366,28 @@ const AccountSettings: React.FC = () => {
                   variant="p"
                   className="text-red-600 text-sm font-medium"
                 >
-                  Para confirmar a exclusão, digite sua senha e confirme abaixo:
+                  {user?.isSocialLogin
+                    ? 'Confirme a exclusão abaixo:'
+                    : 'Para confirmar a exclusão, digite sua senha e confirme abaixo:'}
                 </Typography>
 
-                {/* Form com proteção máxima */}
                 <form autoComplete="off" className="space-y-4">
-                  <input
-                    type="password"
-                    style={{ display: 'none' }}
-                    autoComplete="new-password"
-                  />
-
-                  <div>
-                    <label className="text-sm text-red-600 block mb-1">
-                      Senha
-                    </label>
-                    <input
-                      type="password"
-                      name="password"
-                      autoComplete="new-password"
-                      value={deleteData.password}
-                      onChange={handleDeletePasswordChange}
-                      className="w-full rounded-xl border border-red-300 px-4 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none"
-                      placeholder="Digite sua senha atual manualmente"
-                    />
-                  </div>
+                  {!user?.isSocialLogin && (
+                    <div>
+                      <label className="text-sm text-red-600 block mb-1">
+                        Senha
+                      </label>
+                      <input
+                        type="password"
+                        name="password"
+                        autoComplete="new-password"
+                        value={deleteData.password}
+                        onChange={handleDeletePasswordChange}
+                        className="w-full rounded-xl border border-red-300 px-4 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none"
+                        placeholder="Digite sua senha atual"
+                      />
+                    </div>
+                  )}
 
                   <div>
                     <label className="text-sm text-red-600 block mb-1">
@@ -373,15 +405,13 @@ const AccountSettings: React.FC = () => {
                   </div>
                 </form>
 
-                <div className="flex flex-col space-y-3">
-                  <div className="text-right">
-                    <SubmitButton
-                      onClick={deleteAccount}
-                      loading={isDeletingAccount}
-                    >
-                      Confirmar Exclusão
-                    </SubmitButton>
-                  </div>
+                <div className="text-right">
+                  <SubmitButton
+                    onClick={deleteAccount}
+                    loading={isDeletingAccount}
+                  >
+                    Confirmar Exclusão
+                  </SubmitButton>
                 </div>
               </div>
             </div>

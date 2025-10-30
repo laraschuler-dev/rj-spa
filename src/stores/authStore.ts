@@ -6,7 +6,9 @@ interface User {
   id: number;
   name: string;
   email: string;
-  phone: string;
+  phone?: string;
+  hasPhone?: boolean;
+  isSocialLogin?: boolean;
 }
 
 interface AuthState {
@@ -29,6 +31,7 @@ const useAuthStore = create<AuthState>()(
       },
 
       setUser: (user) => {
+        console.log('🟢 Usuário logado:', user);
         set({ user });
       },
 

@@ -5,6 +5,7 @@ import SubmitButton from '../components/ui/SubmitButton';
 import api from '../services/api';
 import { toast } from 'react-toastify';
 import PasswordInput from '../components/ui/PasswordInput';
+import GoogleLoginButton from '../components/ui/GoogleLoginButton';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -166,6 +167,18 @@ const Register = () => {
           {/* Botão de Criar Conta */}
           <SubmitButton loading={isSubmitting}>Criar Conta</SubmitButton>
         </form>
+
+        {/* Divisor */}
+        <div className="flex items-center my-6">
+          <hr className="flex-grow border-t border-gray-300" />
+          <span className="mx-4 text-gray-500 text-sm">Ou se preferir</span>
+          <hr className="flex-grow border-t border-gray-300" />
+        </div>
+
+        <div className="flex flex-col items-center justify-center max-w-md">
+          {/* Botão de login com Google */}
+          <GoogleLoginButton />
+        </div>
 
         {/* Link para login */}
         <p className="text-center text-sm text-gray-600 mt-6">

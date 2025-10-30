@@ -36,7 +36,7 @@ export default function GoogleLoginButton() {
   };
 
   return (
-    <div className="flex justify-center mt-4 focus:outline-none">
+    <div className="flex justify-center">
       <GoogleLogin
         onSuccess={handleSuccess}
         onError={handleError}

@@ -116,17 +116,11 @@ const Login: React.FC = () => {
         {/* Divisor */}
         <div className="flex items-center my-6">
           <hr className="flex-grow border-t border-gray-300" />
-          <span className="mx-4 text-gray-500 text-sm">Ou entre com</span>
+          <span className="mx-4 text-gray-500 text-sm">Ou se preferir</span>
           <hr className="flex-grow border-t border-gray-300" />
         </div>
 
         <div className="flex flex-col items-center justify-center max-w-md">
-          {/* Botão de login com Facebook */}
-          <button className="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-100 transition">
-            <FaFacebook size={22} className="text-[#1877F2]" />
-            <span className="font-medium">Entrar com Facebook</span>
-          </button>
-
           {/* Botão de login com Google */}
           <GoogleLoginButton />
         </div>
