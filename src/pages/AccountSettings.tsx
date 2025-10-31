@@ -6,6 +6,8 @@ import SubmitButton from '../components/ui/SubmitButton';
 import BackButton from '../components/ui/BackButton';
 import PasswordInput from '../components/ui/PasswordInput';
 import useAuthStore from '../stores/authStore';
+import { useSocialConnections } from '../hooks/useSocialConnections';
+import GoogleLinkButton from '../components/ui/GoogleLinkButton';
 
 const AccountSettings: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -14,9 +16,17 @@ const AccountSettings: React.FC = () => {
     phone: '',
   });
 
+  // Estados para controlar dados originais
+  const [originalData, setOriginalData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+  });
+
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
+    confirmPassword: '',
   });
 
   const [deleteData, setDeleteData] = useState({
@@ -34,6 +44,7 @@ const AccountSettings: React.FC = () => {
   const [openSections, setOpenSections] = useState({
     account: true, // Inicia com a primeira aba aberta
     password: false,
+    social: false,
     danger: false,
   });
 
@@ -41,11 +52,14 @@ const AccountSettings: React.FC = () => {
     axios
       .get('/auth/me')
       .then((res) => {
-        setFormData({
+        const userData = {
           name: res.data.name || '',
           email: res.data.email || '',
           phone: res.data.phone || '',
-        });
+        };
+
+        setFormData(userData);
+        setOriginalData(userData); // ✅ SALVA OS DADOS ORIGINAIS
       })
       .catch((err) => {
         const backendMessage =
@@ -98,14 +112,45 @@ const AccountSettings: React.FC = () => {
     }
   };
 
+  // Verifica se houve mudanças nos dados
+  const hasChanges = () => {
+    return (
+      formData.name !== originalData.name ||
+      formData.email !== originalData.email ||
+      formData.phone !== originalData.phone
+    );
+  };
+
   const updatePassword = async () => {
     if (isUpdatingPassword) return;
+
+    // ✅ VALIDAÇÃO DA CONFIRMAÇÃO (igual ao social)
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error('As senhas não coincidem. Por favor, verifique.');
+      return;
+    }
+
+    // ✅ VALIDAÇÃO DO TAMANHO MÍNIMO
+    if (passwordData.newPassword.length < 6) {
+      toast.error('A senha deve ter pelo menos 6 caracteres.');
+      return;
+    }
+
     setIsUpdatingPassword(true);
 
     try {
-      await axios.put('/auth/password', passwordData);
+      // ✅ ENVIA APENAS OS CAMPOS NECESSÁRIOS
+      await axios.put('/auth/password', {
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+      });
+
       toast.success('Senha atualizada com sucesso.');
-      setPasswordData({ currentPassword: '', newPassword: '' });
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
     } catch (err: any) {
       const backendMessage =
         err.response?.data?.error || 'Erro ao atualizar senha.';
@@ -115,6 +160,44 @@ const AccountSettings: React.FC = () => {
     }
   };
 
+  const updatePasswordForSocial = async () => {
+    if (isUpdatingPassword) return;
+
+    // ✅ VALIDAÇÃO DA CONFIRMAÇÃO
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error('As senhas não coincidem. Por favor, verifique.');
+      return;
+    }
+
+    // ✅ VALIDAÇÃO DO TAMANHO MÍNIMO
+    if (passwordData.newPassword.length < 6) {
+      toast.error('A senha deve ter pelo menos 6 caracteres.');
+      return;
+    }
+
+    setIsUpdatingPassword(true);
+
+    try {
+      await axios.put('/auth/password', {
+        newPassword: passwordData.newPassword,
+      });
+
+      toast.success(
+        'Senha criada com sucesso! Agora você pode fazer login com email também.'
+      );
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+    } catch (err: any) {
+      const backendMessage =
+        err.response?.data?.error || 'Erro ao criar senha.';
+      toast.error(backendMessage);
+    } finally {
+      setIsUpdatingPassword(false);
+    }
+  };
   const deleteAccount = async () => {
     if (isDeletingAccount) return;
 
@@ -142,6 +225,58 @@ const AccountSettings: React.FC = () => {
       toast.error(backendMessage);
     } finally {
       setIsDeletingAccount(false);
+    }
+  };
+
+  // ✅ NOVOS ESTADOS PARA CONEXÕES SOCIAIS
+  const [socialConnections, setSocialConnections] = useState({
+    hasGoogle: false,
+    connectedProviders: [] as string[],
+  });
+  const [unlinkPassword, setUnlinkPassword] = useState('');
+  const [showUnlinkModal, setShowUnlinkModal] = useState(false);
+
+  const {
+    unlinkGoogleAccount,
+    getSocialConnections,
+    loading: socialLoading,
+  } = useSocialConnections();
+
+  // ✅ BUSCAR CONEXÕES SOCIAIS AO CARREGAR
+  useEffect(() => {
+    const loadSocialConnections = async () => {
+      try {
+        const connections = await getSocialConnections();
+        setSocialConnections(connections);
+      } catch (error) {
+        console.error('Erro ao carregar conexões sociais:', error);
+      }
+    };
+
+    loadSocialConnections();
+  }, []);
+
+  // ✅ FUNÇÃO PARA DESVINCULAR GOOGLE
+  const handleUnlinkGoogle = async () => {
+    if (!unlinkPassword) {
+      toast.error('Por favor, informe sua senha');
+      return;
+    }
+
+    try {
+      await unlinkGoogleAccount(unlinkPassword);
+      setSocialConnections((prev) => ({
+        ...prev,
+        hasGoogle: false,
+        connectedProviders: prev.connectedProviders.filter(
+          (p) => p !== 'google'
+        ),
+      }));
+      setShowUnlinkModal(false);
+      setUnlinkPassword('');
+      toast.success('Google desvinculado com sucesso!');
+    } catch (error) {
+      // Erro já é tratado no hook
     }
   };
 
@@ -203,16 +338,18 @@ const AccountSettings: React.FC = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  disabled={user?.isSocialLogin} // ← BLOQUEADO para social
+                  disabled={user?.isSocialLogin || socialConnections.hasGoogle} // ✅ CORRIGIDO
                   className={`w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-primary focus:outline-none ${
-                    user?.isSocialLogin
+                    user?.isSocialLogin || socialConnections.hasGoogle
                       ? 'bg-gray-100 cursor-not-allowed opacity-70'
                       : ''
                   }`}
                 />
-                {user?.isSocialLogin && (
+                {(user?.isSocialLogin || socialConnections.hasGoogle) && (
                   <p className="text-xs text-gray-500 mt-1">
-                    Email não pode ser alterado em contas vinculadas ao Google
+                    {socialConnections.hasGoogle
+                      ? 'Email não pode ser alterado enquanto a conta Google estiver vinculada. Desvincule primeiro.'
+                      : 'Email não pode ser alterado em contas vinculadas ao Google'}
                   </p>
                 )}
               </div>
@@ -232,6 +369,7 @@ const AccountSettings: React.FC = () => {
                 <SubmitButton
                   onClick={updateAccount}
                   loading={isUpdatingAccount}
+                  disabled={!hasChanges()} // ✅ DESABILITA SE NÃO HOUVER ALTERAÇÕES
                 >
                   Salvar Alterações
                 </SubmitButton>
@@ -240,7 +378,6 @@ const AccountSettings: React.FC = () => {
           )}
         </div>
 
-        {/* Seção 2: Alterar Senha */}
         {!user?.isSocialLogin && (
           <div className="border border-gray-200 rounded-xl overflow-hidden">
             <button
@@ -269,7 +406,7 @@ const AccountSettings: React.FC = () => {
 
             {openSections.password && (
               <div className="px-6 py-4 space-y-4">
-                <form autoComplete="off">
+                <form autoComplete="off" className="space-y-4">
                   <div>
                     <PasswordInput
                       label="Senha Atual"
@@ -290,13 +427,33 @@ const AccountSettings: React.FC = () => {
                       autoComplete="new-password"
                       value={passwordData.newPassword}
                       onChange={handlePasswordChange}
+                      placeholder="Mínimo 6 caracteres"
+                    />
+                  </div>
+
+                  {/* ✅ ADICIONAR CONFIRMAÇÃO AQUI TAMBÉM */}
+                  <div>
+                    <PasswordInput
+                      label="Confirmar Nova Senha"
+                      type="password"
+                      name="confirmPassword"
+                      autoComplete="new-password"
+                      value={passwordData.confirmPassword}
+                      onChange={handlePasswordChange}
+                      placeholder="Digite a senha novamente"
                     />
                   </div>
                 </form>
+
                 <div className="text-right pt-2">
                   <SubmitButton
                     onClick={updatePassword}
                     loading={isUpdatingPassword}
+                    disabled={
+                      !passwordData.currentPassword ||
+                      !passwordData.newPassword ||
+                      !passwordData.confirmPassword
+                    }
                   >
                     Alterar Senha
                   </SubmitButton>
@@ -306,8 +463,221 @@ const AccountSettings: React.FC = () => {
           </div>
         )}
 
-        {/* Caso o usuário seja social, mostra aviso no lugar */}
+        {/* ✅ SEÇÃO ATUALIZADA COM CONFIRMAÇÃO */}
         {user?.isSocialLogin && (
+          <div className="border border-gray-200 rounded-xl overflow-hidden">
+            <button
+              onClick={() => toggleSection('createPassword')}
+              className="w-full px-6 py-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left flex justify-between items-center focus:outline-none"
+            >
+              <Typography variant="h3" className="text-gray-800 font-semibold">
+                Criar Senha
+              </Typography>
+              <svg
+                className={`w-5 h-5 text-gray-600 transform transition-transform ${
+                  openSections.createPassword ? 'rotate-180' : ''
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+
+            {openSections.createPassword && (
+              <div className="px-6 py-4 space-y-4">
+                <div className="bg-blue-50 p-4 rounded-lg mb-4">
+                  <Typography variant="p" className="text-blue-700 text-sm">
+                    💡 Crie uma senha para fazer login com email também. Isso
+                    não remove sua conexão com o Google - você poderá usar ambos
+                    os métodos.
+                  </Typography>
+                </div>
+
+                <form autoComplete="off" className="space-y-4">
+                  <div>
+                    <PasswordInput
+                      label="Nova Senha"
+                      type="password"
+                      name="newPassword"
+                      autoComplete="new-password"
+                      value={passwordData.newPassword}
+                      onChange={handlePasswordChange}
+                      placeholder="Mínimo 6 caracteres"
+                    />
+                  </div>
+
+                  {/* ✅ NOVO CAMPO: CONFIRMAR SENHA */}
+                  <div>
+                    <PasswordInput
+                      label="Confirmar Senha"
+                      type="password"
+                      name="confirmPassword"
+                      autoComplete="new-password"
+                      value={passwordData.confirmPassword}
+                      onChange={handlePasswordChange}
+                      placeholder="Digite a senha novamente"
+                    />
+                  </div>
+                </form>
+
+                <div className="text-right pt-2">
+                  <SubmitButton
+                    onClick={updatePasswordForSocial}
+                    loading={isUpdatingPassword}
+                    disabled={
+                      !passwordData.newPassword || !passwordData.confirmPassword
+                    }
+                  >
+                    Criar Senha
+                  </SubmitButton>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ✅ NOVA SEÇÃO: Conexões Sociais */}
+        <div className="border border-gray-200 rounded-xl overflow-hidden">
+          <button
+            onClick={() => toggleSection('social')}
+            className="w-full px-6 py-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left flex justify-between items-center focus:outline-none"
+          >
+            <Typography variant="h3" className="text-gray-800 font-semibold">
+              Conexões Sociais
+            </Typography>
+            <svg
+              className={`w-5 h-5 text-gray-600 transform transition-transform ${
+                openSections.social ? 'rotate-180' : ''
+              }`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+
+          {openSections.social && (
+            <div className="px-6 py-4 space-y-6">
+              {/* Google Connection */}
+              <div className="flex items-center justify-between py-3 border-b border-gray-100">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center">
+                    <span className="text-xs font-semibold text-gray-700">
+                      G
+                    </span>
+                  </div>
+                  <div>
+                    <Typography
+                      variant="h4"
+                      className="text-gray-800 font-medium"
+                    >
+                      Google
+                    </Typography>
+                    <Typography variant="p" className="text-gray-500 text-sm">
+                      {socialConnections.hasGoogle
+                        ? 'Conectado'
+                        : 'Não conectado'}
+                    </Typography>
+                  </div>
+                </div>
+
+                {socialConnections.hasGoogle ? (
+                  <button
+                    onClick={() => setShowUnlinkModal(true)}
+                    disabled={socialLoading}
+                    className="px-4 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50 disabled:opacity-50 transition-colors"
+                  >
+                    Desvincular
+                  </button>
+                ) : (
+                  <GoogleLinkButton
+                    onSuccess={() => {
+                      setSocialConnections((prev) => ({
+                        ...prev,
+                        hasGoogle: true,
+                        connectedProviders: [
+                          ...prev.connectedProviders,
+                          'google',
+                        ],
+                      }));
+                    }}
+                  />
+                )}
+              </div>
+
+              {/* Informações sobre vinculação */}
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <Typography variant="p" className="text-blue-700 text-sm">
+                  💡 Vincule sua conta ao Google para fazer login de forma mais
+                  rápida e segura.
+                  {user?.isSocialLogin &&
+                    ' Você também pode criar uma senha para fazer login com email.'}
+                </Typography>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Modal para Desvincular Google */}
+        {showUnlinkModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl p-6 max-w-md w-full">
+              <Typography
+                variant="h3"
+                className="text-red-700 font-semibold mb-4"
+              >
+                Desvincular Google
+              </Typography>
+
+              <Typography variant="p" className="text-gray-600 mb-4">
+                Para desvincular sua conta Google, confirme sua senha atual:
+              </Typography>
+
+              <input
+                type="password"
+                value={unlinkPassword}
+                onChange={(e) => setUnlinkPassword(e.target.value)}
+                placeholder="Digite sua senha"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-red-500"
+              />
+
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => {
+                    setShowUnlinkModal(false);
+                    setUnlinkPassword('');
+                  }}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleUnlinkGoogle}
+                  disabled={socialLoading || !unlinkPassword}
+                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+                >
+                  {socialLoading ? 'Desvinculando...' : 'Desvincular'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Seção existente: Login Social Info */}
+        {user?.isSocialLogin && !socialConnections.hasGoogle && (
           <div className="p-6 border border-gray-200 rounded-xl bg-gray-50">
             <Typography
               variant="h3"
@@ -322,8 +692,7 @@ const AccountSettings: React.FC = () => {
               Sua conta foi criada usando o login do Google. Por isso, não há
               senha para alterar.
               <br />
-              No futuro, você poderá vincular outros métodos de login nas
-              configurações da conta.
+              Você pode criar uma senha para fazer login com email também.
             </Typography>
           </div>
         )}

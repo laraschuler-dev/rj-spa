@@ -6,9 +6,9 @@ interface User {
   id: number;
   name: string;
   email: string;
-  phone?: string;
-  hasPhone?: boolean;
-  isSocialLogin?: boolean;
+  phone: string;
+  isSocialLogin: boolean;
+  hasGoogle: boolean;
 }
 
 interface AuthState {
