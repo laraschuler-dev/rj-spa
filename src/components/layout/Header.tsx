@@ -40,7 +40,8 @@ const Header: React.FC = () => {
   }, []);
 
   return (
-    <header className="bg-primary text-background py-4 px-6 shadow-md flex items-center justify-between fixed top-0 left-0 w-full z-50">
+    <header className="bg-primary text-background py-4 px-6 shadow-lg flex items-center justify-between fixed top-0 left-0 w-full z-50 border-b border-primary-dark/20">
+      {' '}
       {!isMenuOpen && (
         <ScrollLink
           to="introduction"

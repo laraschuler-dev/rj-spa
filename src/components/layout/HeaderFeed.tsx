@@ -24,15 +24,15 @@ const HeaderFeed: React.FC = () => {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   return (
-    <header className="bg-primary text-background py-4 px-4 md:px-6 flex items-center justify-between fixed top-0 left-0 w-full z-50">
+    <header className="bg-primary text-background py-4 px-4 md:px-6 flex items-center justify-between fixed top-0 left-0 w-full z-50 border-b border-primary-dark/20">
       {/* Logo + Navegação Principal */}
       <div className="flex items-center gap-2 md:gap-10 flex-shrink-0">
         {/* Logo */}
         <Link
           to="/"
-          className="flex items-center gap-1.5 text-lg md:text-2xl font-heading font-bold cursor-pointer text-white bg-primary hover:bg-gradient-to-r hover:from-primary hover:to-accent/30 transition-all duration-300 whitespace-nowrap px-3 py-1.5 md:px-4 md:py-2 rounded-lg border-2 border-accent shadow-lg hover:shadow-xl"
+          className="flex items-center gap-1.5 text-base md:text-2xl font-heading font-bold cursor-pointer text-white bg-primary hover:bg-gradient-to-r hover:from-primary hover:to-accent/30 transition-all duration-300 whitespace-nowrap px-2 py-1 md:px-4 md:py-2 rounded-lg border-2 border-accent shadow-lg hover:shadow-xl"
         >
-          <Sparkles className="w-4 h-4 md:w-5 md:h-5" />
+          <Sparkles className="w-3 h-3 md:w-5 md:h-5" />
           Redefinindo Jornadas
         </Link>
 

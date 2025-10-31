@@ -49,7 +49,11 @@ const EventsPage: React.FC = () => {
     } catch (err) {
       console.error(err);
     } finally {
+      const reopenedId = postToShare.id;
       closeShareModal();
+
+      // Reabre o modal de detalhes, se quiser
+      setSelectedPost(reopenedId);
     }
   };
 
@@ -63,6 +67,11 @@ const EventsPage: React.FC = () => {
       toast.error('Erro ao excluir o evento!');
     }
   };
+
+  React.useEffect(() => {
+    if (shareModalOpen && selectedPost) setSelectedPost(null);
+    if (selectedPost && shareModalOpen) setShareModalOpen(false);
+  }, [shareModalOpen, selectedPost]);
 
   return (
     <Layout variant="feed">
@@ -168,15 +177,21 @@ const EventsPage: React.FC = () => {
           }}
           onShare={() => {
             const event = events.find((e) => e.id === selectedPost);
-            if (event) openShareModal(event);
+            if (event) {
+              // Fecha o modal de detalhes
+              setSelectedPost(null);
+
+              // Abre o modal de compartilhamento com leve delay
+              setTimeout(() => openShareModal(event), 300);
+            }
           }}
           onDelete={() => handleDelete(selectedPost)}
-          onEdit={(postId) => setEditingPost(postId)} // 👈 Apenas ID
+          onEdit={(postId) => setEditingPost(postId)}
         />
       )}
 
       {editingPost && (
-        <EditPostModal // 👈 SEM ShareEditModal (não há compartilhamentos)
+        <EditPostModal
           postId={editingPost}
           onClose={() => setEditingPost(null)}
           onSuccess={(updatedEvent) => {

@@ -96,6 +96,9 @@ const ShareEditModal: React.FC<ShareEditModalProps> = ({
               metadata={post.metadata}
               content={post.content}
               images={post.images?.map((url, index) => ({ id: index, url }))}
+              isAnonymous={
+                post.categoria_idcategoria === 2 && post.metadata?.isAnonymous
+              }
             />
           </div>
 

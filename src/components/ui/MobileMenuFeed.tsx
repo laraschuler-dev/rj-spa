@@ -31,11 +31,11 @@ const MobileMenuFeed: React.FC<MobileMenuFeedProps> = ({ isOpen, onClose }) => {
       animate={{ x: isOpen ? '0%' : '100%' }}
       exit={{ x: '100%' }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      className="fixed top-0 right-0 w-64 h-full bg-primary text-background shadow-lg z-50 p-6 flex flex-col overflow-y-auto"
+      className="fixed top-0 right-0 w-64 h-full bg-gradient-to-b from-primary to-primary/95 text-background shadow-lg z-50 p-6 flex flex-col overflow-y-auto"
     >
       {/* Botão Fechar */}
       <button
-        className="absolute top-4 right-4 text-background text-3xl"
+        className="absolute top-4 right-4 text-background text-3xl focus:outline-none"
         onClick={onClose}
         aria-label="Fechar menu"
       >

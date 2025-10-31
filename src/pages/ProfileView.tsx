@@ -71,6 +71,11 @@ const ProfileView: React.FC = () => {
     shareId?: number;
   } | null>(null);
 
+  useEffect(() => {
+    if (shareModalOpen && selectedPost) setSelectedPost(null);
+    if (selectedPost && shareModalOpen) setShareModalOpen(false);
+  }, [shareModalOpen, selectedPost]);
+
   const openShareModal = (post: any) => {
     setPostToShare(post);
     setShareModalOpen(true);
@@ -94,6 +99,11 @@ const ProfileView: React.FC = () => {
       console.error(err);
     } finally {
       closeShareModal();
+      // Reabre detalhes se quiser voltar àquele post
+      setSelectedPost({
+        id: postToShare.id,
+        shareId: postToShare.sharedBy?.shareId,
+      });
     }
   };
 
@@ -393,7 +403,14 @@ const ProfileView: React.FC = () => {
                 ? p.sharedBy?.shareId === selectedPost.shareId
                 : p.id === selectedPost.id && !p.sharedBy
             );
-            if (post) openShareModal(post);
+
+            if (post) {
+              // Fecha o modal de detalhes
+              setSelectedPost(null);
+
+              // Abre o modal de compartilhamento
+              setTimeout(() => openShareModal(post), 300);
+            }
           }}
           onDelete={isOwnProfile ? handleDelete : undefined}
           onEdit={

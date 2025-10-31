@@ -53,7 +53,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-start pt-20 overflow-auto"
+      className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex justify-center items-start pt-20 overflow-auto"
       onClick={onClose}
     >
       <div
