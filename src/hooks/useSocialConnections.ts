@@ -1,41 +1,99 @@
-// hooks/useSocialConnections.ts
-import { useState } from 'react';
+// src/hooks/useSocialConnections.ts (VERSÃO FINAL UNIFICADA)
+import { useState, useEffect } from 'react';
 import axios from '../services/api';
 import { toast } from 'react-toastify';
+import useAuthStore from '../stores/authStore';
+import { SocialConnections } from '../types/accountSettings';
 
 export const useSocialConnections = () => {
-  const [loading, setLoading] = useState(false);
+  // Estado das conexões
+  const [connections, setConnections] = useState<SocialConnections>({
+    hasGoogle: false,
+    connectedProviders: [],
+  });
 
+  // Estado do modal de desvinculação
+  const [unlinkPassword, setUnlinkPassword] = useState('');
+  const [showUnlinkModal, setShowUnlinkModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const setUser = useAuthStore((state) => state.setUser);
+
+  // ✅ CARREGA CONEXÕES AO INICIAR
+  useEffect(() => {
+    const loadConnections = async () => {
+      try {
+        const response = await axios.get('/auth/social-connections');
+        setConnections(response.data);
+      } catch (error) {
+        console.error('Erro ao carregar conexões sociais:', error);
+      }
+    };
+
+    loadConnections();
+  }, []);
+
+  // ✅ VINCULAR GOOGLE
   const linkGoogleAccount = async (idToken: string) => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       const response = await axios.post('/auth/google/link', { idToken });
-      toast.success('Conta Google vinculada com sucesso!');
+
+      // Atualiza estado local
+      setConnections((prev) => ({
+        ...prev,
+        hasGoogle: true,
+        connectedProviders: [...prev.connectedProviders, 'google'],
+      }));
+
+      // Atualiza user na store
+      setUser(response.data.user);
+
       return response.data;
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Erro ao vincular Google');
       throw error;
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
+  // ✅ DESVINCULAR GOOGLE
   const unlinkGoogleAccount = async (password: string) => {
-    setLoading(true);
+    if (!password) {
+      toast.error('Por favor, informe sua senha');
+      return;
+    }
+
+    setIsLoading(true);
     try {
       await axios.post('/auth/google/unlink', { password });
-      toast.success('Conta Google desvinculada com sucesso!');
+
+      // Atualiza estado local
+      setConnections((prev) => ({
+        ...prev,
+        hasGoogle: false,
+        connectedProviders: prev.connectedProviders.filter(
+          (p) => p !== 'google'
+        ),
+      }));
+
+      setShowUnlinkModal(false);
+      setUnlinkPassword('');
+      toast.success('Google desvinculado com sucesso!');
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Erro ao desvincular Google');
       throw error;
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
+  // ✅ BUSCAR CONEXÕES (para recarregar)
   const getSocialConnections = async () => {
     try {
       const response = await axios.get('/auth/social-connections');
+      setConnections(response.data);
       return response.data;
     } catch (error: any) {
       console.error('Erro ao buscar conexões sociais:', error);
@@ -44,7 +102,15 @@ export const useSocialConnections = () => {
   };
 
   return {
-    loading,
+    // Estado
+    connections,
+    unlinkPassword,
+    setUnlinkPassword,
+    showUnlinkModal,
+    setShowUnlinkModal,
+    isLoading,
+
+    // Ações
     linkGoogleAccount,
     unlinkGoogleAccount,
     getSocialConnections,

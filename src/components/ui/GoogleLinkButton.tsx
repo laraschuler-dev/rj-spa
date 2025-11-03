@@ -9,7 +9,7 @@ interface GoogleLinkButtonProps {
 }
 
 export default function GoogleLinkButton({ onSuccess }: GoogleLinkButtonProps) {
-  const { linkGoogleAccount, loading } = useSocialConnections();
+  const { linkGoogleAccount } = useSocialConnections();
   const setUser = useAuthStore((state) => state.setUser);
 
   const handleSuccess = async (credentialResponse: any) => {
