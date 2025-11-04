@@ -49,11 +49,7 @@ const DonationsPage: React.FC = () => {
     } catch (err) {
       console.error(err);
     } finally {
-      const reopenedId = postToShare.id;
       closeShareModal();
-
-      // Reabre o modal de detalhes, se quiser
-      setSelectedPost(reopenedId);
     }
   };
 

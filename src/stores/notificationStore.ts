@@ -1,5 +1,6 @@
-// stores/notificationStore.ts
+// src/stores/notificationStore.ts
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import axios from '../services/api';
 
 export interface Notification {
@@ -34,87 +35,138 @@ interface NotificationStoreState {
   addNotification: (notification: Notification) => void;
 }
 
-export const useNotificationStore = create<NotificationStoreState>(
-  (set, get) => ({
-    notifications: [],
-    unreadCount: 0,
-    loading: false,
-    hasMore: true,
-    page: 1,
+export const useNotificationStore = create<NotificationStoreState>()(
+  persist(
+    (set, get) => ({
+      notifications: [],
+      unreadCount: 0,
+      loading: false,
+      hasMore: true,
+      page: 1,
 
-    fetchNotifications: async (isInitialLoad = false) => {
-      const { loading, page } = get();
-      if (loading) return;
+      // 🔹 Buscar notificações
+      fetchNotifications: async (isInitialLoad = false) => {
+        console.log(
+          '🟢 [Store] fetchNotifications iniciado (isInitialLoad:',
+          isInitialLoad,
+          ')'
+        );
 
-      console.log('🔄 Buscando notificações...', {
-        isInitialLoad,
-        currentPage: isInitialLoad ? 1 : page,
-      });
-      set({ loading: true });
+        const { loading, page } = get();
+        if (loading) return;
 
-      try {
-        // CORREÇÃO: Calcular a página correta baseada no isInitialLoad
-        const currentPage = isInitialLoad ? 1 : page;
-
-        const response = await axios.get('/notifications', {
-          params: { page: currentPage, limit: 10 },
+        console.log('🔄 Buscando notificações...', {
+          isInitialLoad,
+          currentPage: isInitialLoad ? 1 : page,
         });
+        set({ loading: true });
 
-        const newNotifications: Notification[] = response.data.data;
-        const pagination = response.data.pagination;
+        try {
+          const currentPage = isInitialLoad ? 1 : page;
+          const response = await axios.get('/notifications', {
+            params: { page: currentPage, limit: 10 },
+          });
 
-        set((state) => {
-          const updatedNotifications = isInitialLoad
-            ? newNotifications
-            : [...state.notifications, ...newNotifications];
+          const newNotifications: Notification[] = response.data.data;
+          const pagination = response.data.pagination;
 
-          // CORREÇÃO: Avançar para próxima página apenas se não for load inicial
-          const nextPage = isInitialLoad ? 2 : state.page + 1;
+          set((state) => {
+            const updatedNotifications = isInitialLoad
+              ? newNotifications
+              : [...state.notifications, ...newNotifications];
 
-          return {
-            notifications: updatedNotifications,
-            page: nextPage,
-            hasMore: pagination.hasNextPage,
-            loading: false,
-          };
-        });
-      } catch (error) {
-        console.error('❌ Erro ao buscar notificações:', error);
-        set({ loading: false });
-      }
-    },
+            const nextPage = isInitialLoad ? 2 : state.page + 1;
 
-    fetchUnreadCount: async () => {
-      try {
-        const response = await axios.get('/notifications/unread-count');
-        set({ unreadCount: response.data.count });
-      } catch (error) {
-        console.error('❌ Erro ao buscar contador:', error);
-      }
-    },
+            return {
+              notifications: updatedNotifications,
+              page: nextPage,
+              hasMore: pagination.hasNextPage,
+              loading: false,
+            };
+          });
+        } catch (error) {
+          console.error('❌ Erro ao buscar notificações:', error);
+          set({ loading: false });
+        }
+      },
 
-    markAllAsRead: async () => {
-      try {
-        set({ unreadCount: 0 });
-      } catch (error) {
-        console.error('Erro ao marcar notificações como lidas:', error);
-      }
-    },
+      // 🔹 Contador de não lidas
+      fetchUnreadCount: async () => {
+        console.log('🟡 [Store] fetchUnreadCount chamado...');
+        try {
+          const response = await axios.get('/notifications/unread-count');
+          console.log(
+            '📊 [Store] Unread count recebido da API:',
+            response.data.count
+          );
+          set({ unreadCount: response.data.count });
+        } catch (error) {
+          console.error('❌ Erro ao buscar contador:', error);
+        }
+      },
 
-    clearNotifications: () => {
-      set({
-        notifications: [],
-        page: 1,
-        hasMore: true,
-        loading: false, // Também garantir que loading seja false
-      });
-    },
+      // 🔹 Marcar todas como lidas
+      markAllAsRead: async () => {
+        console.log('✅ [Store] markAllAsRead chamado...');
+        try {
+          // 🔹 Atualiza imediatamente o estado local
+          set((state) => ({
+            unreadCount: 0,
+            notifications: state.notifications.map((n) => ({
+              ...n,
+              is_read: true,
+            })),
+          }));
 
-    addNotification: (notification: Notification) => {
-      set((state) => ({
-        notifications: [notification, ...state.notifications],
-        unreadCount: state.unreadCount + 1,
-      }));
-    },
-  })
+          // 🔹 Faz a chamada para o backend
+          await axios.post('/notifications/mark-all-as-read');
+
+          // 🔹 Evita corrida: pequeno delay antes da revalidação
+          setTimeout(async () => {
+            try {
+              const response = await axios.get('/notifications/unread-count');
+              console.log(
+                '🔁 [Store] Revalidação após markAllAsRead:',
+                response.data.count
+              );
+              set({ unreadCount: response.data.count });
+            } catch (err) {
+              console.warn('[Store] Falha ao revalidar unread count', err);
+            }
+          }, 500); // pequeno delay evita conflito de requests simultâneas
+        } catch (error) {
+          console.error(
+            '❌ [Store] Erro ao marcar notificações como lidas:',
+            error
+          );
+        }
+      },
+
+      // 🔹 Limpar notificações (sem perder contador)
+      clearNotifications: () => {
+        set((state) => ({
+          ...state,
+          notifications: [],
+          page: 1,
+          hasMore: true,
+          loading: false,
+        }));
+      },
+
+      // 🔹 Adicionar notificação em tempo real
+      addNotification: (notification: Notification) => {
+        set((state) => ({
+          notifications: [notification, ...state.notifications],
+          unreadCount: state.unreadCount + 1,
+        }));
+      },
+    }),
+    {
+      name: 'notification-storage',
+      partialize: (state) => ({
+        notifications: state.notifications,
+        unreadCount: state.unreadCount,
+      }),
+    }
+  )
 );

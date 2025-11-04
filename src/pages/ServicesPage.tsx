@@ -50,11 +50,7 @@ const ServicesPage: React.FC = () => {
       console.error(err);
       toast.error('Erro ao compartilhar o serviço');
     } finally {
-      const reopenedId = postToShare.id;
       closeShareModal();
-
-      // Reabre o modal de detalhes, se quiser
-      setSelectedPost(reopenedId);
     }
   };
 

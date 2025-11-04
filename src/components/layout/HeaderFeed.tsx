@@ -1,5 +1,5 @@
-// src/components/HeaderFeed.tsx - VERSÃO SIMPLIFICADA
-import React, { useState } from 'react';
+// src/components/HeaderFeed.tsx
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   FiBell,
@@ -20,8 +20,32 @@ import { Sparkles } from 'lucide-react';
 const HeaderFeed: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const location = useLocation();
-  const { unreadCount, fetchUnreadCount } = useNotifications();
+  const { unreadCount, fetchUnreadCount, markAllAsRead } = useNotifications();
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+
+  useEffect(() => {
+    fetchUnreadCount();
+  }, [fetchUnreadCount]);
+
+  // Evita marcar notificações como lidas várias vezes por mesma abertura
+  const [hasMarkedOnOpen, setHasMarkedOnOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isNotificationsOpen) {
+      // Resetar controle ao fechar dropdown
+      setHasMarkedOnOpen(false);
+      return;
+    }
+
+    // Só executa uma vez por abertura
+    if (!hasMarkedOnOpen) {
+      console.log(
+        '🔔 [Header] Dropdown aberto → marcando notificações como lidas...'
+      );
+      markAllAsRead();
+      setHasMarkedOnOpen(true);
+    }
+  }, [isNotificationsOpen, hasMarkedOnOpen, markAllAsRead]);
 
   return (
     <header className="bg-primary text-background py-4 px-4 md:px-6 flex items-center justify-between fixed top-0 left-0 w-full z-50 border-b border-primary-dark/20">
@@ -98,19 +122,16 @@ const HeaderFeed: React.FC = () => {
 
         {/* Ícones de Ação */}
         <div className="flex items-center gap-1 md:gap-2 bg-primary-dark/20 rounded-lg p-1">
-          {/* Notificações - MANTIDO ORIGINAL */}
+          {/* 🔔 Notificações */}
           <div className="relative">
             <button
-              onClick={() => {
-                setIsNotificationsOpen(!isNotificationsOpen);
-                fetchUnreadCount();
-              }}
+              onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
               className="relative p-2 rounded-md hover:bg-primary-dark hover:text-accent transition-all duration-200 group focus:outline-none"
               aria-label="Notificações"
             >
               <FiBell size={20} />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-accent text-white text-xs rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
+                <span className="absolute -top-0.5 -right-0.5 bg-accent text-white text-xs rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               )}

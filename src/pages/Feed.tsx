@@ -56,22 +56,19 @@ const Feed: React.FC = () => {
   const handleShare = async (message?: string) => {
     if (!postToShare) return;
 
+    // ✅ Guarda se havia um modal de detalhes aberto ANTES do compartilhamento
+    const hadDetailsModalOpen = !!selectedPost;
+
     try {
       const originalPostId = postToShare.sharedBy
         ? postToShare.sharedBy.postId
         : postToShare.id;
       const sharedPostDTO = await sharePost(originalPostId, message);
-      addPost(sharedPostDTO); // store como única fonte da verdade
+      addPost(sharedPostDTO);
     } catch (err) {
       console.error(err);
-      toast.error('Erro ao compartilhar o post');
     } finally {
       closeShareModal();
-      // Reabre detalhes se quiser voltar àquele post
-      setSelectedPost({
-        id: postToShare.id,
-        shareId: postToShare.sharedBy?.shareId,
-      });
     }
   };
 
