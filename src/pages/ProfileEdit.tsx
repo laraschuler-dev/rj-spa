@@ -7,7 +7,6 @@ import { toast } from 'react-toastify';
 import CancelButton from '../components/ui/CancelButton';
 import { useProfileStore } from '../stores/profileStore';
 import { useEditProfile, ProfileFormData } from '../hooks/useEditProfile';
-import BackButton from '../components/ui/BackButton';
 import { resolveImageUrl } from '../utils/resolveImageUrl';
 import { useAuth } from '../hooks/useAuth';
 import AvatarInitials from '../components/ui/AvatarInitials';
@@ -111,7 +110,6 @@ const ProfileEdit: React.FC = () => {
 
   return (
     <main className="min-h-screen bg-background px-4 py-12">
-      <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
       <div className="w-full max-w-[600px] bg-white p-8 rounded-2xl shadow-lg text-center mx-auto">
         <Typography variant="h1" className="text-center text-primary mb-6">
           Editar Perfil

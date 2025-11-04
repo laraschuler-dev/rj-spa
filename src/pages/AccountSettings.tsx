@@ -14,6 +14,7 @@ import { CreatePasswordSection } from '../components/account-settings/CreatePass
 import { SocialConnectionsSection } from '../components/account-settings/SocialConnectionsSection';
 import { DeleteAccountSection } from '../components/account-settings/DeleteAccountSection';
 
+// AccountSettings.tsx
 const AccountSettings: React.FC = () => {
   const { user } = useAuthStore();
 
@@ -54,7 +55,6 @@ const AccountSettings: React.FC = () => {
           onSave={accountData.updateAccount}
           isUpdating={accountData.isUpdating}
           hasChanges={accountData.hasChanges()}
-          socialConnections={socialConnections.connections}
         />
 
         {!user?.isSocialLogin && (

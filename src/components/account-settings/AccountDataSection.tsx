@@ -4,7 +4,6 @@ import Typography from '../ui/Typography';
 import SubmitButton from '../ui/SubmitButton';
 import { UserFormData } from '../../types/accountSettings';
 import useAuthStore from '../../stores/authStore';
-import { SocialConnections } from '../../types/accountSettings';
 
 interface AccountDataSectionProps {
   isOpen: boolean;
@@ -14,7 +13,6 @@ interface AccountDataSectionProps {
   onSave: () => void;
   isUpdating: boolean;
   hasChanges: boolean;
-  socialConnections: SocialConnections;
 }
 
 export const AccountDataSection: React.FC<AccountDataSectionProps> = ({
@@ -25,7 +23,6 @@ export const AccountDataSection: React.FC<AccountDataSectionProps> = ({
   onSave,
   isUpdating,
   hasChanges,
-  socialConnections,
 }) => {
   const { user } = useAuthStore();
 
@@ -36,7 +33,8 @@ export const AccountDataSection: React.FC<AccountDataSectionProps> = ({
     });
   };
 
-  const isEmailDisabled = user?.isSocialLogin || socialConnections.hasGoogle;
+  // FONTE ÚNICA DA VERDADE - usar apenas o authStore
+  const isEmailDisabled = user?.isSocialLogin || user?.hasGoogle;
 
   return (
     <div className="border border-gray-200 rounded-xl overflow-hidden">
@@ -93,9 +91,9 @@ export const AccountDataSection: React.FC<AccountDataSectionProps> = ({
             />
             {isEmailDisabled && (
               <p className="text-xs text-gray-500 mt-1">
-                {socialConnections.hasGoogle
-                  ? 'Email não pode ser alterado enquanto a conta Google estiver vinculada. Desvincule primeiro.'
-                  : 'Email não pode ser alterado em contas vinculadas ao Google'}
+                {user?.isSocialLogin
+                  ? 'Email não pode ser alterado em contas vinculadas ao Google'
+                  : 'Email não pode ser alterado enquanto a conta Google estiver vinculada. Desvincule primeiro.'}
               </p>
             )}
           </div>

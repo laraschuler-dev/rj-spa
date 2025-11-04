@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Typography from '../components/ui/Typography';
 import SubmitButton from '../components/ui/SubmitButton';
-import { FaFacebook } from 'react-icons/fa';
 import api from '../services/api';
 import { toast } from 'react-toastify';
 import useAuthStore from '../stores/authStore';

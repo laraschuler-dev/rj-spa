@@ -24,6 +24,7 @@ export default function GoogleLinkButton({ onSuccess }: GoogleLinkButtonProps) {
       onSuccess?.();
     } catch (error) {
       console.error('Erro ao vincular Google:', error);
+      toast.error('Erro ao vincular Google');
     }
   };
 

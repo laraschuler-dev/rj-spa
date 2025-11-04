@@ -1,8 +1,9 @@
-// components/account-settings/hooks/usePasswordManagement.ts
+// usePasswordManagement.ts
 import { useState } from 'react';
 import axios from '../services/api';
 import { toast } from 'react-toastify';
 import { PasswordFormData } from '../types/accountSettings';
+import useAuthStore from '../stores/authStore';
 
 export const usePasswordManagement = () => {
   const [passwordData, setPasswordData] = useState<PasswordFormData>({
@@ -12,6 +13,8 @@ export const usePasswordManagement = () => {
   });
 
   const [isUpdating, setIsUpdating] = useState(false);
+
+  const { updateUser } = useAuthStore();
 
   const validatePassword = (): string | null => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
@@ -71,6 +74,9 @@ export const usePasswordManagement = () => {
       await axios.put('/auth/password', {
         newPassword: passwordData.newPassword,
       });
+
+      // ATUALIZAR STORE - usuário não é mais apenas social
+      updateUser({ isSocialLogin: false });
 
       toast.success(
         'Senha criada com sucesso! Agora você pode fazer login com email também.'

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import axios from '../services/api';
 import { toast } from 'react-toastify';
 import { UserFormData } from '../types/accountSettings';
+import useAuthStore from '../stores/authStore';
 
 export const useAccountData = () => {
   const [formData, setFormData] = useState<UserFormData>({
@@ -19,6 +20,9 @@ export const useAccountData = () => {
 
   const [isUpdating, setIsUpdating] = useState(false);
 
+  // ✅ Obter o usuário atual da store para reagir a mudanças
+  const user = useAuthStore((state) => state.user);
+
   useEffect(() => {
     const loadUserData = async () => {
       try {
@@ -33,12 +37,12 @@ export const useAccountData = () => {
         setOriginalData(userData);
       } catch (err: any) {
         const message = err.response?.data?.error || 'Erro ao carregar dados';
-        toast.error(message);
+        console.error(message);
       }
     };
 
     loadUserData();
-  }, []);
+  }, [user]); // ✅ Recarregar quando o usuário mudar
 
   const updateAccount = async () => {
     if (isUpdating) return;
@@ -50,7 +54,7 @@ export const useAccountData = () => {
       toast.success('Dados atualizados com sucesso.');
     } catch (err: any) {
       const message = err.response?.data?.error || 'Erro ao atualizar dados';
-      toast.error(message);
+      console.error(message);
     } finally {
       setIsUpdating(false);
     }

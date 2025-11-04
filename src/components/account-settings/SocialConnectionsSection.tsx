@@ -4,7 +4,7 @@ import Typography from '../ui/Typography';
 import GoogleLinkButton from '../ui/GoogleLinkButton';
 import { SocialConnections } from '../../types/accountSettings';
 import useAuthStore from '../../stores/authStore';
-import { FcGoogle } from 'react-icons/fc'; // ✅ Ícone oficial do Google
+import { FcGoogle } from 'react-icons/fc';
 
 interface SocialConnectionsSectionProps {
   isOpen: boolean;
@@ -17,6 +17,9 @@ interface SocialConnectionsSectionProps {
   onShowUnlinkModalChange: (show: boolean) => void;
   isUnlinking: boolean;
 }
+
+// components/account-settings/sections/SocialConnectionsSection.tsx
+// ... imports e interface
 
 export const SocialConnectionsSection: React.FC<
   SocialConnectionsSectionProps
@@ -35,6 +38,29 @@ export const SocialConnectionsSection: React.FC<
 
   const handleGoogleLinkSuccess = () => {
     // Esta função será passada para o GoogleLinkButton
+  };
+
+  const getConnectionMessage = () => {
+    if (connections.hasGoogle) {
+      return '✅ Sua conta está vinculada ao Google. Você pode fazer login de forma rápida e segura.';
+    } else {
+      return '💡 Vincule sua conta ao Google para fazer login de forma mais rápida e segura.';
+    }
+  };
+
+  const getAdditionalInfo = () => {
+    console.log('🔍 Debug SocialConnections:', {
+      isSocialLogin: user?.isSocialLogin,
+      hasGoogle: connections.hasGoogle,
+      user: user,
+    });
+
+    // ✅ CORREÇÃO: Mostrar mensagem quando usuário é social login (só tem Google)
+    // E o Google está vinculado (que sempre será true para social login puro)
+    if (user?.isSocialLogin && connections.hasGoogle) {
+      return ' Você também pode criar uma senha para fazer login com email.';
+    }
+    return '';
   };
 
   return (
@@ -66,11 +92,11 @@ export const SocialConnectionsSection: React.FC<
 
         {isOpen && (
           <div className="px-6 py-4 space-y-6">
-            {/* Google Connection */}
-            <div className="flex items-center justify-between py-3 border-b border-gray-100">
-              <div className="flex items-center space-x-3">
+            <div className="flex flex-col items-center text-center md:flex-row md:items-center md:justify-between py-3 border-b border-gray-100 gap-4">
+              {/* Ícone e textos */}
+              <div className="flex flex-col items-center md:flex-row md:items-center md:space-x-3">
                 <div className="w-9 h-9 bg-white border border-gray-300 rounded-full flex items-center justify-center shadow-sm">
-                  <FcGoogle size={22} /> {/* ✅ Ícone estiloso e pronto */}
+                  <FcGoogle size={22} />
                 </div>
                 <div>
                   <Typography
@@ -85,26 +111,38 @@ export const SocialConnectionsSection: React.FC<
                 </div>
               </div>
 
-              {connections.hasGoogle ? (
-                <button
-                  onClick={() => onShowUnlinkModalChange(true)}
-                  disabled={isUnlinking}
-                  className="px-4 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50 disabled:opacity-50 transition-colors"
-                >
-                  Desvincular
-                </button>
-              ) : (
-                <GoogleLinkButton onSuccess={handleGoogleLinkSuccess} />
-              )}
+              {/* Botão */}
+              <div className="flex justify-center md:justify-end w-full md:w-auto">
+                {connections.hasGoogle ? (
+                  <button
+                    onClick={() => onShowUnlinkModalChange(true)}
+                    disabled={isUnlinking}
+                    className="px-4 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50 disabled:opacity-50 transition-colors focus:outline-none w-full sm:w-auto"
+                  >
+                    Desvincular
+                  </button>
+                ) : (
+                  <div className="w-full sm:w-auto">
+                    <GoogleLinkButton onSuccess={handleGoogleLinkSuccess} />
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Informações sobre vinculação */}
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <Typography variant="p" className="text-blue-700 text-sm">
-                💡 Vincule sua conta ao Google para fazer login de forma mais
-                rápida e segura.
-                {user?.isSocialLogin &&
-                  ' Você também pode criar uma senha para fazer login com email.'}
+            {/* Informações contextuais */}
+            <div
+              className={`p-4 rounded-lg ${
+                connections.hasGoogle ? 'bg-green-50' : 'bg-blue-50'
+              }`}
+            >
+              <Typography
+                variant="p"
+                className={`text-sm ${
+                  connections.hasGoogle ? 'text-green-700' : 'text-blue-700'
+                }`}
+              >
+                {getConnectionMessage()}
+                {getAdditionalInfo()}
               </Typography>
             </div>
           </div>
@@ -140,14 +178,14 @@ export const SocialConnectionsSection: React.FC<
                   onShowUnlinkModalChange(false);
                   onUnlinkPasswordChange('');
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none"
               >
                 Cancelar
               </button>
               <button
                 onClick={onUnlinkGoogle}
                 disabled={isUnlinking || !unlinkPassword}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors focus:outline-none"
               >
                 {isUnlinking ? 'Desvinculando...' : 'Desvincular'}
               </button>

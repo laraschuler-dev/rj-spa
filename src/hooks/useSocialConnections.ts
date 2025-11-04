@@ -1,64 +1,39 @@
-// src/hooks/useSocialConnections.ts (VERSÃO FINAL UNIFICADA)
-import { useState, useEffect } from 'react';
+// useSocialConnections.ts - Versão corrigida
+import { useState } from 'react';
 import axios from '../services/api';
 import { toast } from 'react-toastify';
 import useAuthStore from '../stores/authStore';
 import { SocialConnections } from '../types/accountSettings';
 
 export const useSocialConnections = () => {
-  // Estado das conexões
-  const [connections, setConnections] = useState<SocialConnections>({
-    hasGoogle: false,
-    connectedProviders: [],
-  });
-
-  // Estado do modal de desvinculação
   const [unlinkPassword, setUnlinkPassword] = useState('');
   const [showUnlinkModal, setShowUnlinkModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const setUser = useAuthStore((state) => state.setUser);
+  // ✅ Usar refreshUser em vez de setUser
+  const { user, refreshUser, setHasGoogle } = useAuthStore();
 
-  // ✅ CARREGA CONEXÕES AO INICIAR
-  useEffect(() => {
-    const loadConnections = async () => {
-      try {
-        const response = await axios.get('/auth/social-connections');
-        setConnections(response.data);
-      } catch (error) {
-        console.error('Erro ao carregar conexões sociais:', error);
-      }
-    };
+  const connections: SocialConnections = {
+    hasGoogle: user?.hasGoogle || false,
+    connectedProviders: user?.hasGoogle ? ['google'] : [],
+  };
 
-    loadConnections();
-  }, []);
-
-  // ✅ VINCULAR GOOGLE
   const linkGoogleAccount = async (idToken: string) => {
     setIsLoading(true);
     try {
       const response = await axios.post('/auth/google/link', { idToken });
 
-      // Atualiza estado local
-      setConnections((prev) => ({
-        ...prev,
-        hasGoogle: true,
-        connectedProviders: [...prev.connectedProviders, 'google'],
-      }));
-
-      // Atualiza user na store
-      setUser(response.data.user);
-
+      // Atualizar dados do usuário sem afetar a sessão
+      await refreshUser();
       return response.data;
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Erro ao vincular Google');
+      console.error(error.response?.data?.error || 'Erro ao vincular Google');
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ✅ DESVINCULAR GOOGLE
   const unlinkGoogleAccount = async (password: string) => {
     if (!password) {
       toast.error('Por favor, informe sua senha');
@@ -69,50 +44,38 @@ export const useSocialConnections = () => {
     try {
       await axios.post('/auth/google/unlink', { password });
 
-      // Atualiza estado local
-      setConnections((prev) => ({
-        ...prev,
-        hasGoogle: false,
-        connectedProviders: prev.connectedProviders.filter(
-          (p) => p !== 'google'
-        ),
-      }));
+      // Atualizar dados do usuário sem afetar a sessão
+      await refreshUser();
 
       setShowUnlinkModal(false);
       setUnlinkPassword('');
       toast.success('Google desvinculado com sucesso!');
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Erro ao desvincular Google');
+      console.error('🔴 Erro ao desvincular Google:', error);
+
+      // Se for erro 401, pode ser que o backend invalidou o token
+      if (error.response?.status === 401) {
+        toast.error('Sessão expirada ao desvincular Google.');
+        // O useAuthListener vai redirecionar para login
+      } else {
+        toast.error(
+          error.response?.data?.error || 'Erro ao desvincular Google'
+        );
+      }
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ✅ BUSCAR CONEXÕES (para recarregar)
-  const getSocialConnections = async () => {
-    try {
-      const response = await axios.get('/auth/social-connections');
-      setConnections(response.data);
-      return response.data;
-    } catch (error: any) {
-      console.error('Erro ao buscar conexões sociais:', error);
-      throw error;
-    }
-  };
-
   return {
-    // Estado
     connections,
     unlinkPassword,
     setUnlinkPassword,
     showUnlinkModal,
     setShowUnlinkModal,
     isLoading,
-
-    // Ações
     linkGoogleAccount,
     unlinkGoogleAccount,
-    getSocialConnections,
   };
 };
