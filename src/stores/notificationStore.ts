@@ -46,19 +46,9 @@ export const useNotificationStore = create<NotificationStoreState>()(
 
       // 🔹 Buscar notificações
       fetchNotifications: async (isInitialLoad = false) => {
-        console.log(
-          '🟢 [Store] fetchNotifications iniciado (isInitialLoad:',
-          isInitialLoad,
-          ')'
-        );
-
         const { loading, page } = get();
         if (loading) return;
 
-        console.log('🔄 Buscando notificações...', {
-          isInitialLoad,
-          currentPage: isInitialLoad ? 1 : page,
-        });
         set({ loading: true });
 
         try {
@@ -92,13 +82,9 @@ export const useNotificationStore = create<NotificationStoreState>()(
 
       // 🔹 Contador de não lidas
       fetchUnreadCount: async () => {
-        console.log('🟡 [Store] fetchUnreadCount chamado...');
         try {
           const response = await axios.get('/notifications/unread-count');
-          console.log(
-            '📊 [Store] Unread count recebido da API:',
-            response.data.count
-          );
+
           set({ unreadCount: response.data.count });
         } catch (error) {
           console.error('❌ Erro ao buscar contador:', error);
@@ -107,7 +93,6 @@ export const useNotificationStore = create<NotificationStoreState>()(
 
       // 🔹 Marcar todas como lidas
       markAllAsRead: async () => {
-        console.log('✅ [Store] markAllAsRead chamado...');
         try {
           // 🔹 Atualiza imediatamente o estado local
           set((state) => ({
@@ -125,10 +110,7 @@ export const useNotificationStore = create<NotificationStoreState>()(
           setTimeout(async () => {
             try {
               const response = await axios.get('/notifications/unread-count');
-              console.log(
-                '🔁 [Store] Revalidação após markAllAsRead:',
-                response.data.count
-              );
+
               set({ unreadCount: response.data.count });
             } catch (err) {
               console.warn('[Store] Falha ao revalidar unread count', err);
@@ -142,7 +124,7 @@ export const useNotificationStore = create<NotificationStoreState>()(
         }
       },
 
-      // 🔹 Limpar notificações (sem perder contador)
+      // Limpar notificações
       clearNotifications: () => {
         set((state) => ({
           ...state,
@@ -153,7 +135,7 @@ export const useNotificationStore = create<NotificationStoreState>()(
         }));
       },
 
-      // 🔹 Adicionar notificação em tempo real
+      // Adicionar notificação em tempo real
       addNotification: (notification: Notification) => {
         set((state) => ({
           notifications: [notification, ...state.notifications],

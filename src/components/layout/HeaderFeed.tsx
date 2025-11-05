@@ -39,9 +39,6 @@ const HeaderFeed: React.FC = () => {
 
     // Só executa uma vez por abertura
     if (!hasMarkedOnOpen) {
-      console.log(
-        '🔔 [Header] Dropdown aberto → marcando notificações como lidas...'
-      );
       markAllAsRead();
       setHasMarkedOnOpen(true);
     }
@@ -143,7 +140,7 @@ const HeaderFeed: React.FC = () => {
             />
           </div>
 
-          {/* UserDropdownMenu - NOVA VERSÃO */}
+          {/* UserDropdownMenu*/}
           <div className="hidden md:block">
             <UserDropdownMenu variant="header" />
           </div>

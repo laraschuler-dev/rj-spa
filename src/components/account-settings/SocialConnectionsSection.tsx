@@ -49,14 +49,6 @@ export const SocialConnectionsSection: React.FC<
   };
 
   const getAdditionalInfo = () => {
-    console.log('🔍 Debug SocialConnections:', {
-      isSocialLogin: user?.isSocialLogin,
-      hasGoogle: connections.hasGoogle,
-      user: user,
-    });
-
-    // ✅ CORREÇÃO: Mostrar mensagem quando usuário é social login (só tem Google)
-    // E o Google está vinculado (que sempre será true para social login puro)
     if (user?.isSocialLogin && connections.hasGoogle) {
       return ' Você também pode criar uma senha para fazer login com email.';
     }
