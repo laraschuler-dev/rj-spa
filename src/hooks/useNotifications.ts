@@ -1,7 +1,5 @@
-// hooks/useNotifications.ts - CORREÇÃO NA ORDEM
 import { useEffect, useCallback } from 'react';
 import { useNotificationStore } from '../stores/notificationStore';
-
 export const useNotifications = () => {
   const {
     notifications,
@@ -14,18 +12,20 @@ export const useNotifications = () => {
     clearNotifications,
   } = useNotificationStore();
 
-  // CORREÇÃO: Ordem mais lógica e sem zerar o contador
   const initializeNotifications = useCallback(async () => {
-    // Primeiro busca o contador (mantém o valor atual)
+    console.log('[useNotifications] Inicializando notificações...');
     await fetchUnreadCount();
-    // Depois limpa e busca notificações
-    clearNotifications();
     await fetchNotifications(true);
-  }, [fetchNotifications, fetchUnreadCount, clearNotifications]);
+    console.log('[useNotifications] Finalizado initializeNotifications');
+  }, [fetchNotifications, fetchUnreadCount]);
 
-  // Buscar notificações e contador ao montar
   useEffect(() => {
-    initializeNotifications();
+    // Evita buscar contador novamente se o hook for re-renderizado imediatamente após markAllAsRead
+    const timeout = setTimeout(() => {
+      initializeNotifications();
+    }, 300);
+
+    return () => clearTimeout(timeout);
   }, [initializeNotifications]);
 
   return {

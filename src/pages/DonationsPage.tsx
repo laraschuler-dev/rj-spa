@@ -64,6 +64,11 @@ const DonationsPage: React.FC = () => {
     }
   };
 
+  React.useEffect(() => {
+    if (shareModalOpen && selectedPost) setSelectedPost(null);
+    if (selectedPost && shareModalOpen) setShareModalOpen(false);
+  }, [shareModalOpen, selectedPost]);
+
   return (
     <Layout variant="feed">
       <div className="mt-6 mb-6">
@@ -169,8 +174,14 @@ const DonationsPage: React.FC = () => {
             }
           }}
           onShare={() => {
-            const donation = donations.find((d) => d.id === selectedPost);
-            if (donation) openShareModal(donation);
+            const donation = donations.find((e) => e.id === selectedPost);
+            if (donation) {
+              // Fecha o modal de detalhes
+              setSelectedPost(null);
+
+              // Abre o modal de compartilhamento com leve delay
+              setTimeout(() => openShareModal(donation), 300);
+            }
           }}
           onDelete={() => handleDelete(selectedPost)}
           onEdit={(postId) => setEditingPost(postId)}

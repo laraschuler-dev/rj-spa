@@ -46,7 +46,6 @@ const ServicesPage: React.FC = () => {
 
     try {
       await sharePost(postToShare.id, message);
-      toast.success('Serviço compartilhado com sucesso!');
     } catch (err) {
       console.error(err);
       toast.error('Erro ao compartilhar o serviço');
@@ -79,6 +78,11 @@ const ServicesPage: React.FC = () => {
         return 'Serviço';
     }
   };
+
+  React.useEffect(() => {
+    if (shareModalOpen && selectedPost) setSelectedPost(null);
+    if (selectedPost && shareModalOpen) setShareModalOpen(false);
+  }, [shareModalOpen, selectedPost]);
 
   return (
     <Layout variant="feed">
@@ -198,8 +202,14 @@ const ServicesPage: React.FC = () => {
             }
           }}
           onShare={() => {
-            const service = services.find((s) => s.id === selectedPost);
-            if (service) openShareModal(service);
+            const service = services.find((e) => e.id === selectedPost);
+            if (service) {
+              // Fecha o modal de detalhes
+              setSelectedPost(null);
+
+              // Abre o modal de compartilhamento com leve delay
+              setTimeout(() => openShareModal(service), 300);
+            }
           }}
           onDelete={() => handleDelete(selectedPost)}
           onEdit={(postId) => setEditingPost(postId)}

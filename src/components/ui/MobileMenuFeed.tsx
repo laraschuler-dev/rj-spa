@@ -15,6 +15,7 @@ import {
 import { PiStudent } from 'react-icons/pi';
 import { IoMdClose } from 'react-icons/io';
 import { UserDropdownMobile } from './UserDropdownMobile';
+import { Sparkles } from 'lucide-react'; // Importar o ícone Sparkles
 
 interface MobileMenuFeedProps {
   isOpen: boolean;
@@ -30,27 +31,26 @@ const MobileMenuFeed: React.FC<MobileMenuFeedProps> = ({ isOpen, onClose }) => {
       animate={{ x: isOpen ? '0%' : '100%' }}
       exit={{ x: '100%' }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      className="fixed top-0 right-0 w-64 h-full bg-primary text-background shadow-lg z-50 p-6 flex flex-col overflow-y-auto"
+      className="fixed top-0 right-0 w-64 h-full bg-gradient-to-b from-primary to-primary/95 text-background shadow-lg z-50 p-6 flex flex-col overflow-y-auto"
     >
       {/* Botão Fechar */}
       <button
-        className="absolute top-4 right-4 text-background text-3xl"
+        className="absolute top-4 right-4 text-background text-3xl focus:outline-none"
         onClick={onClose}
         aria-label="Fechar menu"
       >
         <IoMdClose />
       </button>
 
-      {/* Logo */}
-      <h2
-        className="text-xl font-heading font-bold hover:text-accent transition-colors mb-4 mt-8 cursor-pointer"
-        onClick={() => {
-          window.location.href = '/';
-          onClose();
-        }}
+      {/* Logo - Versão mais compacta */}
+      <Link
+        to="/"
+        onClick={onClose}
+        className="flex items-center gap-1.5 text-base font-heading font-bold cursor-pointer text-white bg-primary hover:bg-gradient-to-r hover:from-primary hover:to-accent/30 transition-all duration-300 whitespace-nowrap px-2 py-1.5 rounded-lg border border-accent shadow-md hover:shadow-lg mt-6 mb-4"
       >
+        <Sparkles className="w-3 h-3" />
         Redefinindo Jornadas
-      </h2>
+      </Link>
 
       {/* UserDropdownMobile - COMPONENTE PERSONALIZADO */}
       <div className="mb-4">

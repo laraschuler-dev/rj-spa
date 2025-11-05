@@ -157,10 +157,10 @@ export default function Services() {
                     </Typography>
                   </div>
 
-                  <div className="h-20 mb-2 flex-1">
+                  <div className="h-14 mb-2">
                     <Typography
                       variant="p"
-                      className="text-sm text-gray-600 line-clamp-3"
+                      className="text-sm text-gray-600 line-clamp-2"
                     >
                       {service.description}
                     </Typography>

@@ -25,7 +25,8 @@ function Sidebar() {
           width: '256px', // 64 * 4
         }}
       >
-        <aside className="w-64 bg-sidebar text-white h-full p-6 shadow-lg flex flex-col">
+        <aside className="w-64 bg-gradient-to-b from-sidebar to-sidebar/50 text-white h-full p-6 flex flex-col shadow-lg">
+          {' '}
           <h2 className="text-2xl mt-6 mb-6">Ações</h2>{' '}
           {/* ← Reduzi o mb-6 para mb-4 */}
           <nav className="flex flex-col gap-2 flex-1">

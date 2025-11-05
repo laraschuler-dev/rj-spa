@@ -6,6 +6,7 @@ import MobileMenu from '../ui/MobileMenu';
 import { Link } from 'react-router-dom';
 import useAuthStore from '../../stores/authStore';
 import { UserDropdownMenu } from '../ui/UserDropdownMenu';
+import { Sparkles } from 'lucide-react';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -39,14 +40,16 @@ const Header: React.FC = () => {
   }, []);
 
   return (
-    <header className="bg-primary text-background py-4 px-6 shadow-md flex items-center justify-between fixed top-0 left-0 w-full z-50">
+    <header className="bg-primary text-background py-4 px-6 shadow-lg flex items-center justify-between fixed top-0 left-0 w-full z-50 border-b border-primary-dark/20">
+      {' '}
       {!isMenuOpen && (
         <ScrollLink
           to="introduction"
           smooth={true}
           duration={500}
-          className="text-xl md:text-2xl font-heading font-bold cursor-pointer hover:text-accent transition-colors"
+          className="flex items-center gap-1.5 text-lg md:text-2xl font-heading font-bold cursor-pointer text-white bg-primary hover:bg-gradient-to-r hover:from-primary hover:to-accent/30 transition-all duration-300 whitespace-nowrap px-3 py-1.5 md:px-4 md:py-2 rounded-lg border-2 border-accent shadow-lg hover:shadow-xl"
         >
+          <Sparkles className="w-4 h-4 md:w-5 md:h-5" />
           Redefinindo Jornadas
         </ScrollLink>
       )}
