@@ -87,6 +87,8 @@ const PostCard: React.FC<PostCardProps> = ({
   );
 
   const isOriginalDeleted = metadata?.isDeletedOriginal ?? false;
+  const isUnavailable = metadata?.isUnavailable ?? false;
+  const shouldShowUnavailableContent = isUnavailable || isOriginalDeleted;
 
   // ✅ Verifica se é post anônimo
   const isAnonymousPost = categoryId === 2 && metadata?.isAnonymous;
@@ -98,10 +100,22 @@ const PostCard: React.FC<PostCardProps> = ({
     : new Date();
 
   // ✅ Função para renderizar avatar do autor
+  // PostCard.tsx - função renderAuthorAvatar (VERSÃO CORRIGIDA)
   const renderAuthorAvatar = () => {
     const currentAuthor = expanded && sharedBy ? author : author;
 
-    if (isAnonymousPost) {
+    // 👇 NOVO CENÁRIO: Autor removido (id === 0 e nome é "Usuário Removido")
+    const isAuthorRemoved =
+      currentAuthor.id === 0 && currentAuthor.name === 'Usuário Removido';
+
+    if (isAuthorRemoved) {
+      // ✅ Cenário 4: Autor removido - mostra ícone igual ao anônimo
+      return (
+        <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center border">
+          <CgProfile size={40} className="text-gray-500" />
+        </div>
+      );
+    } else if (isAnonymousPost) {
       // ✅ Cenário 3: Post anônimo - mostra ícone
       return (
         <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center border">
@@ -146,6 +160,25 @@ const PostCard: React.FC<PostCardProps> = ({
         </div>
       );
     }
+  };
+
+  // 👇 NO FINAL do componente, antes do return, adicione esta função:
+  // PostCard.tsx - função getUnavailableMessage (VERSÃO MELHORADA)
+  const getUnavailableMessage = () => {
+    if (isUnavailable) {
+      switch (metadata?.reason) {
+        case 'ORIGINAL_POST_DELETED':
+          return 'Conteúdo indisponível - O post original foi removido pelo autor';
+        case 'ORIGINAL_AUTHOR_DELETED':
+          return 'Conteúdo indisponível - O autor do post original não está mais na plataforma';
+        default:
+          return 'Conteúdo indisponível';
+      }
+    }
+    if (isOriginalDeleted) {
+      return 'Este post original foi removido pelo autor.';
+    }
+    return '';
   };
 
   return (
@@ -218,12 +251,12 @@ const PostCard: React.FC<PostCardProps> = ({
       </div>
 
       {/* Título e conteúdo */}
-      {isOriginalDeleted ? (
+      {shouldShowUnavailableContent ? (
         <Typography
           variant="p"
           className="text-sm text-gray-500 italic bg-gray-50 p-2 rounded-md"
         >
-          Este post original foi removido pelo autor.
+          {getUnavailableMessage()} {/* 👈 MENSAGEM DINÂMICA NOVA */}
         </Typography>
       ) : (
         <>
@@ -352,22 +385,23 @@ const PostCard: React.FC<PostCardProps> = ({
           )}
         </>
       )}
-      <Swiper spaceBetween={8} slidesPerView={1} className="rounded-xl">
-        {images.map((url, index) => (
-          <SwiperSlide key={`${id}-img-${index}`}>
-            <div className="w-full aspect-[4/3] flex items-center justify-center bg-gray-100 rounded-xl overflow-hidden">
-              <img
-                src={resolveImageUrl(url)}
-                alt={`Imagem ${index + 1}`}
-                className="object-contain w-full h-full transition-transform duration-300"
-              />
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
-
+      {!shouldShowUnavailableContent && images.length > 0 && (
+        <Swiper spaceBetween={8} slidesPerView={1} className="rounded-xl">
+          {images.map((url, index) => (
+            <SwiperSlide key={`${id}-img-${index}`}>
+              <div className="w-full aspect-[4/3] flex items-center justify-center bg-gray-100 rounded-xl overflow-hidden">
+                <img
+                  src={resolveImageUrl(url)}
+                  alt={`Imagem ${index + 1}`}
+                  className="object-contain w-full h-full transition-transform duration-300"
+                />
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      )}
       {/* Ver mais */}
-      {!isOriginalDeleted && (
+      {!shouldShowUnavailableContent && (
         <div className="text-right">
           {!expanded && !isInModal && (
             <button
@@ -381,7 +415,7 @@ const PostCard: React.FC<PostCardProps> = ({
       )}
 
       {/* Ações */}
-      {!isOriginalDeleted && (
+      {!shouldShowUnavailableContent && (
         <PostActions
           post={{
             id,
@@ -401,7 +435,7 @@ const PostCard: React.FC<PostCardProps> = ({
       )}
 
       {/* Comentários */}
-      {showComments && !isOriginalDeleted && (
+      {showComments && !shouldShowUnavailableContent && (
         <div className="pt-4 border-t">
           <CommentSection
             postId={postIdForComments}
