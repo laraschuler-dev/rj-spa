@@ -99,11 +99,6 @@ const ProfileView: React.FC = () => {
       console.error(err);
     } finally {
       closeShareModal();
-      // Reabre detalhes se quiser voltar àquele post
-      setSelectedPost({
-        id: postToShare.id,
-        shareId: postToShare.sharedBy?.shareId,
-      });
     }
   };
 
@@ -146,6 +141,36 @@ const ProfileView: React.FC = () => {
       </div>
     );
   }
+
+  // ProfileView.tsx - versão alternativa mais organizada
+  const getPostAuthor = (post: any) => {
+    // 1. Se é post indisponível, respeita o que veio da API
+    if (post.metadata?.isUnavailable) {
+      return {
+        id: post.user?.id || 0,
+        name: post.user?.name || 'Usuário desconhecido',
+        avatarUrl: post.user?.avatarUrl,
+        profileType: post.user?.profileType,
+      };
+    }
+
+    // 2. Se é post anônimo
+    if (post.categoria_idcategoria === 2 && post.metadata?.isAnonymous) {
+      return {
+        id: 0,
+        name: 'Usuário Anônimo',
+        avatarUrl: undefined,
+      };
+    }
+
+    // 3. Post normal
+    return {
+      id: post.user?.id,
+      name: post.user?.name || 'Usuário desconhecido',
+      avatarUrl: post.user?.avatarUrl,
+      profileType: post.user?.profileType,
+    };
+  };
 
   return (
     <main className="min-h-screen bg-background px-4 py-12">
@@ -299,20 +324,7 @@ const ProfileView: React.FC = () => {
                   createdAt={post.createdAt}
                   categoryId={post.categoria_idcategoria}
                   metadata={post.metadata}
-                  author={
-                    post.user?.id === 0
-                      ? {
-                          id: 0,
-                          name: 'Usuário Anônimo',
-                          avatarUrl: undefined,
-                        }
-                      : {
-                          id: post.user?.id,
-                          name: post.user?.name || 'Usuário desconhecido',
-                          avatarUrl: post.user?.avatarUrl,
-                          profileType: post.user?.profileType,
-                        }
-                  }
+                  author={getPostAuthor(post)}
                   isLiked={post.liked}
                   sharedBy={post.sharedBy}
                   onLike={async () => {
