@@ -56,7 +56,6 @@ const Feed: React.FC = () => {
   const handleShare = async (message?: string) => {
     if (!postToShare) return;
 
-    // ✅ Guarda se havia um modal de detalhes aberto ANTES do compartilhamento
     const hadDetailsModalOpen = !!selectedPost;
 
     try {

@@ -5,7 +5,7 @@ import { formatTimeAgo } from '../../utils/formatTimeAgo';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import { CgProfile } from 'react-icons/cg';
-import AvatarInitials from '../ui/AvatarInitials'; // ✅ importa o mesmo componente usado no PostCard
+import AvatarInitials from '../ui/AvatarInitials';
 
 interface PostPreviewCardProps {
   author: {
@@ -14,10 +14,14 @@ interface PostPreviewCardProps {
     id?: number;
   };
   createdAt: string;
-  metadata?: { title?: string };
+  metadata?: {
+    title?: string;
+    isUnavailable?: boolean;
+    originalAuthorDeleted?: boolean;
+  };
   content?: string;
   images?: { id: number; url: string }[];
-  isAnonymous?: boolean; // ✅ opcional, caso queira compatibilidade com posts anônimos
+  isAnonymous?: boolean;
 }
 
 const PostPreviewCard: React.FC<PostPreviewCardProps> = ({
@@ -28,12 +32,18 @@ const PostPreviewCard: React.FC<PostPreviewCardProps> = ({
   images,
   isAnonymous = false,
 }) => {
-  // ✅ Função reutilizada do PostCard para renderizar avatar
+  // ✅ Função melhorada para renderizar avatar
   const renderAuthorAvatar = () => {
-    // considera anônimo se explícito ou id === 0
-    const authorIsAnonymous = isAnonymous || author.id === 0;
+    const isAuthorRemoved =
+      author.id === 0 && author.name === 'Usuário Removido';
 
-    if (authorIsAnonymous) {
+    const isUnavailableAuthorRemoved =
+      metadata?.isUnavailable && metadata?.originalAuthorDeleted;
+
+    const shouldShowAnonymousAvatar =
+      isAnonymous || isAuthorRemoved || isUnavailableAuthorRemoved;
+
+    if (shouldShowAnonymousAvatar) {
       return (
         <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center border">
           <CgProfile size={40} className="text-gray-500" />
@@ -56,6 +66,16 @@ const PostPreviewCard: React.FC<PostPreviewCardProps> = ({
     }
   };
 
+  // ✅ Função para determinar o nome do autor
+  const getAuthorName = () => {
+    if (isAnonymous) return 'Anônimo';
+    if (author.id === 0 && author.name === 'Usuário Removido')
+      return 'Usuário Removido';
+    if (metadata?.isUnavailable && metadata?.originalAuthorDeleted)
+      return 'Usuário Removido';
+    return author.name;
+  };
+
   return (
     <div className="bg-white rounded-2xl border shadow-sm p-4">
       {/* Cabeçalho (autor + data) */}
@@ -63,7 +83,7 @@ const PostPreviewCard: React.FC<PostPreviewCardProps> = ({
         {renderAuthorAvatar()}
         <div>
           <Typography variant="p" className="text-sm font-semibold">
-            {isAnonymous ? 'Anônimo' : author.name}
+            {getAuthorName()}
           </Typography>
           <Typography variant="p" className="text-xs text-gray-500">
             {formatTimeAgo(createdAt)}
@@ -78,15 +98,30 @@ const PostPreviewCard: React.FC<PostPreviewCardProps> = ({
         </Typography>
       )}
 
-      {/* Conteúdo */}
-      {content && (
+      {/* Conteúdo - MOSTRA APENAS SE NÃO FOR INDISPONÍVEL */}
+      {content && !metadata?.isUnavailable && (
         <Typography variant="p" className="text-sm text-gray-700 mb-3">
           {content}
         </Typography>
       )}
 
-      {/* Imagens */}
-      {images?.length ? (
+      {/* Mensagem de conteúdo indisponível */}
+      {metadata?.isUnavailable && (
+        <Typography
+          variant="p"
+          className="text-sm text-gray-500 italic bg-gray-50 p-2 rounded-md mb-3"
+        >
+          Conteúdo indisponível
+          {metadata.originalAuthorDeleted &&
+            ' - O autor do post original não está mais na plataforma'}
+          {metadata.originalPostDeleted &&
+            !metadata.originalAuthorDeleted &&
+            ' - O post original foi removido pelo autor'}
+        </Typography>
+      )}
+
+      {/* Imagens - MOSTRA APENAS SE NÃO FOR INDISPONÍVEL */}
+      {images?.length && !metadata?.isUnavailable ? (
         <Swiper spaceBetween={8} slidesPerView={1} className="rounded-xl">
           {images.map((img) => (
             <SwiperSlide key={img.id}>

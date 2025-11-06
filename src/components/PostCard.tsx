@@ -99,24 +99,22 @@ const PostCard: React.FC<PostCardProps> = ({
     ? new Date(sharedBy.sharedAt)
     : new Date();
 
-  // ✅ Função para renderizar avatar do autor
-  // PostCard.tsx - função renderAuthorAvatar (VERSÃO CORRIGIDA)
   const renderAuthorAvatar = () => {
     const currentAuthor = expanded && sharedBy ? author : author;
 
-    // 👇 NOVO CENÁRIO: Autor removido (id === 0 e nome é "Usuário Removido")
+    // Autor removido (id === 0 e nome é "Usuário Removido")
     const isAuthorRemoved =
       currentAuthor.id === 0 && currentAuthor.name === 'Usuário Removido';
 
     if (isAuthorRemoved) {
-      // ✅ Cenário 4: Autor removido - mostra ícone igual ao anônimo
+      // Cenário 4: Autor removido - mostra ícone igual ao anônimo
       return (
         <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center border">
           <CgProfile size={40} className="text-gray-500" />
         </div>
       );
     } else if (isAnonymousPost) {
-      // ✅ Cenário 3: Post anônimo - mostra ícone
+      // Cenário 3: Post anônimo - mostra ícone
       return (
         <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center border">
           <CgProfile size={40} className="text-gray-500" />
@@ -141,7 +139,7 @@ const PostCard: React.FC<PostCardProps> = ({
     }
   };
 
-  // ✅ Função para renderizar avatar do compartilhador
+  // Função para renderizar avatar do compartilhador
   const renderSharedByAvatar = () => {
     if (!sharedBy) return null;
 
@@ -256,7 +254,7 @@ const PostCard: React.FC<PostCardProps> = ({
           variant="p"
           className="text-sm text-gray-500 italic bg-gray-50 p-2 rounded-md"
         >
-          {getUnavailableMessage()} {/* 👈 MENSAGEM DINÂMICA NOVA */}
+          {getUnavailableMessage()}
         </Typography>
       ) : (
         <>

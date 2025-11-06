@@ -99,11 +99,6 @@ const ProfileView: React.FC = () => {
       console.error(err);
     } finally {
       closeShareModal();
-      // Reabre detalhes se quiser voltar àquele post
-      setSelectedPost({
-        id: postToShare.id,
-        shareId: postToShare.sharedBy?.shareId,
-      });
     }
   };
 

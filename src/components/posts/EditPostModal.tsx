@@ -76,7 +76,6 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
 
               try {
                 const updatedPost = await editPost(formData);
-                console.log('✅ Resposta da API após editar:', updatedPost);
 
                 if (updatedPost) {
                   updatePost(updatedPost);
