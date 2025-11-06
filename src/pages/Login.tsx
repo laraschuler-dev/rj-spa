@@ -45,9 +45,23 @@ const Login: React.FC = () => {
       localStorage.setItem('token', response.data.token);
       await validateToken();
       toast.success('Login realizado com sucesso!');
+      localStorage.removeItem('pendingEmail');
     } catch (err: any) {
       if (err.response?.data?.error) {
-        toast.error(err.response.data.error);
+        const message = err.response.data.error;
+
+        // Caso o backend retorne mensagem indicando que o e-mail não foi verificado
+        if (message.toLowerCase().includes('não verificado')) {
+          toast.warning('Verifique seu e-mail antes de entrar.');
+          const email = formData.emailOrPhone.includes('@')
+            ? formData.emailOrPhone
+            : null;
+          if (email) localStorage.setItem('pendingEmail', email);
+          navigate('/verify-pending');
+          return;
+        }
+
+        toast.error(message);
       } else if (err.request) {
         toast.error('Erro de conexão com o servidor.');
       } else {

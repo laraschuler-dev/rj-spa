@@ -28,6 +28,11 @@ const Register = () => {
     e.preventDefault();
     setError('');
 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      toast.error('Digite um e-mail válido.');
+      return;
+    }
+
     // Impede múltiplos envios
     if (isSubmitting) return;
 
@@ -46,8 +51,11 @@ const Register = () => {
         phone: formData.phone,
         password: formData.password,
       });
-      toast.success('Conta criada com sucesso! Redirecionando para o login...');
-      navigate('/login'); // Redireciona para a página de login após o sucesso
+      toast.success(
+        'Conta criada com sucesso! Verifique seu e-mail para ativar sua conta.'
+      );
+      localStorage.setItem('pendingEmail', formData.email);
+      navigate('/verify-pending');
     } catch (err: any) {
       if (err.response && err.response.data) {
         // Exibe a mensagem de erro retornada pelo backend
