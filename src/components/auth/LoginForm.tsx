@@ -1,10 +1,10 @@
 // components/LoginForm.tsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Typography from './ui/Typography';
-import PasswordInput from './ui/PasswordInput';
-import SubmitButton from './ui/SubmitButton';
-import GoogleLoginButton from './ui/GoogleLoginButton';
+import Typography from '../ui/Typography';
+import PasswordInput from '../ui/PasswordInput';
+import SubmitButton from '../ui/SubmitButton';
+import GoogleLoginButton from '../ui/GoogleLoginButton';
 
 interface LoginFormProps {
   formData: {

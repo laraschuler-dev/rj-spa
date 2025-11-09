@@ -1,7 +1,7 @@
 // Register.tsx
 import React from 'react';
 import { useRegister } from '../hooks/useRegister';
-import { RegisterForm } from '../components/RegisterForm';
+import { RegisterForm } from '../components/auth/RegisterForm';
 const Register: React.FC = () => {
   const { formData, error, isSubmitting, handleChange, handleSubmit } =
     useRegister();

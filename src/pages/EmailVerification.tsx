@@ -1,7 +1,7 @@
 // EmailVerification.tsx - VERSÃO FINAL CORRIGIDA
 import React from 'react';
 import { useEmailVerification } from '../hooks/useEmailVerification';
-import { VerificationLoader } from '../components/VerificationLoader';
+import { VerificationLoader } from '../components/auth/VerificationLoader';
 
 const EmailVerification: React.FC = () => {
   useEmailVerification(); // ✅ Limpo e simples

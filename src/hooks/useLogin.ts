@@ -58,8 +58,14 @@ export const useLogin = () => {
         const email = formData.emailOrPhone.includes('@')
           ? formData.emailOrPhone
           : null;
-        if (email) localStorage.setItem('pendingEmail', email);
-        navigate('/verify-pending');
+
+        if (email) {
+          localStorage.setItem('pendingEmail', email);
+          navigate('/verify-pending');
+        } else {
+          // ✅ NOVO: Redireciona para recuperação
+          navigate('/recover-verification');
+        }
         return;
       }
 

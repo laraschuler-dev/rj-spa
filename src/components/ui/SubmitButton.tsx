@@ -1,10 +1,10 @@
-// SubmitButton.tsx - Versão simplificada
+// SubmitButton.tsx - corrigido sem mudar estrutura
 import React from 'react';
 import clsx from 'clsx';
 
 interface SubmitButtonProps {
   children: React.ReactNode;
-  variant?: 'primary' | 'secondary' | 'outline' | 'danger';
+  variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'neutral';
   onClick?: () => void;
   disabled?: boolean;
   loading?: boolean;
@@ -25,21 +25,22 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({
       className={clsx(
         'w-full py-3 rounded-lg font-semibold transition flex justify-center items-center focus:outline-none',
         {
-          // Variante primária (azul padrão)
-          'bg-primary text-white hover:bg-primary-dark': variant === 'primary',
+          // Variante primária (azul padrão com hover laranja)
+          'bg-primary text-white hover:bg-orange-600': variant === 'primary',
 
           // Variante secundária (laranja)
           'bg-secondary text-white hover:bg-orange-700':
             variant === 'secondary',
 
-          // Variante outline
+          // Variante neutra (cinza)
+          'bg-gray-200 text-gray-700 hover:bg-gray-300': variant === 'neutral',
+
+          // Variante outline (borda azul)
           'border border-primary text-primary hover:bg-primary hover:text-white':
             variant === 'outline',
 
           // Variante danger (vermelho)
           'bg-red-600 text-white hover:bg-red-700': variant === 'danger',
-          'border border-red-600 text-red-600 hover:bg-red-600 hover:text-white':
-            variant === 'outline' && variant === 'danger',
 
           // Estados comuns
           'opacity-50 cursor-not-allowed': disabled || loading,

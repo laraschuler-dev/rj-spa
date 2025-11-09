@@ -2,11 +2,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { RegisterFormData } from '../hooks/useRegister';
-import Typography from './ui/Typography';
-import PasswordInput from './ui/PasswordInput';
-import SubmitButton from './ui/SubmitButton';
-import GoogleLoginButton from './ui/GoogleLoginButton';
+import { RegisterFormData } from '../../hooks/useRegister';
+import Typography from '../ui/Typography';
+import PasswordInput from '../ui/PasswordInput';
+import SubmitButton from '../ui/SubmitButton';
+import GoogleLoginButton from '../ui/GoogleLoginButton';
 
 interface RegisterFormProps {
   formData: RegisterFormData;

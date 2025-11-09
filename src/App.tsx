@@ -20,6 +20,8 @@ import ServicesPage from './pages/ServicesPage';
 import PostDetailsPage from './pages/PostDetailsPage';
 import EmailVerification from './pages/EmailVerification';
 import VerifyPending from './pages/VerifyPending';
+import RecoverVerification from './pages/RecoverVerification';
+import { VerificationLoader } from './components/auth/VerificationLoader';
 
 const App = () => {
   return (
@@ -33,6 +35,10 @@ const App = () => {
             <Route path="/register" element={<Register />} />
             <Route path="/verify-email" element={<EmailVerification />} />
             <Route path="/verify-pending" element={<VerifyPending />} />
+            <Route
+              path="/recover-verification"
+              element={<RecoverVerification />}
+            />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/contact" element={<Contact />} />
