@@ -229,7 +229,7 @@ const ProfileView: React.FC = () => {
           </div>
         )}
 
-        {/* 👇 MOSTRA EDITAR APENAS NO PRÓPRIO PERFIL */}
+        {/* MOSTRA EDITAR APENAS NO PRÓPRIO PERFIL */}
         {isOwnProfile && (
           <div className="flex justify-center">
             <Link
