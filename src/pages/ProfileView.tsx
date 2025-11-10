@@ -21,6 +21,11 @@ import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
 import { resolveImageUrl } from '../utils/resolveImageUrl';
 import AvatarInitials from '../components/ui/AvatarInitials';
+import { useFollow, UserFollowerInfo } from '../hooks/useFollow';
+import FollowButton from '../components/follow/FollowButton';
+import { useProfileStore } from '../stores/profileStore';
+import FollowListModal from '../components/follow/FollowListModal';
+import FollowStats from '../components/follow/FollowStats';
 
 // 👇 Type Guard para verificar se é PrivateUserData (tem email)
 const hasEmail = (user: any): user is { email: string; fone?: string } => {
@@ -71,10 +76,61 @@ const ProfileView: React.FC = () => {
     shareId?: number;
   } | null>(null);
 
+  const [showFollowersModal, setShowFollowersModal] = useState(false);
+  const [showFollowingModal, setShowFollowingModal] = useState(false);
+  const [followers, setFollowers] = useState<UserFollowerInfo[]>([]);
+  const [following, setFollowing] = useState<UserFollowerInfo[]>([]);
+
+  const { getFollowers, getFollowing } = useFollow();
+
+  // Funções para carregar as listas
+  const loadFollowers = async () => {
+    const data = await getFollowers(targetUserId!);
+    setFollowers(data);
+    setShowFollowersModal(true);
+  };
+
+  const loadFollowing = async () => {
+    const data = await getFollowing(targetUserId!);
+    setFollowing(data);
+    setShowFollowingModal(true);
+  };
+
+  // Função para atualizar o estado de follow de um usuário na lista
+  const updateUserFollowStatus = (userId: number, isFollowing: boolean) => {
+    setFollowers((prev) =>
+      prev.map((user) => (user.id === userId ? { ...user, isFollowing } : user))
+    );
+    setFollowing((prev) =>
+      prev.map((user) => (user.id === userId ? { ...user, isFollowing } : user))
+    );
+  };
+
   useEffect(() => {
     if (shareModalOpen && selectedPost) setSelectedPost(null);
     if (selectedPost && shareModalOpen) setShareModalOpen(false);
   }, [shareModalOpen, selectedPost]);
+
+  // No ProfileView.tsx, adicione este useEffect:
+  const { refreshFollowStats } = useFollow();
+
+  useEffect(() => {
+    if (targetUserId && profile?.followStats) {
+      // A store já está sendo atualizada automaticamente
+    }
+  }, [targetUserId, profile?.followStats]);
+
+  // No ProfileView.tsx, adicione um useEffect para debug:
+  useEffect(() => {
+    console.log('🔍 ProfileView - Estado atual:', {
+      targetUserId,
+      isOwnProfile,
+      user: user?.id,
+      profile: profile?.followStats,
+      storeUser: useProfileStore.getState().user?.id,
+      storeProfile: useProfileStore.getState().profile?.followStats,
+    });
+  }, [targetUserId, isOwnProfile, user, profile]);
 
   const openShareModal = (post: any) => {
     setPostToShare(post);
@@ -142,7 +198,6 @@ const ProfileView: React.FC = () => {
     );
   }
 
-  // ProfileView.tsx - versão alternativa mais organizada
   const getPostAuthor = (post: any) => {
     // 1. Se é post indisponível, respeita o que veio da API
     if (post.metadata?.isUnavailable) {
@@ -178,69 +233,104 @@ const ProfileView: React.FC = () => {
 
       {/* Card de perfil */}
       <div className="w-full max-w-[600px] bg-white p-8 rounded-2xl shadow-lg text-center mx-auto">
-        {/* ✅ Atualizado para mostrar iniciais quando não tem avatar */}
-        {profile.profile_photo ? (
-          <img
-            src={resolveImageUrl(profile.profile_photo)}
-            alt="Foto de perfil"
-            className="w-32 h-32 mx-auto rounded-full object-cover mb-4 border"
-          />
-        ) : (
-          <div className="w-32 h-32 mx-auto rounded-full bg-accent flex items-center justify-center mb-4 border border-white">
-            <AvatarInitials name={user?.name} className="w-20 h-20 text-4xl" />
-          </div>
-        )}
+        {/* Avatar e Informações Básicas */}
+        <div className="mb-6">
+          {profile.profile_photo ? (
+            <img
+              src={resolveImageUrl(profile.profile_photo)}
+              alt="Foto de perfil"
+              className="w-32 h-32 mx-auto rounded-full object-cover mb-4 border"
+            />
+          ) : (
+            <div className="w-32 h-32 mx-auto rounded-full bg-accent flex items-center justify-center mb-4 border border-white">
+              <AvatarInitials
+                name={user?.name}
+                className="w-20 h-20 text-4xl"
+              />
+            </div>
+          )}
 
-        <Typography
-          variant="h2"
-          className="text-xl font-bold text-primary mb-1"
-        >
-          {user.name}
-        </Typography>
+          <Typography
+            variant="h2"
+            className="text-xl font-bold text-primary mb-1"
+          >
+            {user.name}
+          </Typography>
 
-        <p className="text-sm text-gray-600 mb-2">
-          {profile.translated_type || 'Tipo de perfil não informado'}
-        </p>
-
-        {profile.bio && (
-          <p className="text-gray-700 text-sm mb-4 italic">"{profile.bio}"</p>
-        )}
-
-        {(profile.city || profile.state) && (
-          <p className="flex justify-center items-center gap-2 text-gray-500 text-sm mb-2">
-            <FaMapMarkerAlt />
-            {profile.city}
-            {profile.city && profile.state ? ' - ' : ''}
-            {profile.state}
+          <p className="text-sm text-gray-600 mb-2">
+            {profile.translated_type || 'Tipo de perfil não informado'}
           </p>
-        )}
 
-        {/* 👇 VERIFICAÇÃO DE TIPO SEGURA */}
-        {hasEmail(user) && (
-          <div className="text-sm text-gray-600 mb-4">
-            <p>
-              <strong>Email:</strong> {user.email}
+          {profile.bio && (
+            <p className="text-gray-700 text-sm mb-4 italic">"{profile.bio}"</p>
+          )}
+
+          {(profile.city || profile.state) && (
+            <p className="flex justify-center items-center gap-2 text-gray-500 text-sm">
+              <FaMapMarkerAlt />
+              {profile.city}
+              {profile.city && profile.state ? ' - ' : ''}
+              {profile.state}
             </p>
-            {user.fone && (
-              <p>
-                <strong>Telefone:</strong> {user.fone}
-              </p>
+          )}
+        </div>
+
+        {/* Seção de Follow - Agora com melhor espaçamento */}
+        <div className="border-t border-gray-100 pt-6">
+          {/* Estatísticas de Follow */}
+          <div className="mb-4">
+            <FollowStats
+              followersCount={profile.followStats?.followersCount || 0}
+              followingCount={profile.followStats?.followingCount || 0}
+              onFollowersClick={loadFollowers}
+              onFollowingClick={loadFollowing}
+            />
+          </div>
+
+          {/* Botão de Seguir (apenas se não for o próprio perfil) */}
+          {!isOwnProfile && (
+            <div className="mb-4">
+              <FollowButton
+                targetUserId={targetUserId!}
+                isFollowing={profile.followStats?.isFollowing}
+                onFollowChange={(isFollowing) => {
+                  console.log('Status de follow alterado:', isFollowing);
+                }}
+                enableOptimisticUpdate={true} // 👈 MANTÉM ATUALIZAÇÃO OTIMISTA AQUI (valor padrão)
+              />
+            </div>
+          )}
+
+          {/* Informações de Contato e Ações */}
+          <div className="space-y-3">
+            {/* Informações de contato (apenas no próprio perfil) */}
+            {isOwnProfile && hasEmail(user) && (
+              <div className="text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
+                <p>
+                  <strong>Email:</strong> {user.email}
+                </p>
+                {user.fone && (
+                  <p>
+                    <strong>Telefone:</strong> {user.fone}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Botão Editar (apenas no próprio perfil) */}
+            {isOwnProfile && (
+              <div className="flex justify-center">
+                <Link
+                  to="/profile/edit"
+                  className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary-dark font-medium transition-colors"
+                >
+                  <FiEdit2 size={16} />
+                  Editar Perfil
+                </Link>
+              </div>
             )}
           </div>
-        )}
-
-        {/* MOSTRA EDITAR APENAS NO PRÓPRIO PERFIL */}
-        {isOwnProfile && (
-          <div className="flex justify-center">
-            <Link
-              to="/profile/edit"
-              className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
-            >
-              <FiEdit2 size={16} />
-              Editar
-            </Link>
-          </div>
-        )}
+        </div>
       </div>
 
       {/* 👇 MOSTRA "CRIAR POST" APENAS NO PRÓPRIO PERFIL */}
@@ -468,6 +558,32 @@ const ProfileView: React.FC = () => {
             }}
           />
         ))}
+
+      <FollowListModal
+        isOpen={showFollowersModal}
+        onClose={() => setShowFollowersModal(false)}
+        users={followers}
+        title="Seguidores"
+        onUserClick={(userId) => {
+          setShowFollowersModal(false);
+          // Navega para o perfil do usuário
+          // navigate(`/profile/${userId}`);
+        }}
+        onFollowChange={updateUserFollowStatus} // 👈 ADICIONAR ESTA PROP
+      />
+
+      <FollowListModal
+        isOpen={showFollowingModal}
+        onClose={() => setShowFollowingModal(false)}
+        users={following}
+        title="Seguindo"
+        onUserClick={(userId) => {
+          setShowFollowingModal(false);
+          // Navega para o perfil do usuário
+          // navigate(`/profile/${userId}`);
+        }}
+        onFollowChange={updateUserFollowStatus} // 👈 ADICIONAR ESTA PROP
+      />
     </main>
   );
 };

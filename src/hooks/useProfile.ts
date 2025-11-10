@@ -38,6 +38,7 @@ export function useProfile() {
           bio: res.data.profile?.bio,
           city: res.data.profile?.city,
           state: res.data.profile?.state,
+          followStats: res.data.followStats,
         };
 
         console.log('🔍 Dados extraídos para store:', {

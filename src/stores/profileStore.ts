@@ -1,4 +1,4 @@
-// src/stores/profileStore.ts
+// src/stores/profileStore.ts (ATUALIZADO)
 import { create } from 'zustand';
 
 export interface UserData {
@@ -15,6 +15,11 @@ export interface UserProfile {
   bio?: string;
   city?: string;
   state?: string;
+  followStats?: {
+    followersCount: number;
+    followingCount: number;
+    isFollowing?: boolean;
+  };
 }
 
 export interface ProfileState {
@@ -25,19 +30,100 @@ export interface ProfileState {
   setProfile: (user: UserData, profile: UserProfile) => void;
   clearProfile: () => void;
   setLoading: (loading: boolean) => void;
+  updateFollowStats: (followStats: UserProfile['followStats']) => void;
+  // 👇 NOVAS AÇÕES para atualização granular
+  incrementFollowers: () => void;
+  decrementFollowers: () => void;
+  incrementFollowing: () => void;
+  decrementFollowing: () => void;
 }
 
-export const useProfileStore = create<ProfileState>((set) => ({
+export const useProfileStore = create<ProfileState>((set, get) => ({
   user: null,
   profile: null,
   loading: false,
 
   setProfile: (user: UserData, profile: UserProfile) =>
-    set((state) => ({
-      user: { ...state.user, ...user },
-      profile: { ...state.profile, ...profile },
-    })),
+    set({
+      user: user,
+      profile: profile,
+    }),
 
   clearProfile: () => set({ user: null, profile: null }),
   setLoading: (loading: boolean) => set({ loading }),
+
+  updateFollowStats: (followStats) =>
+    set((state) => ({
+      profile: state.profile ? { ...state.profile, followStats } : null,
+    })),
+
+  // 👇 CORREÇÃO DAS AÇÕES
+  incrementFollowers: () =>
+    set((state) => ({
+      profile: state.profile
+        ? {
+            ...state.profile,
+            followStats: state.profile.followStats
+              ? {
+                  ...state.profile.followStats,
+                  followersCount:
+                    (state.profile.followStats.followersCount || 0) + 1,
+                }
+              : { followersCount: 1, followingCount: 0 },
+          }
+        : null,
+    })),
+
+  decrementFollowers: () =>
+    set((state) => ({
+      profile: state.profile
+        ? {
+            ...state.profile,
+            followStats: state.profile.followStats
+              ? {
+                  ...state.profile.followStats,
+                  followersCount: Math.max(
+                    0,
+                    (state.profile.followStats.followersCount || 1) - 1
+                  ),
+                }
+              : { followersCount: 0, followingCount: 0 },
+          }
+        : null,
+    })),
+
+  // 👇 CORREÇÃO CRÍTICA: estava usando followersCount em vez de followingCount
+  incrementFollowing: () =>
+    set((state) => ({
+      profile: state.profile
+        ? {
+            ...state.profile,
+            followStats: state.profile.followStats
+              ? {
+                  ...state.profile.followStats,
+                  followingCount:
+                    (state.profile.followStats.followingCount || 0) + 1, // 👈 CORRIGIDO
+                }
+              : { followersCount: 0, followingCount: 1 },
+          }
+        : null,
+    })),
+
+  decrementFollowing: () =>
+    set((state) => ({
+      profile: state.profile
+        ? {
+            ...state.profile,
+            followStats: state.profile.followStats
+              ? {
+                  ...state.profile.followStats,
+                  followingCount: Math.max(
+                    0,
+                    (state.profile.followStats.followingCount || 1) - 1
+                  ),
+                }
+              : { followersCount: 0, followingCount: 0 },
+          }
+        : null,
+    })),
 }));

@@ -1,93 +1,78 @@
-// src/hooks/useUserProfile.ts
-import { useEffect, useState } from 'react';
+// src/hooks/useUserProfile.ts (CORRIGIDO)
+import { useEffect } from 'react';
 import api from '../services/api';
+import { useFollow } from './useFollow';
+import { useProfileStore } from '../stores/profileStore';
 
-// 👇 ADICIONE ESTES TIPOS NOVOS (no topo do arquivo)
-export interface PublicUserData {
-  id: number;
-  name: string;
-  // ❌ NÃO inclui email/telefone - são dados sensíveis
-}
-
-export interface PrivateUserData {
-  id: number;
-  name: string;
-  email: string;
-  fone?: string;
-}
-
-// 👇 ATUALIZE esta interface para usar os tipos específicos
-interface UserProfileData {
-  user: PublicUserData | PrivateUserData | null; // 👈 MUDOU AQUI
-  profile: {
-    translated_type?: string;
-    profile_photo?: string;
-    bio?: string;
-    city?: string;
-    state?: string;
-  } | null;
-  loading: boolean;
-  error: string | null;
-}
-
-// src/hooks/useUserProfile.ts
-export function useUserProfile(userId?: number): UserProfileData {
-  const [state, setState] = useState<UserProfileData>({
-    user: null,
-    profile: null,
-    loading: true,
-    error: null,
-  });
+export function useUserProfile(userId?: number) {
+  const { setProfile, setLoading } = useProfileStore();
+  const { getFollowStats, checkIsFollowing } = useFollow();
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    let isMounted = true;
+
+    const fetchProfile = async () => {
       if (!userId) {
-        setState({ user: null, profile: null, loading: false, error: null });
+        if (isMounted) {
+          setLoading(false);
+        }
         return;
       }
 
       try {
-        setState((prev) => ({ ...prev, loading: true, error: null }));
+        if (isMounted) {
+          setLoading(true);
+        }
 
-        // 👇 CORREÇÃO: Use a rota correta /profile/public/{userId}
+        // Busca dados básicos do perfil
         const res = await api.get(`/profile/public/${userId}`);
 
-        console.log('🔍 Resposta perfil público:', res.data);
+        // Busca estatísticas de follow
+        const followStats = await getFollowStats(userId);
 
-        // 👇 Dados públicos apenas
-        const userData: PublicUserData = {
-          id: res.data.id,
-          name: res.data.name,
-          // ❌ NÃO inclui email e telefone
-        };
+        // Verifica se o usuário atual está seguindo este perfil
+        const isFollowing = await checkIsFollowing(userId);
 
-        const profileData = {
-          translated_type: res.data.profile?.translated_type,
-          profile_photo: res.data.profile?.profile_photo,
-          bio: res.data.profile?.bio,
-          city: res.data.profile?.city,
-          state: res.data.profile?.state,
-        };
+        if (isMounted) {
+          const userData = {
+            id: res.data.id,
+            name: res.data.name,
+            // 👇 PARA PERFIS PÚBLICOS, NÃO TEMOS email E fone
+          };
 
-        setState({
-          user: userData,
-          profile: profileData,
-          loading: false,
-          error: null,
-        });
+          const profileData = {
+            translated_type: res.data.profile?.translated_type,
+            profile_photo: res.data.profile?.profile_photo,
+            bio: res.data.profile?.bio,
+            city: res.data.profile?.city,
+            state: res.data.profile?.state,
+            followStats: {
+              followersCount: followStats?.followersCount || 0,
+              followingCount: followStats?.followingCount || 0,
+              isFollowing: isFollowing || false,
+            },
+          };
+
+          // 👇 AGORA A STORE TERÁ OS DADOS DO USUÁRIO QUE ESTAMOS VISUALIZANDO
+          setProfile(userData, profileData);
+        }
       } catch (err: any) {
-        console.error('Erro ao buscar perfil público:', err);
-        setState({
-          user: null,
-          profile: null,
-          loading: false,
-          error: err.response?.data?.error || 'Erro ao carregar perfil',
-        });
+        console.error('Erro ao carregar perfil público:', err);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
-    fetchUserProfile();
-  }, [userId]);
+    fetchProfile();
 
-  return state;
+    return () => {
+      isMounted = false;
+    };
+  }, [userId, getFollowStats, checkIsFollowing, setProfile, setLoading]);
+
+  // 👇 RETORNAR OS DADOS DA STORE, NÃO DO ESTADO LOCAL
+  const { user, profile, loading } = useProfileStore();
+  return { user, profile, loading };
 }
