@@ -1,5 +1,6 @@
 // src/components/follow/FollowListModal.tsx
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { UserFollowerInfo } from '../../hooks/useFollow';
 import Typography from '../ui/Typography';
 import AvatarInitials from '../ui/AvatarInitials';
@@ -25,23 +26,33 @@ const FollowListModal: React.FC<FollowListModalProps> = ({
   onFollowChange,
 }) => {
   const { user: currentUser } = useAuth();
+  const navigate = useNavigate();
 
   if (!isOpen) return null;
 
   const handleUserClick = (userId: number) => {
     // Não permitir clique no próprio usuário
     if (userId === currentUser?.id) return;
+
+    // ✅ REDIRECIONAR PARA O PERFIL
+    navigate(`/profile/${userId}`);
+
+    // Fechar o modal após o clique
+    onClose();
+
+    // Chamar callback se existir
     onUserClick?.(userId);
   };
 
   const handleFollowChange = (userId: number, isFollowing: boolean) => {
-    // Atualizar o estado local do usuário
     onFollowChange?.(userId, isFollowing);
   };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] overflow-hidden">
+      <div className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] overflow-hidden focus:outline-none">
+        {' '}
+        {/* ✅ REMOVE BORDA DE FOCO */}
         {/* Header */}
         <div className="border-b border-gray-200 p-4">
           <div className="flex items-center justify-between">
@@ -50,7 +61,7 @@ const FollowListModal: React.FC<FollowListModalProps> = ({
             </Typography>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 transition-colors"
+              className="text-gray-500 hover:text-gray-700 transition-colors p-1 rounded-lg hover:bg-gray-100 focus:outline-none" // ✅ REMOVE BORDA DE FOCO
             >
               <svg
                 className="w-6 h-6"
@@ -68,7 +79,6 @@ const FollowListModal: React.FC<FollowListModalProps> = ({
             </button>
           </div>
         </div>
-
         {/* Lista de usuários */}
         <div className="overflow-y-auto max-h-96">
           {users.length === 0 ? (
@@ -84,7 +94,7 @@ const FollowListModal: React.FC<FollowListModalProps> = ({
                 {/* Informações do usuário (clicável) */}
                 <button
                   onClick={() => handleUserClick(user.id)}
-                  className="flex items-center gap-3 flex-1 text-left"
+                  className="flex items-center gap-3 flex-1 text-left hover:opacity-80 transition-opacity focus:outline-none" // ✅ REMOVE BORDA DE FOCO
                 >
                   {/* Avatar */}
                   {user.profilePhoto ? (
@@ -104,7 +114,7 @@ const FollowListModal: React.FC<FollowListModalProps> = ({
                   <div className="flex-1 min-w-0">
                     <Typography
                       variant="h3"
-                      className="text-sm font-semibold text-gray-900 truncate"
+                      className="text-sm font-semibold text-gray-900 truncate hover:text-blue-600 transition-colors" // ✅ AZUL HARMONIZADO
                     >
                       {user.name}
                     </Typography>

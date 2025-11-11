@@ -22,7 +22,7 @@ const FollowStats: React.FC<FollowStatsProps> = ({
       {/* Seguidores */}
       <button
         onClick={onFollowersClick}
-        className="text-center transition-transform hover:scale-105 active:scale-95"
+        className="text-center transition-transform hover:scale-105 active:scale-95 focus:outline-none"
       >
         <Typography variant="h3" className="text-lg font-bold text-primary">
           {followersCount}
@@ -35,7 +35,7 @@ const FollowStats: React.FC<FollowStatsProps> = ({
       {/* Seguindo */}
       <button
         onClick={onFollowingClick}
-        className="text-center transition-transform hover:scale-105 active:scale-95"
+        className="text-center transition-transform hover:scale-105 active:scale-95 focus:outline-none"
       >
         <Typography variant="h3" className="text-lg font-bold text-primary">
           {followingCount}

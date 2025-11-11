@@ -15,6 +15,7 @@ import { resolveImageUrl } from '../utils/resolveImageUrl';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import Typography from './ui/Typography';
+import AvatarInitials from './ui/AvatarInitials';
 
 interface NotificationDropdownProps {
   isOpen: boolean;
@@ -67,36 +68,20 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   };
 
   const getNotificationIcon = (type: string) => {
+    // ✅ DETALHES EM AZUL - ícones em azul suave
     switch (type) {
       case 'LIKE':
-        return <FiHeart className="w-4 h-4 text-red-500" />;
+        return <FiHeart className="w-4 h-4 text-blue-500" />;
       case 'COMMENT':
-        return <FiMessageSquare className="w-4 h-4 text-green-500" />;
+        return <FiMessageSquare className="w-4 h-4 text-blue-500" />;
       case 'FOLLOW':
         return <FiUser className="w-4 h-4 text-blue-500" />;
       case 'SHARE':
-        return <FiShare2 className="w-4 h-4 text-purple-500" />;
+        return <FiShare2 className="w-4 h-4 text-blue-500" />;
       case 'EVENT_ATTENDANCE':
-        return <FiCalendar className="w-4 h-4 text-orange-500" />;
+        return <FiCalendar className="w-4 h-4 text-blue-500" />;
       default:
-        return <FiBell className="w-4 h-4 text-gray-500" />;
-    }
-  };
-
-  const getNotificationColor = (type: string) => {
-    switch (type) {
-      case 'LIKE':
-        return 'bg-red-50 border-l-red-500';
-      case 'COMMENT':
-        return 'bg-green-50 border-l-green-500';
-      case 'FOLLOW':
-        return 'bg-blue-50 border-l-blue-500';
-      case 'SHARE':
-        return 'bg-purple-50 border-l-purple-500';
-      case 'EVENT_ATTENDANCE':
-        return 'bg-orange-50 border-l-orange-500';
-      default:
-        return 'bg-gray-50 border-l-gray-500';
+        return <FiBell className="w-4 h-4 text-blue-400" />;
     }
   };
 
@@ -109,7 +94,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: -10 }}
           transition={{ duration: 0.2 }}
-          className="fixed md:absolute right-2 left-2 md:left-auto top-16 md:top-full mt-2 w-auto md:w-96 bg-white rounded-2xl shadow-xl border border-gray-200 z-50 max-h-[80vh] md:max-h-[70vh] overflow-hidden mx-auto md:mx-0"
+          className="fixed md:absolute right-2 left-2 md:left-auto top-16 md:top-full mt-2 w-auto md:w-96 bg-white rounded-2xl shadow-xl border border-gray-200 z-50 max-h-[80vh] md:max-h-[70vh] overflow-hidden mx-auto md:mx-0 focus:outline-none"
           style={{
             maxWidth: 'calc(100vw - 1rem)',
             width: 'min(400px, calc(100vw - 1rem))',
@@ -126,14 +111,14 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                   Notificações
                 </Typography>
                 {unreadCount > 0 && (
-                  <span className="bg-accent text-white text-xs rounded-full px-2 py-1 min-w-6 h-6 flex items-center justify-center font-medium">
+                  <span className="bg-blue-500 text-white text-xs rounded-full px-2 py-1 min-w-6 h-6 flex items-center justify-center font-medium">
                     {unreadCount}
                   </span>
                 )}
               </div>
               <button
                 onClick={onClose}
-                className="text-gray-500 hover:text-gray-700 transition-colors p-1 rounded-lg hover:bg-gray-100 flex-shrink-0"
+                className="text-gray-500 hover:text-gray-700 transition-colors p-1 rounded-lg hover:bg-gray-100 flex-shrink-0 focus:outline-none"
               >
                 <FiX size={18} />
               </button>
@@ -144,7 +129,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
           <div className="overflow-y-auto max-h-96">
             {loading && notifications.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-gray-500">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent mb-2"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mb-2"></div>
                 <Typography variant="p" className="text-sm">
                   Carregando notificações...
                 </Typography>
@@ -167,9 +152,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                 {notifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className={`p-3 md:p-4 border-l-4 transition-colors hover:bg-gray-50 ${getNotificationColor(
-                      notification.type
-                    )}`}
+                    className="p-3 md:p-4 border-l-4 border-l-blue-200 bg-white transition-colors hover:bg-gray-50" // ✅ FUNDO BRANCO E HOVER CINZA CLARO
                   >
                     <div className="flex items-start gap-3">
                       {/* Avatar */}
@@ -182,7 +165,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                           />
                         ) : (
                           <div className="w-8 h-8 md:w-10 md:h-10 bg-accent rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                            {notification.actor.name.charAt(0).toUpperCase()}
+                            <AvatarInitials name={notification.actor.name} />
                           </div>
                         )}
                       </div>
@@ -244,7 +227,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                           {/* Indicador de não lida */}
                           {!notification.is_read && (
                             <div className="flex-shrink-0 mt-1">
-                              <div className="w-2 h-2 bg-accent rounded-full"></div>
+                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                             </div>
                           )}
                         </div>
@@ -261,11 +244,11 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                 <button
                   onClick={handleLoadMore}
                   disabled={loading}
-                  className="w-full py-2 text-sm text-accent hover:bg-accent/10 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                  className="w-full py-2 text-sm text-blue-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium focus:outline-none" // ✅ HOVER CINZA CLARO
                 >
                   {loading ? (
                     <div className="flex items-center justify-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-accent"></div>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400"></div>
                       Carregando...
                     </div>
                   ) : (

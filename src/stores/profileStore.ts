@@ -60,7 +60,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
             ...state.profile,
             followStats: {
               ...state.profile.followStats,
-              ...followStats, // 👈 GARANTIR QUE MESCLA CORRETAMENTE
+              ...followStats,
             },
           }
         : null,

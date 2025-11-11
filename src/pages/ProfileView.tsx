@@ -1,5 +1,4 @@
 // src/views/ProfileView.tsx
-// src/views/ProfileView.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Typography from '../components/ui/Typography';
@@ -39,14 +38,9 @@ const ProfileView: React.FC = () => {
   const targetUserId = urlUserId ? parseInt(urlUserId) : currentUser?.id;
   const isOwnProfile = !urlUserId || currentUser?.id === targetUserId;
 
-  // ✅ Hook para perfil próprio ou de outros usuários
-  const profileData = isOwnProfile
-    ? useProfile()
-    : useUserProfile(targetUserId);
-
-  // ✅ Extraia user, profile, loading E refreshFollowStats do profileData
-  const { user, profile, loading, refreshFollowStats } = profileData;
-
+  // ✅ CORRETO: Chamar TODOS os hooks incondicionalmente no topo
+  const ownProfileData = useProfile(); // Sempre chamado
+  const otherProfileData = useUserProfile(targetUserId); // Sempre chamado, mesmo quando undefined
   const {
     posts: userPosts,
     loadMorePosts,
@@ -54,6 +48,12 @@ const ProfileView: React.FC = () => {
     hasMore,
     loading: postsLoading,
   } = useProfilePosts(targetUserId);
+
+  // ✅ Agora escolha os dados baseado na condição DEPOIS dos hooks
+  const profileData = isOwnProfile ? ownProfileData : otherProfileData;
+
+  // ✅ Extraia user, profile, loading E refreshFollowStats do profileData
+  const { user, profile, loading, refreshFollowStats } = profileData;
 
   // ✅ ADICIONE: getFollowers e getFollowing
   const { getFollowers, getFollowing } = useFollow();
@@ -87,13 +87,15 @@ const ProfileView: React.FC = () => {
 
   // Funções para carregar as listas
   const loadFollowers = async () => {
-    const data = await getFollowers(targetUserId!);
+    if (!targetUserId) return;
+    const data = await getFollowers(targetUserId);
     setFollowers(data);
     setShowFollowersModal(true);
   };
 
   const loadFollowing = async () => {
-    const data = await getFollowing(targetUserId!);
+    if (!targetUserId) return;
+    const data = await getFollowing(targetUserId);
     setFollowing(data);
     setShowFollowingModal(true);
   };
@@ -112,28 +114,6 @@ const ProfileView: React.FC = () => {
     if (shareModalOpen && selectedPost) setSelectedPost(null);
     if (selectedPost && shareModalOpen) setShareModalOpen(false);
   }, [shareModalOpen, selectedPost]);
-
-  // 👇 DEBUG: Adicione estes logs para verificar os dados
-  useEffect(() => {
-    console.log('🔍 [ProfileView] Dados completos do hook:', {
-      isOwnProfile,
-      targetUserId,
-      user: profileData.user,
-      profile: profileData.profile,
-      followStats: profileData.profile?.followStats,
-    });
-  }, [profileData.user, profileData.profile, isOwnProfile, targetUserId]);
-
-  // 👇 DEBUG adicional para dados renderizados
-  useEffect(() => {
-    console.log('🔍 [ProfileView] Dados renderizados:', {
-      user,
-      profile,
-      hasUser: !!user,
-      hasProfile: !!profile,
-      followStats: profile?.followStats,
-    });
-  }, [user, profile]);
 
   const openShareModal = (post: any) => {
     setPostToShare(post);
@@ -584,7 +564,7 @@ const ProfileView: React.FC = () => {
           // Navega para o perfil do usuário
           // navigate(`/profile/${userId}`);
         }}
-        onFollowChange={updateUserFollowStatus} // 👈 ADICIONAR ESTA PROP
+        onFollowChange={updateUserFollowStatus}
       />
 
       <FollowListModal
@@ -597,7 +577,7 @@ const ProfileView: React.FC = () => {
           // Navega para o perfil do usuário
           // navigate(`/profile/${userId}`);
         }}
-        onFollowChange={updateUserFollowStatus} // 👈 ADICIONAR ESTA PROP
+        onFollowChange={updateUserFollowStatus}
       />
     </main>
   );
