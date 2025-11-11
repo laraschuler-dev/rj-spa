@@ -1,4 +1,4 @@
-// src/components/follow/FollowButton.tsx (ATUALIZADO)
+// src/components/follow/FollowButton.tsx
 import React, { useState, useEffect } from 'react';
 import { useFollow } from '../../hooks/useFollow';
 import { useAuth } from '../../hooks/useAuth';
@@ -9,7 +9,6 @@ interface FollowButtonProps {
   onFollowChange?: (isFollowing: boolean) => void;
   size?: 'sm' | 'md' | 'lg';
   variant?: 'primary' | 'outline';
-  enableOptimisticUpdate?: boolean; // 👈 NOVA PROP
 }
 
 const FollowButton: React.FC<FollowButtonProps> = ({
@@ -18,7 +17,6 @@ const FollowButton: React.FC<FollowButtonProps> = ({
   onFollowChange,
   size = 'md',
   variant = 'primary',
-  enableOptimisticUpdate = true, // 👈 VALOR PADRÃO
 }) => {
   const { user: currentUser } = useAuth();
   const { followUser, unfollowUser, loading, checkIsFollowing } = useFollow();
@@ -26,17 +24,12 @@ const FollowButton: React.FC<FollowButtonProps> = ({
 
   // Verifica o status de follow quando o componente monta
   useEffect(() => {
-    const checkFollowStatus = async () => {
-      if (currentUser?.id && currentUser.id !== targetUserId) {
-        const following = await checkIsFollowing(targetUserId);
-        setIsFollowing(following);
-      }
-    };
-
-    checkFollowStatus();
+    if (currentUser?.id && currentUser.id !== targetUserId) {
+      checkIsFollowing(targetUserId).then(setIsFollowing);
+    }
   }, [targetUserId, currentUser?.id, checkIsFollowing]);
 
-  // Sincroniza com prop changes
+  // Sincroniza com prop externa
   useEffect(() => {
     setIsFollowing(initialIsFollowing);
   }, [initialIsFollowing]);
@@ -50,8 +43,8 @@ const FollowButton: React.FC<FollowButtonProps> = ({
     if (loading) return;
 
     const success = isFollowing
-      ? await unfollowUser(targetUserId, enableOptimisticUpdate) // 👈 PASSAR PARÂMETRO
-      : await followUser(targetUserId, enableOptimisticUpdate); // 👈 PASSAR PARÂMETRO
+      ? await unfollowUser(targetUserId)
+      : await followUser(targetUserId);
 
     if (success) {
       const newIsFollowing = !isFollowing;

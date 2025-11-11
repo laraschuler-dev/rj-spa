@@ -1,4 +1,5 @@
 // src/views/ProfileView.tsx
+// src/views/ProfileView.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Typography from '../components/ui/Typography';
@@ -23,7 +24,6 @@ import { resolveImageUrl } from '../utils/resolveImageUrl';
 import AvatarInitials from '../components/ui/AvatarInitials';
 import { useFollow, UserFollowerInfo } from '../hooks/useFollow';
 import FollowButton from '../components/follow/FollowButton';
-import { useProfileStore } from '../stores/profileStore';
 import FollowListModal from '../components/follow/FollowListModal';
 import FollowStats from '../components/follow/FollowStats';
 
@@ -39,12 +39,13 @@ const ProfileView: React.FC = () => {
   const targetUserId = urlUserId ? parseInt(urlUserId) : currentUser?.id;
   const isOwnProfile = !urlUserId || currentUser?.id === targetUserId;
 
-  // Hook para perfil próprio ou de outros usuários
+  // ✅ Hook para perfil próprio ou de outros usuários
   const profileData = isOwnProfile
     ? useProfile()
     : useUserProfile(targetUserId);
 
-  const { user, profile, loading } = profileData;
+  // ✅ Extraia user, profile, loading E refreshFollowStats do profileData
+  const { user, profile, loading, refreshFollowStats } = profileData;
 
   const {
     posts: userPosts,
@@ -53,6 +54,9 @@ const ProfileView: React.FC = () => {
     hasMore,
     loading: postsLoading,
   } = useProfilePosts(targetUserId);
+
+  // ✅ ADICIONE: getFollowers e getFollowing
+  const { getFollowers, getFollowing } = useFollow();
 
   useEffect(() => {
     if (targetUserId) {
@@ -80,8 +84,6 @@ const ProfileView: React.FC = () => {
   const [showFollowingModal, setShowFollowingModal] = useState(false);
   const [followers, setFollowers] = useState<UserFollowerInfo[]>([]);
   const [following, setFollowing] = useState<UserFollowerInfo[]>([]);
-
-  const { getFollowers, getFollowing } = useFollow();
 
   // Funções para carregar as listas
   const loadFollowers = async () => {
@@ -111,26 +113,27 @@ const ProfileView: React.FC = () => {
     if (selectedPost && shareModalOpen) setShareModalOpen(false);
   }, [shareModalOpen, selectedPost]);
 
-  // No ProfileView.tsx, adicione este useEffect:
-  const { refreshFollowStats } = useFollow();
-
+  // 👇 DEBUG: Adicione estes logs para verificar os dados
   useEffect(() => {
-    if (targetUserId && profile?.followStats) {
-      // A store já está sendo atualizada automaticamente
-    }
-  }, [targetUserId, profile?.followStats]);
-
-  // No ProfileView.tsx, adicione um useEffect para debug:
-  useEffect(() => {
-    console.log('🔍 ProfileView - Estado atual:', {
-      targetUserId,
+    console.log('🔍 [ProfileView] Dados completos do hook:', {
       isOwnProfile,
-      user: user?.id,
-      profile: profile?.followStats,
-      storeUser: useProfileStore.getState().user?.id,
-      storeProfile: useProfileStore.getState().profile?.followStats,
+      targetUserId,
+      user: profileData.user,
+      profile: profileData.profile,
+      followStats: profileData.profile?.followStats,
     });
-  }, [targetUserId, isOwnProfile, user, profile]);
+  }, [profileData.user, profileData.profile, isOwnProfile, targetUserId]);
+
+  // 👇 DEBUG adicional para dados renderizados
+  useEffect(() => {
+    console.log('🔍 [ProfileView] Dados renderizados:', {
+      user,
+      profile,
+      hasUser: !!user,
+      hasProfile: !!profile,
+      followStats: profile?.followStats,
+    });
+  }, [user, profile]);
 
   const openShareModal = (post: any) => {
     setPostToShare(post);
@@ -286,21 +289,33 @@ const ProfileView: React.FC = () => {
               onFollowingClick={loadFollowing}
             />
           </div>
-
           {/* Botão de Seguir (apenas se não for o próprio perfil) */}
           {!isOwnProfile && (
             <div className="mb-4">
               <FollowButton
                 targetUserId={targetUserId!}
-                isFollowing={profile.followStats?.isFollowing}
-                onFollowChange={(isFollowing) => {
-                  console.log('Status de follow alterado:', isFollowing);
+                isFollowing={profile?.followStats?.isFollowing}
+                onFollowChange={async (isFollowing) => {
+                  console.log(
+                    '🔄 [ProfileView] Follow alterado para:',
+                    isFollowing
+                  );
+
+                  if (!isOwnProfile && refreshFollowStats) {
+                    console.log(
+                      '🔄 [ProfileView] Chamando refreshFollowStats...'
+                    );
+                    await refreshFollowStats();
+                  } else {
+                    console.log('🔄 [ProfileView] Recarregando página...');
+                    setTimeout(() => {
+                      window.location.reload();
+                    }, 800);
+                  }
                 }}
-                enableOptimisticUpdate={true} // 👈 MANTÉM ATUALIZAÇÃO OTIMISTA AQUI (valor padrão)
               />
             </div>
           )}
-
           {/* Informações de Contato e Ações */}
           <div className="space-y-3">
             {/* Informações de contato (apenas no próprio perfil) */}

@@ -1,4 +1,4 @@
-// src/components/follow/FollowListModal.tsx (CORRIGIDO)
+// src/components/follow/FollowListModal.tsx
 import React from 'react';
 import { UserFollowerInfo } from '../../hooks/useFollow';
 import Typography from '../ui/Typography';
@@ -116,14 +116,6 @@ const FollowListModal: React.FC<FollowListModalProps> = ({
                         {user.profileType}
                       </Typography>
                     )}
-                    {user.bio && (
-                      <Typography
-                        variant="p"
-                        className="text-xs text-gray-600 mt-1 line-clamp-2"
-                      >
-                        {user.bio}
-                      </Typography>
-                    )}
                   </div>
                 </button>
 
@@ -138,7 +130,6 @@ const FollowListModal: React.FC<FollowListModalProps> = ({
                       }
                       size="sm"
                       variant="outline"
-                      enableOptimisticUpdate={false}
                     />
                   </div>
                 )}

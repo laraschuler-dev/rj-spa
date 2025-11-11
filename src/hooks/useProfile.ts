@@ -1,12 +1,14 @@
+// src/hooks/useProfile.ts
 import { useEffect } from 'react';
-import { useProfileStore } from '../stores/profileStore';
 import useAuthStore from '../stores/authStore';
 import api from '../services/api';
+import { useProfileBase } from './useProfileBase';
+import { useProfileStore } from '../stores/profileStore';
 
 export function useProfile() {
   const { token } = useAuthStore();
-  const { user, profile, loading, setProfile, clearProfile, setLoading } =
-    useProfileStore();
+  const { setProfile, clearProfile, setLoading } = useProfileStore();
+  const baseData = useProfileBase();
 
   useEffect(() => {
     console.log('🟢 useProfile hook executado, token:', token);
@@ -45,13 +47,7 @@ export function useProfile() {
           userData,
           profileData,
         });
-
         setProfile(userData, profileData);
-
-        console.log('🟢 Store após setProfile:', {
-          user: user,
-          profile: profile,
-        });
       } catch (err) {
         console.error('🔴 Erro ao buscar perfil:', err);
         clearProfile();
@@ -63,5 +59,5 @@ export function useProfile() {
     fetchProfile();
   }, [token, setProfile, clearProfile, setLoading]);
 
-  return { user, profile, loading };
+  return baseData;
 }
