@@ -125,6 +125,7 @@ const ProfileView: React.FC = () => {
     setShareModalOpen(false);
   };
 
+  // ProfileView.tsx - método handleShare (ATUALIZAR)
   const handleShare = async (message?: string) => {
     if (!postToShare) return;
 
@@ -132,7 +133,14 @@ const ProfileView: React.FC = () => {
       const originalPostId = postToShare.sharedBy
         ? postToShare.sharedBy.postId
         : postToShare.id;
-      const sharedPostDTO = await sharePost(originalPostId, message);
+
+      const shareIdToSend = postToShare.sharedBy?.shareId;
+
+      const sharedPostDTO = await sharePost(
+        originalPostId,
+        message,
+        shareIdToSend
+      );
       addPost(sharedPostDTO);
     } catch (err) {
       console.error(err);

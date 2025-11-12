@@ -24,7 +24,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
   onSave,
 }) => {
   const [message, setMessage] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false); // Estado de loading
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleShare = async () => {
     // Impede múltiplos cliques
