@@ -52,17 +52,22 @@ const Feed: React.FC = () => {
     setShareModalOpen(false);
   };
 
-  // Compartilhar
   const handleShare = async (message?: string) => {
     if (!postToShare) return;
-
-    const hadDetailsModalOpen = !!selectedPost;
 
     try {
       const originalPostId = postToShare.sharedBy
         ? postToShare.sharedBy.postId
         : postToShare.id;
-      const sharedPostDTO = await sharePost(originalPostId, message);
+
+      // ✅ DETERMINA se é compartilhamento de compartilhamento
+      const shareIdToSend = postToShare.sharedBy?.shareId;
+
+      const sharedPostDTO = await sharePost(
+        originalPostId,
+        message,
+        shareIdToSend
+      );
       addPost(sharedPostDTO);
     } catch (err) {
       console.error(err);

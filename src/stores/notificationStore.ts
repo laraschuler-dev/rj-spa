@@ -5,7 +5,7 @@ import axios from '../services/api';
 
 export interface Notification {
   id: number;
-  type: 'LIKE' | 'COMMENT' | 'EVENT_ATTENDANCE' | 'SHARE';
+  type: 'LIKE' | 'COMMENT' | 'EVENT_ATTENDANCE' | 'SHARE' | 'FOLLOW';
   is_read: boolean;
   created_at: string;
   actor: {

@@ -1,64 +1,28 @@
 // src/hooks/useUserProfile.ts
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import api from '../services/api';
+import { useFollow } from './useFollow';
 
-// 👇 ADICIONE ESTES TIPOS NOVOS (no topo do arquivo)
-export interface PublicUserData {
-  id: number;
-  name: string;
-  // ❌ NÃO inclui email/telefone - são dados sensíveis
-}
-
-export interface PrivateUserData {
-  id: number;
-  name: string;
-  email: string;
-  fone?: string;
-}
-
-// 👇 ATUALIZE esta interface para usar os tipos específicos
-interface UserProfileData {
-  user: PublicUserData | PrivateUserData | null; // 👈 MUDOU AQUI
-  profile: {
-    translated_type?: string;
-    profile_photo?: string;
-    bio?: string;
-    city?: string;
-    state?: string;
-  } | null;
-  loading: boolean;
-  error: string | null;
-}
-
-// src/hooks/useUserProfile.ts
-export function useUserProfile(userId?: number): UserProfileData {
-  const [state, setState] = useState<UserProfileData>({
-    user: null,
-    profile: null,
+export function useUserProfile(userId?: number) {
+  const [state, setState] = useState({
+    user: null as any,
+    profile: null as any,
     loading: true,
-    error: null,
+    error: null as string | null,
   });
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (!userId) {
-        setState({ user: null, profile: null, loading: false, error: null });
-        return;
-      }
+  const { getFollowStats } = useFollow();
 
+  const fetchProfile = useCallback(
+    async (id: number) => {
       try {
         setState((prev) => ({ ...prev, loading: true, error: null }));
 
-        // 👇 CORREÇÃO: Use a rota correta /profile/public/{userId}
-        const res = await api.get(`/profile/public/${userId}`);
+        const res = await api.get(`/profile/public/${id}`);
 
-        console.log('🔍 Resposta perfil público:', res.data);
-
-        // 👇 Dados públicos apenas
-        const userData: PublicUserData = {
+        const userData = {
           id: res.data.id,
           name: res.data.name,
-          // ❌ NÃO inclui email e telefone
         };
 
         const profileData = {
@@ -67,7 +31,22 @@ export function useUserProfile(userId?: number): UserProfileData {
           bio: res.data.profile?.bio,
           city: res.data.profile?.city,
           state: res.data.profile?.state,
+          followStats: res.data.profile?.followStats,
         };
+
+        // SEMPRE buscar followStats atualizados
+        try {
+          const followStats = await getFollowStats(id);
+          console.log(
+            '🔍 [useUserProfile] FollowStats atualizados:',
+            followStats
+          );
+          if (followStats) {
+            profileData.followStats = followStats;
+          }
+        } catch (followError) {
+          console.error('Erro ao buscar follow stats:', followError);
+        }
 
         setState({
           user: userData,
@@ -84,10 +63,49 @@ export function useUserProfile(userId?: number): UserProfileData {
           error: err.response?.data?.error || 'Erro ao carregar perfil',
         });
       }
-    };
+    },
+    [getFollowStats]
+  );
 
-    fetchUserProfile();
-  }, [userId]);
+  const refreshFollowStats = useCallback(async () => {
+    if (!userId || !state.profile) return;
 
-  return state;
+    try {
+      console.log('🔄 [useUserProfile] Atualizando apenas follow stats...');
+      const followStats = await getFollowStats(userId);
+
+      if (followStats) {
+        setState((prev) => ({
+          ...prev,
+          profile: {
+            ...prev.profile,
+            followStats,
+          },
+        }));
+        console.log(
+          '✅ [useUserProfile] Follow stats atualizados:',
+          followStats
+        );
+      }
+    } catch (error) {
+      console.error(
+        '❌ [useUserProfile] Erro ao atualizar follow stats:',
+        error
+      );
+    }
+  }, [userId, state.profile, getFollowStats]);
+
+  useEffect(() => {
+    if (userId) {
+      fetchProfile(userId);
+    } else {
+      setState({ user: null, profile: null, loading: false, error: null });
+    }
+  }, [userId, fetchProfile]);
+
+  return {
+    ...state,
+    refreshProfile: () => userId && fetchProfile(userId),
+    refreshFollowStats,
+  };
 }

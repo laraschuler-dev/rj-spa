@@ -318,7 +318,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <span>Anunciar Vaga</span>
           </Link>
           <Link
-            to={isAuthenticated ? '/posts/complaint' : '/login'}
+            to={isAuthenticated ? '/posts/create/2' : '/login'}
             onClick={onClose}
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-dark hover:text-accent transition-all duration-200"
           >
