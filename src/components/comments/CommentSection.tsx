@@ -1,4 +1,4 @@
-// src/components/comments/CommentSection.tsx
+// components/comments/CommentSection.tsx
 import React, { useEffect, useState } from 'react';
 import { useComments } from '../../hooks/useComments';
 import CommentItem from './CommentItem';
@@ -7,9 +7,15 @@ import { toast } from 'react-toastify';
 interface CommentSectionProps {
   postId: number;
   shareId?: number;
+  highlightedCommentId?: number | null; // ✅ INTERFACE ATUALIZADA
 }
 
-const CommentSection: React.FC<CommentSectionProps> = ({ postId, shareId }) => {
+// ✅ RECEBA A PROP highlightedCommentId NA FUNÇÃO
+const CommentSection: React.FC<CommentSectionProps> = ({
+  postId,
+  shareId,
+  highlightedCommentId, // ✅ ADICIONE ESTA LINHA
+}) => {
   const {
     comments,
     loading,
@@ -26,6 +32,51 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId, shareId }) => {
   useEffect(() => {
     fetchComments();
   }, [postId, shareId]);
+
+  // ✅ EFFECT PARA SCROLLAR E DESTACAR COMENTÁRIO
+  useEffect(() => {
+    if (highlightedCommentId && comments.length > 0) {
+      console.log('🎯 Tentando highlight comentário:', highlightedCommentId);
+
+      const timer = setTimeout(() => {
+        const commentElement = document.getElementById(
+          `comment-${highlightedCommentId}`
+        );
+        if (commentElement) {
+          console.log('✅ Comentário encontrado, fazendo scroll...');
+          commentElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          });
+
+          // Destaca o comentário
+          commentElement.classList.add(
+            'bg-yellow-50',
+            'border-l-4',
+            'border-yellow-400',
+            'transition-all',
+            'duration-300'
+          );
+
+          // Remove o destaque depois de 4 segundos
+          setTimeout(() => {
+            commentElement.classList.remove(
+              'bg-yellow-50',
+              'border-l-4',
+              'border-yellow-400'
+            );
+          }, 10000);
+        } else {
+          console.warn(
+            '❌ Elemento do comentário não encontrado:',
+            highlightedCommentId
+          );
+        }
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [highlightedCommentId, comments.length]);
 
   async function handleCreate() {
     if (!newComment.trim() || isCreating) return;
@@ -53,7 +104,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId, shareId }) => {
   const handleDelete = async (commentId: number) => {
     setIsDeleting(commentId);
     try {
-      await deleteComment(commentId); // idem
+      await deleteComment(commentId);
       toast.success('Comentário excluído!');
     } catch {
       toast.error('Erro ao excluir comentário');
@@ -96,6 +147,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId, shareId }) => {
               onUpdate={handleEdit}
               onDelete={handleDelete}
               isDeleting={isDeleting === comment.id}
+              isHighlighted={highlightedCommentId === comment.id}
             />
           ) : null
         )

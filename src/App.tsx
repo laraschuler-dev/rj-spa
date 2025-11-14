@@ -21,7 +21,6 @@ import PostDetailsPage from './pages/PostDetailsPage';
 import EmailVerification from './pages/EmailVerification';
 import VerifyPending from './pages/VerifyPending';
 import RecoverVerification from './pages/RecoverVerification';
-import { VerificationLoader } from './components/auth/VerificationLoader';
 
 const App = () => {
   return (
@@ -53,9 +52,9 @@ const App = () => {
               <Route path="/events" element={<EventsPage />} />
               <Route path="/donations" element={<DonationsPage />} />
               <Route path="/services" element={<ServicesPage />} />
-              <Route path="/posts/:postId" element={<PostDetailsPage />} />
+              <Route path="/post/:id" element={<PostDetailsPage />} />
               <Route
-                path="/posts/:postId/share/:shareId"
+                path="/post/:id/share/:shareId"
                 element={<PostDetailsPage />}
               />
               <Route path="/profile" element={<ProfileView />} />

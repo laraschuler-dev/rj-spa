@@ -1,18 +1,22 @@
-import { useEffect, useState } from 'react';
-import axios from '../services/api';
+// usePostDetails.ts - VERSÃO SEM LOOP
+import { useEffect, useState, useRef } from 'react';
 import { PostListItem } from '../types/Post';
 import { usePostStore } from '../stores/postStore';
 
 export const usePostDetails = (postId: number, shareId?: number) => {
-  const { posts, updatePost } = usePostStore();
+  const { posts, updatePost, fetchPostDetails } = usePostStore();
   const [post, setPost] = useState<PostListItem | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // ✅ REF para controlar se já buscou da API
+  const hasFetchedFromApi = useRef(false);
+  const key = shareId ? `share-${shareId}` : `post-${postId}`;
 
   useEffect(() => {
     if (!postId) return;
 
-    const key = shareId ? `share-${shareId}` : `post-${postId}`;
-
+    // ✅ Encontra post na store
     const existing = posts.find((p) => {
       const pKey = p.sharedBy?.shareId
         ? `share-${p.sharedBy.shareId}`
@@ -20,53 +24,80 @@ export const usePostDetails = (postId: number, shareId?: number) => {
       return pKey === key;
     });
 
-    if (existing) {
+    // ✅ PRIMEIRA RENDERIZAÇÃO: Mostra da store + busca da API
+    if (existing && !hasFetchedFromApi.current) {
       setPost(existing);
       setLoading(false);
-      return;
+
+      // ✅ Busca dados atualizados (só uma vez)
+      const fetchUpdatedPost = async () => {
+        try {
+          console.log('🔄 Buscando dados atualizados da API...');
+          const fetchedPost = await fetchPostDetails(postId, shareId);
+          if (fetchedPost) {
+            setPost(fetchedPost);
+            hasFetchedFromApi.current = true; // ✅ Marca que já buscou
+          }
+        } catch (err) {
+          console.error('Erro ao atualizar detalhes do post:', err);
+        }
+      };
+
+      fetchUpdatedPost();
     }
+    // ✅ SE NÃO EXISTE NA STORE: Busca normal
+    else if (!existing && !hasFetchedFromApi.current) {
+      const fetchPost = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const fetchedPost = await fetchPostDetails(postId, shareId);
+          if (fetchedPost) {
+            setPost(fetchedPost);
+            hasFetchedFromApi.current = true; // ✅ Marca que já buscou
+          } else {
+            setError('Post não encontrado');
+          }
+        } catch (err) {
+          console.error('Erro ao carregar detalhes do post:', err);
+          setError('Erro ao carregar o post');
+        } finally {
+          setLoading(false);
+        }
+      };
 
-    const fetchPost = async () => {
-      setLoading(true);
-      try {
-        const res = await axios.get(`/posts/${postId}`, {
-          params: shareId ? { shareId } : undefined,
-        });
+      fetchPost();
+    }
+    // ✅ ATUALIZAÇÕES DA STORE (sem loop): Só atualiza se for o mesmo post
+    else if (existing && post?.uniqueKey !== existing.uniqueKey) {
+      setPost(existing);
+    }
+  }, [postId, shareId, posts, fetchPostDetails, post?.uniqueKey, key]);
 
-        const fetchedPost = res.data;
+  // ✅ Reset do ref quando o postId/shareId mudar
+  useEffect(() => {
+    hasFetchedFromApi.current = false;
+  }, [postId, shareId]);
 
-        const normalizedPost: PostListItem = {
-          ...fetchedPost,
-          id: fetchedPost.id,
-          liked: fetchedPost.liked ?? fetchedPost.likedByUser ?? false,
-          likeCount: fetchedPost.likeCount ?? fetchedPost.likesCount ?? 0,
-          user: fetchedPost.user ?? fetchedPost.author,
-          images: Array.isArray(fetchedPost.images)
-            ? fetchedPost.images.map((img: any) =>
-                typeof img === 'string' ? img : img.url
-              )
-            : [],
-
-          sharedBy: fetchedPost.sharedBy
-            ? {
-                ...fetchedPost.sharedBy,
-                shareId: fetchedPost.sharedBy.shareId, // ← Use o valor original
-                postId: fetchedPost.sharedBy.postId, // ← Use o valor original
-              }
-            : undefined,
-        };
-
-        setPost(normalizedPost);
-        updatePost(normalizedPost);
-      } catch (err) {
-        console.error('Erro ao carregar detalhes do post:', err);
-      } finally {
-        setLoading(false);
+  const refetch = async () => {
+    if (!postId) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const fetchedPost = await fetchPostDetails(postId, shareId);
+      if (fetchedPost) {
+        setPost(fetchedPost);
+        hasFetchedFromApi.current = true;
+      } else {
+        setError('Post não encontrado');
       }
-    };
+    } catch (err) {
+      console.error('Erro ao recarregar detalhes do post:', err);
+      setError('Erro ao recarregar o post');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchPost();
-  }, [postId, shareId, posts, updatePost]);
-
-  return { post, loading };
+  return { post, loading, error, refetch };
 };

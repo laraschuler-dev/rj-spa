@@ -7,12 +7,11 @@ import { PostComment } from '../../types/Comment';
 import AvatarInitials from '../ui/AvatarInitials';
 
 interface CommentItemProps {
-  comment: PostComment; // <-- ajuste aqui
-  // eslint-disable-next-line no-unused-vars
+  comment: PostComment;
   onUpdate: (commentId: number, newContent: string) => Promise<void>;
-  // eslint-disable-next-line no-unused-vars
   onDelete: (commentId: number) => Promise<void>;
   isDeleting?: boolean;
+  isHighlighted?: boolean;
 }
 
 const CommentItem: React.FC<CommentItemProps> = ({
@@ -20,6 +19,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   onUpdate,
   onDelete,
   isDeleting = false,
+  isHighlighted = false,
 }) => {
   const { user } = useAuth();
   const isAuthor = comment.author.id === user?.id;
@@ -39,7 +39,14 @@ const CommentItem: React.FC<CommentItemProps> = ({
   };
 
   return (
-    <div className="bg-gray-100 p-3 rounded-xl flex items-start gap-3">
+    <div
+      // ✅ ADICIONE APENAS ESTAS 2 LINHAS - NÃO MUDE NADA MAIS
+      id={`comment-${comment.id}`}
+      className={`bg-gray-100 p-3 rounded-xl flex items-start gap-3 transition-all duration-300 ${
+        isHighlighted ? 'bg-yellow-50 border-l-4 border-yellow-400' : ''
+      }`}
+    >
+      {/* ✅ MANTENHA TUDO EXATAMENTE COMO ESTÁ ABAIXO */}
       {/* Avatar */}
       {comment.author.avatarUrl ? (
         <img

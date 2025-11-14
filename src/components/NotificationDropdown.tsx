@@ -10,12 +10,14 @@ import {
   FiUser,
   FiCalendar,
 } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../hooks/useNotifications';
 import { resolveImageUrl } from '../utils/resolveImageUrl';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import Typography from './ui/Typography';
 import AvatarInitials from './ui/AvatarInitials';
+import axios from 'axios';
 
 interface NotificationDropdownProps {
   isOpen: boolean;
@@ -26,10 +28,24 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { notifications, unreadCount, loading, hasMore, fetchNotifications } =
-    useNotifications();
+  const navigate = useNavigate();
+  const {
+    notifications,
+    unreadCount,
+    loading,
+    hasMore,
+    fetchNotifications,
+    markAllAsRead, // ✅ AGORA MARCA COMO LIDA AO ABRIR
+  } = useNotifications();
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // ✅ MARCA COMO LIDA QUANDO ABRE O DROPDOWN
+  useEffect(() => {
+    if (isOpen && unreadCount > 0) {
+      markAllAsRead();
+    }
+  }, [isOpen, unreadCount, markAllAsRead]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -68,7 +84,6 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   };
 
   const getNotificationIcon = (type: string) => {
-    // ✅ DETALHES EM AZUL - ícones em azul suave
     switch (type) {
       case 'LIKE':
         return <FiHeart className="w-4 h-4 text-blue-500" />;
@@ -82,6 +97,65 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
         return <FiCalendar className="w-4 h-4 text-blue-500" />;
       default:
         return <FiBell className="w-4 h-4 text-blue-400" />;
+    }
+  };
+
+  const handleNotificationClick = async (notification: any) => {
+    onClose();
+
+    // ✅ NOTIFICAÇÃO DE COMMENT COM comment_id - BUSCA O COMENTÁRIO
+    if (notification.type === 'COMMENT' && notification.post?.comment_id) {
+      try {
+        // Busca detalhes do comentário
+        const commentResponse = await axios.get(
+          `/posts/comments/${notification.post.comment_id}`
+        );
+        const comment = commentResponse.data;
+
+        // Navega para a página de detalhes do post com o comentário aberto
+        if (notification.post.share_id) {
+          navigate(
+            `/post/${notification.post.id}/share/${notification.post.share_id}`,
+            {
+              state: {
+                openCommentId: notification.post.comment_id,
+                scrollToComment: true,
+              },
+            }
+          );
+        } else {
+          navigate(`/post/${notification.post.id}`, {
+            state: {
+              openCommentId: notification.post.comment_id,
+              scrollToComment: true,
+            },
+          });
+        }
+      } catch (error) {
+        console.error('Erro ao buscar comentário:', error);
+        // Fallback: navega normal sem abrir comentário
+        navigateToPostNormal(notification);
+      }
+    }
+    // ✅ OUTRAS NOTIFICAÇÕES - COMPORTAMENTO NORMAL
+    else if (notification.post && notification.post.id) {
+      navigateToPostNormal(notification);
+    }
+
+    // Para notificações de FOLLOW
+    if (notification.type === 'FOLLOW' && notification.actor.id) {
+      navigate(`/profile/${notification.actor.id}`);
+    }
+  };
+
+  // ✅ FUNÇÃO AUXILIAR PARA NAVEGAÇÃO NORMAL
+  const navigateToPostNormal = (notification: any) => {
+    if (notification.post.share_id) {
+      navigate(
+        `/post/${notification.post.id}/share/${notification.post.share_id}`
+      );
+    } else {
+      navigate(`/post/${notification.post.id}`);
     }
   };
 
@@ -150,9 +224,10 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
             ) : (
               <div className="divide-y divide-gray-100">
                 {notifications.map((notification) => (
-                  <div
+                  <button
                     key={notification.id}
-                    className="p-3 md:p-4 border-l-4 border-l-blue-200 bg-white transition-colors hover:bg-gray-50" // ✅ FUNDO BRANCO E HOVER CINZA CLARO
+                    onClick={() => handleNotificationClick(notification)}
+                    className="w-full text-left p-3 md:p-4 border-l-4 border-l-blue-200 bg-white transition-colors hover:bg-gray-50 focus:outline-none focus:bg-gray-50 cursor-pointer"
                   >
                     <div className="flex items-start gap-3">
                       {/* Avatar */}
@@ -224,16 +299,11 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                             </Typography>
                           </div>
 
-                          {/* Indicador de não lida */}
-                          {!notification.is_read && (
-                            <div className="flex-shrink-0 mt-1">
-                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                            </div>
-                          )}
+                          {/* ❌ REMOVIDO: Indicador de não lida (já marca todas como lidas ao abrir) */}
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             )}
@@ -244,7 +314,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                 <button
                   onClick={handleLoadMore}
                   disabled={loading}
-                  className="w-full py-2 text-sm text-blue-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium focus:outline-none" // ✅ HOVER CINZA CLARO
+                  className="w-full py-2 text-sm text-blue-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium focus:outline-none"
                 >
                   {loading ? (
                     <div className="flex items-center justify-center gap-2">

@@ -1,157 +1,304 @@
-// pages/PostDetailsPage.tsx
-import React, { useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom'; // ✅ ADICIONE useLocation
 import PostCard from '../components/PostCard';
-import { usePostStore } from '../stores/postStore';
-import { useEventAttendance } from '../hooks/useEventAttendance';
+import ShareModal from '../components/ShareModal';
+import EditPostModal from '../components/posts/EditPostModal';
+import ShareEditModal from '../components/posts/ShareEditModal';
 import { usePostDetails } from '../hooks/usePostDetails';
-import { FiArrowLeft } from 'react-icons/fi';
+import { usePostStore } from '../stores/postStore';
+import { useSharePost } from '../hooks/useSharePost';
+import { likePost } from '../hooks/useLikePost';
+import { useDeletePost } from '../hooks/useDeletePost';
+import { toast } from 'react-toastify';
+import { FiRefreshCw } from 'react-icons/fi';
+import BackButton from '../components/ui/BackButton';
 
 const PostDetailsPage: React.FC = () => {
-  const { postId, shareId } = useParams<{ postId: string; shareId?: string }>();
+  const { id, shareId } = useParams<{ id: string; shareId?: string }>();
   const navigate = useNavigate();
+  const location = useLocation(); // ✅ HOOK PARA ACESSAR O ESTADO
 
-  const numericPostId = postId ? parseInt(postId) : 0;
-  const numericShareId = shareId ? parseInt(shareId) : undefined;
+  const postId = id ? parseInt(id) : 0;
+  const parsedShareId = shareId ? parseInt(shareId) : undefined;
 
-  const { post, loading } = usePostDetails(numericPostId, numericShareId);
-  const { toggleLikePost } = usePostStore();
-
-  const { status, toggleAttendance: toggleAttendanceHook } = useEventAttendance(
-    numericPostId,
-    numericShareId
+  const { post, loading, error, refetch } = usePostDetails(
+    postId,
+    parsedShareId
   );
+  const { updatePost, removePost, toggleLikePost, addPost } = usePostStore();
 
-  // Redirecionar se não tiver postId
+  const { sharePost } = useSharePost();
+  const { deletePost } = useDeletePost();
+
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [postToShare, setPostToShare] = useState<any>(null);
+  const [editingPost, setEditingPost] = useState<{
+    id: number;
+    shareId?: number;
+  } | null>(null);
+
+  // ✅ ESTADO PARA CONTROLAR COMENTÁRIOS ABERTOS
+  const [openCommentId, setOpenCommentId] = useState<number | null>(null);
+  const [showComments, setShowComments] = useState(false);
+
+  // ✅ EFFECT PARA LER O ESTADO DA NAVEGAÇÃO
   useEffect(() => {
-    if (!numericPostId) {
+    if (location.state) {
+      const { openCommentId: navOpenCommentId, scrollToComment } =
+        location.state;
+
+      if (scrollToComment && navOpenCommentId) {
+        setOpenCommentId(navOpenCommentId);
+        setShowComments(true); // ✅ ABRE A SEÇÃO DE COMENTÁRIOS
+
+        // Limpa o estado de navegação para não reexecutar em recarregamentos
+        window.history.replaceState({}, document.title);
+      }
+    }
+  }, [location.state]);
+
+  // ✅ EFFECT PARA SCROLLAR ATÉ O COMENTÁRIO QUANDO POST CARREGAR
+  useEffect(() => {
+    if (post && openCommentId && showComments) {
+      // Pequeno delay para garantir que os comentários renderizaram
+      const timer = setTimeout(() => {
+        scrollToComment(openCommentId);
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [post, openCommentId, showComments]);
+
+  // ✅ FUNÇÃO PARA SCROLLAR ATÉ O COMENTÁRIO
+  const scrollToComment = (commentId: number) => {
+    const commentElement = document.getElementById(`comment-${commentId}`);
+    if (commentElement) {
+      commentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      // ✅ DESTACA O COMENTÁRIO
+      commentElement.classList.add(
+        'bg-yellow-50',
+        'border-l-4',
+        'border-yellow-400'
+      );
+
+      // Remove o destaque depois de 3 segundos
+      setTimeout(() => {
+        commentElement.classList.remove(
+          'bg-yellow-50',
+          'border-l-4',
+          'border-yellow-400'
+        );
+      }, 3000);
+    } else {
+      console.warn(`Comentário com ID ${commentId} não encontrado`);
+    }
+  };
+
+  // ✅ FUNÇÃO PARA MANIPULAR ABERTURA DE COMENTÁRIOS (passar para o PostCard)
+  const handleCommentAction = () => {
+    setShowComments((prev) => !prev);
+  };
+
+  // Redireciona se não há ID válido
+  useEffect(() => {
+    if (!postId) {
       navigate('/feed');
     }
-  }, [numericPostId, navigate]);
+  }, [postId, navigate]);
+
+  const openShareModal = (post: any) => {
+    setPostToShare(post);
+    setShareModalOpen(true);
+  };
+
+  const closeShareModal = () => {
+    setPostToShare(null);
+    setShareModalOpen(false);
+  };
+
+  const handleShare = async (message?: string) => {
+    if (!postToShare) return;
+
+    try {
+      const originalPostId = postToShare.sharedBy
+        ? postToShare.sharedBy.postId
+        : postToShare.id;
+
+      const shareIdToSend = postToShare.sharedBy?.shareId;
+
+      const sharedPostDTO = await sharePost(
+        originalPostId,
+        message,
+        shareIdToSend
+      );
+      addPost(sharedPostDTO);
+      toast.success('Post compartilhado com sucesso!');
+    } catch (err) {
+      console.error(err);
+      toast.error('Erro ao compartilhar o post');
+    } finally {
+      closeShareModal();
+    }
+  };
+
+  const handleDelete = async (postId: number, shareId?: number) => {
+    if (!window.confirm('Tem certeza que deseja excluir este post?')) {
+      return;
+    }
+
+    try {
+      if (shareId) {
+        await deletePost(postId, shareId);
+      } else {
+        await deletePost(postId);
+      }
+
+      removePost(postId, shareId);
+      toast.success('Post excluído com sucesso!');
+      navigate('/feed');
+    } catch (err) {
+      console.error(err);
+      toast.error('Erro ao excluir o post!');
+    }
+  };
 
   const handleLike = async () => {
-    try {
-      if (!post) return;
+    if (!post) return;
 
-      const currentLiked = post.liked ?? false;
-      toggleLikePost(numericPostId, !currentLiked, numericShareId);
+    const postIdToSend = post.sharedBy?.postId || post.id;
+    const shareIdToSend = post.sharedBy?.shareId;
+
+    const currentLiked = post.liked ?? false;
+    toggleLikePost(postIdToSend, !currentLiked, shareIdToSend);
+
+    try {
+      const { liked } = await likePost(postIdToSend, shareIdToSend);
+      if (liked !== !currentLiked) {
+        toggleLikePost(postIdToSend, liked, shareIdToSend);
+      }
     } catch (err) {
+      toggleLikePost(postIdToSend, currentLiked, shareIdToSend);
       console.error('Erro ao curtir/descurtir post:', err);
+      toast.error('Erro ao curtir o post');
     }
-  };
-
-  const handleShare = () => {
-    // Implementar lógica de compartilhamento
-    console.log('Compartilhar post:', numericPostId, numericShareId);
-  };
-
-  const handleEdit = () => {
-    // Implementar navegação para edição
-    console.log('Editar post:', numericPostId, numericShareId);
-  };
-
-  const handleDelete = async () => {
-    // Implementar lógica de exclusão
-    console.log('Excluir post:', numericPostId, numericShareId);
-  };
-
-  const handleAttendance = async () => {
-    try {
-      await toggleAttendanceHook();
-    } catch (err) {
-      console.error('Erro ao alternar presença:', err);
-    }
-  };
-
-  const handleBack = () => {
-    navigate(-1); // Voltar para página anterior
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p>Carregando...</p>
+      <div className="flex justify-center items-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
-  if (!post) {
+  if (error || !post) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-500 mb-4">Post não encontrado</p>
+      <div className="max-w-[600px] mx-auto p-4">
+        <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
+
+        <div className="text-center py-12">
+          <div className="text-red-500 text-lg mb-4">
+            {error || 'Post não encontrado'}
+          </div>
           <button
-            onClick={handleBack}
-            className="text-blue-500 hover:underline"
+            onClick={refetch}
+            className="flex items-center gap-2 mx-auto px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
-            Voltar
+            <FiRefreshCw size={16} />
+            Tentar novamente
           </button>
         </div>
       </div>
     );
   }
 
-  const author =
-    post.categoria_idcategoria === 2 && post.metadata?.isAnonymous
-      ? {
-          id: 0,
-          name: 'Anônimo',
-          avatarUrl: undefined,
-        }
-      : {
-          id: post.user?.id || post.author?.id,
-          name: post.user?.name || post.author?.name || 'Usuário desconhecido',
-          avatarUrl: post.user?.avatarUrl || post.author?.avatarUrl,
-        };
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b sticky top-0 z-10">
-        <div className="max-w-2xl mx-auto px-4 py-3">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={handleBack}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <FiArrowLeft size={20} className="text-gray-600" />
-            </button>
-            <h1 className="text-lg font-semibold text-gray-900">
-              Detalhes do Post
-            </h1>
-          </div>
-        </div>
-      </div>
+    <div className="max-w-[600px] mx-auto p-4">
+      <div className="mb-6"></div>
+      <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
 
-      {/* Conteúdo */}
-      <div className="max-w-2xl mx-auto px-4 py-6">
-        <PostCard
-          id={post.id}
-          title={post.metadata?.title || ''}
-          content={post.content}
-          images={
-            post.images?.map((img: any) =>
-              typeof img === 'string' ? img : img.url
-            ) || []
-          }
-          createdAt={post.createdAt}
-          categoryId={post.categoria_idcategoria}
-          metadata={post.metadata}
-          author={author}
-          isLiked={post.liked ?? false}
-          sharedBy={post.sharedBy}
-          expanded={true}
-          isInModal={false} // Importante: false para página
-          onLike={handleLike}
+      {/* Post em modo expandido */}
+      <PostCard
+        key={post.uniqueKey || `post-${post.id}`}
+        id={post.id}
+        title={post.metadata?.title || ''}
+        content={post.content}
+        images={post.images || []}
+        createdAt={post.createdAt}
+        categoryId={post.categoria_idcategoria}
+        metadata={post.metadata}
+        author={{
+          id:
+            post.categoria_idcategoria === 2 && post.metadata?.isAnonymous
+              ? 0
+              : post.user?.id || post.author?.id || 0,
+          name:
+            post.categoria_idcategoria === 2 && post.metadata?.isAnonymous
+              ? 'Anônimo'
+              : post.user?.name || post.author?.name || 'Usuário desconhecido',
+          avatarUrl: post.user?.avatarUrl || post.author?.avatarUrl,
+        }}
+        isLiked={post.liked}
+        sharedBy={post.sharedBy}
+        expanded={true}
+        likesCount={post.likesCount}
+        commentsCount={post.commentsCount}
+        sharesCount={post.sharesCount}
+        attendanceCount={post.attendanceCount}
+        onLike={handleLike}
+        onShare={() => openShareModal(post)}
+        onDelete={handleDelete}
+        onEdit={(postId, shareId) => setEditingPost({ id: postId, shareId })}
+        isPostOwner={post.isPostOwner}
+        isShareOwner={post.isShareOwner}
+        // ✅ NOVAS PROPS PARA CONTROLAR COMENTÁRIOS
+        showComments={showComments}
+        onComment={handleCommentAction}
+        highlightedCommentId={openCommentId}
+      />
+
+      {/* Modais */}
+      {editingPost &&
+        (editingPost.shareId ? (
+          <ShareEditModal
+            isOpen={!!editingPost}
+            onClose={() => setEditingPost(null)}
+            postId={editingPost.id}
+            shareId={editingPost.shareId}
+            onSave={(updatedPost) => {
+              updatePost(updatedPost);
+              setEditingPost(null);
+              toast.success('Post atualizado com sucesso!');
+            }}
+          />
+        ) : (
+          <EditPostModal
+            postId={editingPost.id}
+            onClose={() => setEditingPost(null)}
+            onSuccess={(updatedPost) => {
+              updatePost(updatedPost);
+              setEditingPost(null);
+              toast.success('Post atualizado com sucesso!');
+            }}
+          />
+        ))}
+
+      {postToShare && (
+        <ShareModal
+          isOpen={shareModalOpen}
+          onClose={closeShareModal}
+          postSummary={{
+            title: postToShare.metadata?.title || '',
+            content: postToShare.content,
+            author:
+              postToShare.user?.name ||
+              postToShare.author?.name ||
+              'Usuário desconhecido',
+          }}
           onShare={handleShare}
-          onAttend={handleAttendance}
-          isAttending={status.userStatus === 'confirmed'}
-          isPostOwner={post.isPostOwner ?? false}
-          isShareOwner={post.isShareOwner ?? false}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
         />
-      </div>
+      )}
     </div>
   );
 };

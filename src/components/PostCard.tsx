@@ -11,6 +11,7 @@ import formatDateBR from '../utils/formatDateBR';
 import PostMenuButton from './ui/PostMenuButton';
 import { useEventAttendance } from '../hooks/useEventAttendance';
 import AvatarInitials from './ui/AvatarInitials';
+import { EngagementCounters } from './ui/EngagementCounters';
 
 interface PostCardProps {
   id: number;
@@ -51,6 +52,12 @@ interface PostCardProps {
   onEdit?: (postId: number, shareId?: number) => void;
   isPostOwner?: boolean;
   isShareOwner?: boolean;
+  likesCount?: number;
+  commentsCount?: number;
+  sharesCount?: number;
+  attendanceCount?: number;
+  showComments?: boolean;
+  highlightedCommentId?: number | null;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -73,8 +80,30 @@ const PostCard: React.FC<PostCardProps> = ({
   onEdit,
   isPostOwner = false,
   isShareOwner = false,
+  likesCount,
+  commentsCount,
+  sharesCount,
+  attendanceCount,
+  showComments: externalShowComments,
+  onComment: externalOnComment,
+  highlightedCommentId,
 }) => {
-  const [showComments, setShowComments] = useState(false);
+  // ✅ STATE INTERNO COM FALLBACK PARA CONTROLE EXTERNO
+  const [internalShowComments, setInternalShowComments] = useState(false);
+
+  const showComments =
+    externalShowComments !== undefined
+      ? externalShowComments
+      : internalShowComments;
+
+  const handleCommentClick = () => {
+    if (externalOnComment) {
+      externalOnComment();
+    } else {
+      setInternalShowComments((prev) => !prev);
+    }
+  };
+
   const postIdForAttendance = sharedBy?.postId ?? id;
   const postShareIdForAttendance = sharedBy?.shareId;
 
@@ -424,11 +453,21 @@ const PostCard: React.FC<PostCardProps> = ({
           }}
           isLiked={isLiked ?? false}
           onLike={onLike}
-          onComment={() => setShowComments((prev) => !prev)}
+          onComment={handleCommentClick}
           onShare={onShare}
           onAttend={toggleAttendance} // ✅ usa hook
           isAttending={status.attending} // ✅ vem do hook
           loadingAttend={loading} // opcional: se quiser desabilitar botão enquanto envia
+        />
+      )}
+
+      {expanded && !shouldShowUnavailableContent && (
+        <EngagementCounters
+          likesCount={likesCount}
+          commentsCount={commentsCount}
+          sharesCount={sharesCount}
+          attendanceCount={attendanceCount}
+          categoryId={categoryId}
         />
       )}
 
@@ -438,6 +477,7 @@ const PostCard: React.FC<PostCardProps> = ({
           <CommentSection
             postId={postIdForComments}
             shareId={shareIdForComments}
+            highlightedCommentId={highlightedCommentId}
           />
         </div>
       )}
