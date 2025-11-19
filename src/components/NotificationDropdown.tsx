@@ -227,7 +227,8 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                   <button
                     key={notification.id}
                     onClick={() => handleNotificationClick(notification)}
-                    className="w-full text-left p-3 md:p-4 border-l-4 border-l-blue-200 bg-white transition-colors hover:bg-gray-50 focus:outline-none focus:bg-gray-50 cursor-pointer"
+                    className="block text-left p-3 border-l-4 border-l-blue-200 bg-white 
+  transition hover:bg-gray-50 focus:outline-none mx-auto w-full max-w-[340px]"
                   >
                     <div className="flex items-start gap-3">
                       {/* Avatar */}
@@ -251,20 +252,25 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
                               {getNotificationIcon(notification.type)}
-                              <Typography
-                                variant="h3"
-                                className="text-sm font-semibold text-gray-900 truncate"
-                              >
-                                {notification.actor.name}
-                              </Typography>
-                            </div>
 
-                            <Typography
-                              variant="p"
-                              className="text-sm text-gray-700 leading-relaxed break-words"
-                            >
-                              {notification.message}
-                            </Typography>
+                              <div className="flex items-center gap-1 min-w-0">
+                                {/* Nome com ellipsis */}
+                                <Typography
+                                  variant="h3"
+                                  className="text-sm font-semibold text-gray-900 truncate max-w-[140px]"
+                                >
+                                  {notification.actor.name}
+                                </Typography>
+
+                                {/* Mensagem continua na mesma linha */}
+                                <Typography
+                                  variant="p"
+                                  className="text-sm text-gray-700 leading-relaxed whitespace-nowrap text-ellipsis overflow-hidden"
+                                >
+                                  {notification.message}
+                                </Typography>
+                              </div>
+                            </div>
 
                             {/* Preview do post apenas para notificações com post */}
                             {notification.type !== 'FOLLOW' &&

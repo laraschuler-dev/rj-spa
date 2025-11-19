@@ -232,25 +232,32 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
     }));
   },
 
-  // No postStore.ts - método fetchPostDetails (ATUALIZADO)
   fetchPostDetails: async (postId: number, shareId?: number) => {
     try {
+      console.log('🔄 STORE: Buscando post com contadores...', {
+        postId,
+        shareId,
+      });
+
       const params = shareId ? { shareId } : undefined;
       const res = await axios.get(`/posts/${postId}`, { params });
 
+      console.log('📥 STORE: Resposta completa da API:', res.data);
+
       const fetchedPost = res.data;
 
-      // ✅ NORMALIZAÇÃO COMPLETA COM CONTADORES
+      // ✅ NORMALIZAÇÃO GARANTINDO CONTADORES
       const normalizedPost: PostListItem = {
         ...fetchedPost,
         id: fetchedPost.id,
         liked: fetchedPost.likedByUser ?? fetchedPost.liked ?? false,
-        likeCount: fetchedPost.likesCount ?? fetchedPost.likeCount ?? 0,
-        // ✅ INCLUI OS NOVOS CONTADORES
-        likesCount: fetchedPost.likesCount,
-        commentsCount: fetchedPost.commentsCount,
-        sharesCount: fetchedPost.sharesCount,
-        attendanceCount: fetchedPost.attendanceCount,
+
+        // ✅ GARANTIR que os contadores vêm da API
+        likesCount: fetchedPost.likesCount ?? fetchedPost.likeCount ?? 0,
+        commentsCount: fetchedPost.commentsCount ?? 0,
+        sharesCount: fetchedPost.sharesCount ?? 0,
+        attendanceCount: fetchedPost.attendanceCount ?? 0,
+
         user: fetchedPost.user ?? fetchedPost.author,
         author: fetchedPost.author ?? fetchedPost.user,
         images: Array.isArray(fetchedPost.images)
@@ -274,24 +281,45 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
           (shareId ? `share-${shareId}` : `post-${postId}`),
       };
 
-      console.log('📊 Post normalizado com contadores:', {
+      console.log('📊 STORE: Post normalizado COM CONTADORES:', {
+        id: normalizedPost.id,
         likesCount: normalizedPost.likesCount,
         commentsCount: normalizedPost.commentsCount,
         sharesCount: normalizedPost.sharesCount,
         attendanceCount: normalizedPost.attendanceCount,
       });
 
-      // Atualiza o post na store
-      get().updatePost(normalizedPost, true);
+      // ✅ ATUALIZA na store SUBSTITUINDO o post antigo
+      set((state) => {
+        const key = shareId ? `share-${shareId}` : `post-${postId}`;
+
+        const existingIndex = state.posts.findIndex((p) => {
+          const pKey = p.sharedBy?.shareId
+            ? `share-${p.sharedBy.shareId}`
+            : `post-${p.id}`;
+          return pKey === key;
+        });
+
+        let newPosts;
+        if (existingIndex >= 0) {
+          // ✅ SUBSTITUI o post existente
+          newPosts = [...state.posts];
+          newPosts[existingIndex] = normalizedPost;
+        } else {
+          // ✅ ADICIONA novo post
+          newPosts = [normalizedPost, ...state.posts];
+        }
+
+        return { posts: newPosts };
+      });
 
       return normalizedPost;
     } catch (err) {
-      console.error('Erro ao buscar detalhes do post:', err);
-      return null;
+      console.error('❌ STORE: Erro ao buscar post:', err);
+      throw err;
     }
   },
 
-  // No postStore.ts - método fetchPosts (ATUALIZADO)
   fetchPosts: async (isInitialLoad: boolean = false) => {
     const { loading, page } = get();
     if (loading) return;

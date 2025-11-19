@@ -12,6 +12,8 @@ import PostMenuButton from './ui/PostMenuButton';
 import { useEventAttendance } from '../hooks/useEventAttendance';
 import AvatarInitials from './ui/AvatarInitials';
 import { EngagementCounters } from './ui/EngagementCounters';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
 interface PostCardProps {
   id: number;
@@ -88,6 +90,9 @@ const PostCard: React.FC<PostCardProps> = ({
   onComment: externalOnComment,
   highlightedCommentId,
 }) => {
+  const navigate = useNavigate();
+  const { user: currentUser } = useAuth();
+
   // ✅ STATE INTERNO COM FALLBACK PARA CONTROLE EXTERNO
   const [internalShowComments, setInternalShowComments] = useState(false);
 
@@ -102,6 +107,14 @@ const PostCard: React.FC<PostCardProps> = ({
     } else {
       setInternalShowComments((prev) => !prev);
     }
+  };
+
+  const handleUserClick = (userId: number) => {
+    // Não permitir clique no próprio usuário
+    if (userId === currentUser?.id) return;
+
+    // ✅ REDIRECIONAR PARA O PERFIL
+    navigate(`/profile/${userId}`);
   };
 
   const postIdForAttendance = sharedBy?.postId ?? id;
@@ -168,7 +181,6 @@ const PostCard: React.FC<PostCardProps> = ({
     }
   };
 
-  // Função para renderizar avatar do compartilhador
   const renderSharedByAvatar = () => {
     if (!sharedBy) return null;
 
@@ -177,20 +189,18 @@ const PostCard: React.FC<PostCardProps> = ({
         <img
           src={resolveImageUrl(sharedBy.avatarUrl)}
           alt={sharedBy.name}
-          className="w-8 h-8 aspect-square rounded-full object-cover border"
+          className="w-8 h-8 rounded-full object-cover border flex-shrink-0"
         />
       );
     } else {
       return (
-        <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center border border-white">
-          <AvatarInitials name={sharedBy.name} />
+        <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center border border-white flex-shrink-0">
+          <AvatarInitials name={sharedBy.name} className="w-full h-full" />
         </div>
       );
     }
   };
 
-  // 👇 NO FINAL do componente, antes do return, adicione esta função:
-  // PostCard.tsx - função getUnavailableMessage (VERSÃO MELHORADA)
   const getUnavailableMessage = () => {
     if (isUnavailable) {
       switch (metadata?.reason) {
@@ -208,15 +218,62 @@ const PostCard: React.FC<PostCardProps> = ({
     return '';
   };
 
+  // ✅ Função para verificar se o nome deve ser clicável
+  const shouldNameBeClickable = (userId: number) => {
+    // Não é clicável se:
+    // 1. É o próprio usuário
+    // 2. É post anônimo
+    // 3. É usuário removido (id === 0)
+    return userId !== currentUser?.id && !isAnonymousPost && userId !== 0;
+  };
+
+  const renderAuthorName = () => {
+    const displayName = isAnonymousPost
+      ? 'Anônimo'
+      : expanded && sharedBy
+        ? author.name
+        : author.name;
+
+    if (shouldNameBeClickable(author.id)) {
+      return (
+        <button
+          onClick={() => handleUserClick(author.id)}
+          className="hover:text-blue-600 transition-colors focus:outline-none"
+        >
+          <strong>{displayName}</strong>
+        </button>
+      );
+    } else {
+      return <strong>{displayName}</strong>;
+    }
+  };
+
+  const renderSharedByName = () => {
+    if (!sharedBy) return null;
+
+    if (shouldNameBeClickable(sharedBy.id)) {
+      return (
+        <button
+          onClick={() => handleUserClick(sharedBy.id)}
+          className="font-medium hover:text-blue-600 transition-colors focus:outline-none"
+        >
+          <strong>{sharedBy.name}</strong>
+        </button>
+      );
+    } else {
+      return <strong>{sharedBy.name}</strong>;
+    }
+  };
+
   return (
     <div className="bg-white shadow-md rounded-2xl p-4 space-y-3 max-w-[600px] mx-auto w-full">
       {/* Se for compartilhamento */}
       {sharedBy && (
         <div className="relative flex flex-col gap-1 text-sm text-gray-500 mb-3 border-b pb-2">
           <div className="relative flex items-center gap-3">
-            {renderSharedByAvatar()}
-            <span className="text-sm">
-              Compartilhado por <strong>{sharedBy.name}</strong> •{' '}
+            <div className="flex-shrink-0">{renderSharedByAvatar()}</div>
+            <span className="text-sm flex-1 min-w-0">
+              Compartilhado por {renderSharedByName()} •{' '}
               <span className="text-xs text-gray-400">
                 {formatTimeAgo(safeSharedAt.toISOString())}
               </span>
@@ -226,7 +283,7 @@ const PostCard: React.FC<PostCardProps> = ({
               <PostMenuButton
                 postId={sharedBy.postId}
                 shareId={sharedBy.shareId}
-                className="ml-auto"
+                className="ml-auto flex-shrink-0"
                 onEdit={onEdit}
                 onDelete={onDelete}
               />
@@ -253,13 +310,7 @@ const PostCard: React.FC<PostCardProps> = ({
               variant="h3"
               className="font-medium text-gray-800 text-sm"
             >
-              <strong>
-                {isAnonymousPost
-                  ? 'Anônimo'
-                  : expanded && sharedBy
-                    ? author.name
-                    : author.name}
-              </strong>
+              {renderAuthorName()}
             </Typography>
             <Typography variant="p" className="text-xs text-gray-500">
               {formatTimeAgo(safeCreatedAt.toISOString())}
@@ -277,7 +328,7 @@ const PostCard: React.FC<PostCardProps> = ({
         )}
       </div>
 
-      {/* Título e conteúdo */}
+      {/* ... resto do componente permanece igual ... */}
       {shouldShowUnavailableContent ? (
         <Typography
           variant="p"

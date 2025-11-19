@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom'; // ✅ ADICIONE useLocation
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import PostCard from '../components/PostCard';
 import ShareModal from '../components/ShareModal';
 import EditPostModal from '../components/posts/EditPostModal';
@@ -16,10 +16,15 @@ import BackButton from '../components/ui/BackButton';
 const PostDetailsPage: React.FC = () => {
   const { id, shareId } = useParams<{ id: string; shareId?: string }>();
   const navigate = useNavigate();
-  const location = useLocation(); // ✅ HOOK PARA ACESSAR O ESTADO
+  const location = useLocation();
 
   const postId = id ? parseInt(id) : 0;
   const parsedShareId = shareId ? parseInt(shareId) : undefined;
+
+  // ✅ DEBUG: log para verificar parâmetros
+  useEffect(() => {
+    console.log('🎯 PostDetailsPage Params:', { postId, parsedShareId });
+  }, [postId, parsedShareId]);
 
   const { post, loading, error, refetch } = usePostDetails(
     postId,
@@ -41,6 +46,22 @@ const PostDetailsPage: React.FC = () => {
   const [openCommentId, setOpenCommentId] = useState<number | null>(null);
   const [showComments, setShowComments] = useState(false);
 
+  // ✅ DEBUG: log do post quando carrega
+  useEffect(() => {
+    if (post) {
+      console.log('✅ Post carregado:', {
+        id: post.id,
+        hasCounters: {
+          likes: post.likesCount,
+          comments: post.commentsCount,
+          shares: post.sharesCount,
+          attendance: post.attendanceCount,
+        },
+        content: post.content?.substring(0, 50) + '...',
+      });
+    }
+  }, [post]);
+
   // ✅ EFFECT PARA LER O ESTADO DA NAVEGAÇÃO
   useEffect(() => {
     if (location.state) {
@@ -49,9 +70,7 @@ const PostDetailsPage: React.FC = () => {
 
       if (scrollToComment && navOpenCommentId) {
         setOpenCommentId(navOpenCommentId);
-        setShowComments(true); // ✅ ABRE A SEÇÃO DE COMENTÁRIOS
-
-        // Limpa o estado de navegação para não reexecutar em recarregamentos
+        setShowComments(true);
         window.history.replaceState({}, document.title);
       }
     }
@@ -60,11 +79,9 @@ const PostDetailsPage: React.FC = () => {
   // ✅ EFFECT PARA SCROLLAR ATÉ O COMENTÁRIO QUANDO POST CARREGAR
   useEffect(() => {
     if (post && openCommentId && showComments) {
-      // Pequeno delay para garantir que os comentários renderizaram
       const timer = setTimeout(() => {
         scrollToComment(openCommentId);
       }, 500);
-
       return () => clearTimeout(timer);
     }
   }, [post, openCommentId, showComments]);
@@ -74,15 +91,11 @@ const PostDetailsPage: React.FC = () => {
     const commentElement = document.getElementById(`comment-${commentId}`);
     if (commentElement) {
       commentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-      // ✅ DESTACA O COMENTÁRIO
       commentElement.classList.add(
         'bg-yellow-50',
         'border-l-4',
         'border-yellow-400'
       );
-
-      // Remove o destaque depois de 3 segundos
       setTimeout(() => {
         commentElement.classList.remove(
           'bg-yellow-50',
@@ -95,7 +108,7 @@ const PostDetailsPage: React.FC = () => {
     }
   };
 
-  // ✅ FUNÇÃO PARA MANIPULAR ABERTURA DE COMENTÁRIOS (passar para o PostCard)
+  // ✅ FUNÇÃO PARA MANIPULAR ABERTURA DE COMENTÁRIOS
   const handleCommentAction = () => {
     setShowComments((prev) => !prev);
   };
@@ -119,41 +132,32 @@ const PostDetailsPage: React.FC = () => {
 
   const handleShare = async (message?: string) => {
     if (!postToShare) return;
-
     try {
       const originalPostId = postToShare.sharedBy
         ? postToShare.sharedBy.postId
         : postToShare.id;
-
       const shareIdToSend = postToShare.sharedBy?.shareId;
-
       const sharedPostDTO = await sharePost(
         originalPostId,
         message,
         shareIdToSend
       );
       addPost(sharedPostDTO);
-      toast.success('Post compartilhado com sucesso!');
     } catch (err) {
       console.error(err);
-      toast.error('Erro ao compartilhar o post');
     } finally {
       closeShareModal();
     }
   };
 
   const handleDelete = async (postId: number, shareId?: number) => {
-    if (!window.confirm('Tem certeza que deseja excluir este post?')) {
-      return;
-    }
-
+    if (!window.confirm('Tem certeza que deseja excluir este post?')) return;
     try {
       if (shareId) {
         await deletePost(postId, shareId);
       } else {
         await deletePost(postId);
       }
-
       removePost(postId, shareId);
       toast.success('Post excluído com sucesso!');
       navigate('/feed');
@@ -165,13 +169,10 @@ const PostDetailsPage: React.FC = () => {
 
   const handleLike = async () => {
     if (!post) return;
-
     const postIdToSend = post.sharedBy?.postId || post.id;
     const shareIdToSend = post.sharedBy?.shareId;
-
     const currentLiked = post.liked ?? false;
     toggleLikePost(postIdToSend, !currentLiked, shareIdToSend);
-
     try {
       const { liked } = await likePost(postIdToSend, shareIdToSend);
       if (liked !== !currentLiked) {
@@ -184,19 +185,24 @@ const PostDetailsPage: React.FC = () => {
     }
   };
 
+  // ✅ LOADING MELHORADO com mensagem
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="max-w-[600px] mx-auto p-4">
+        <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
+        <div className="flex justify-center items-center py-12 flex-col">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+          <span className="text-gray-600">Carregando post...</span>
+        </div>
       </div>
     );
   }
 
+  // ✅ ERROR MELHORADO
   if (error || !post) {
     return (
       <div className="max-w-[600px] mx-auto p-4">
         <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
-
         <div className="text-center py-12">
           <div className="text-red-500 text-lg mb-4">
             {error || 'Post não encontrado'}

@@ -1,8 +1,30 @@
 import { motion } from 'framer-motion';
 import Typography from './ui/Typography';
 import Button from './ui/Button';
+import { toast } from 'react-toastify';
 
 const HowToDonate = () => {
+  const handleOtherOptionsClick = () => {
+    toast.info(
+      'No momento, estamos focados no desenvolvimento da plataforma e buscando parcerias com entidades especializadas em PSR. Outras opções de doação estarão disponíveis em breve!',
+      {
+        position: 'top-center',
+        autoClose: 10000, // Aumentei para 8 segundos
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: 'colored',
+        style: {
+          minWidth: '400px', // Largura mínima maior
+          maxWidth: '90vw', // Máximo 90% da viewport
+          fontSize: '16px',
+          padding: '16px',
+        },
+      }
+    );
+  };
+
   return (
     <section
       id="donate"
@@ -47,6 +69,17 @@ const HowToDonate = () => {
           >
             Doe Agora via Pix
           </Typography>
+
+          {/* Mensagem informativa discreta */}
+          <div className="mt-2 mb-3">
+            <Typography
+              variant="p"
+              className="text-xs text-white/80 text-center italic"
+            >
+              *QR Code ilustrativo - Em desenvolvimento
+            </Typography>
+          </div>
+
           <div className="mt-4 flex justify-center">
             <img
               src="/img/qrcode.png"
@@ -57,11 +90,25 @@ const HowToDonate = () => {
           <Typography variant="p" className="mt-4 text-center text-white">
             Aponte sua câmera para o QR Code e faça uma doação via Pix.
           </Typography>
+
+          {/* Mensagem adicional de transparência */}
+          <div className="mt-4 p-3 bg-white/10 rounded-lg">
+            <Typography
+              variant="p"
+              className="text-xs text-white/90 text-center"
+            >
+              Estamos em fase de MVP e buscando parcerias com entidades
+              especializadas em PSR para garantir total transparência no
+              direcionamento de recursos.
+            </Typography>
+          </div>
         </div>
 
         {/* Botão para outras opções */}
         <div className="mt-8 text-center">
-          <Button variant="primary">Outras Opções</Button>
+          <Button variant="primary" onClick={handleOtherOptionsClick}>
+            Outras Opções
+          </Button>
         </div>
       </div>
     </section>
