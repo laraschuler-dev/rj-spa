@@ -12,6 +12,7 @@ export function useEvents() {
     removePost,
     toggleLikePost,
     toggleAttendance,
+    resetPosts,
   } = usePostStore();
 
   const events = posts.filter(
@@ -70,6 +71,7 @@ export function useEvents() {
   };
 
   useEffect(() => {
+    resetPosts();
     refreshEvents();
   }, []);
 

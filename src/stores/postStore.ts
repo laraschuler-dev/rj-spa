@@ -41,6 +41,8 @@ interface PostStoreState {
     postId: number,
     shareId?: number
   ) => Promise<PostListItem | null>;
+
+  resetPosts: () => void;
 }
 
 export const usePostStore = create<PostStoreState>((set, get) => ({
@@ -431,5 +433,14 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
 
   refreshUserPosts: async (userId: number, requestingUserId: number) => {
     await get().fetchUserPosts(userId, requestingUserId, true);
+  },
+
+  resetPosts: () => {
+    set({
+      posts: [],
+      page: 1,
+      hasMore: true,
+      loading: false,
+    });
   },
 }));

@@ -12,6 +12,7 @@ export function useServices() {
     toggleLikePost,
     hasMore,
     loading,
+    resetPosts,
   } = usePostStore();
 
   const services = posts.filter(
@@ -71,6 +72,7 @@ export function useServices() {
   };
 
   useEffect(() => {
+    resetPosts();
     refreshServices();
   }, []);
 

@@ -112,11 +112,11 @@ const PostModal: React.FC<PostModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex justify-center items-start pt-20 overflow-auto"
+      className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex justify-center items-start pt-12 sm:pt-16 overflow-auto"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl w-full max-w-[92vw] sm:max-w-[500px] md:max-w-[550px] mx-3 p-4 relative"
+        className="bg-white rounded-2xl w-full max-w-[95vw] sm:max-w-[520px] md:max-w-[620px] mx-3 p-5 sm:p-6 relative mb-8"
         onClick={(e) => e.stopPropagation()}
       >
         <button

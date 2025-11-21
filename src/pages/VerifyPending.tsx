@@ -4,17 +4,9 @@ import { useVerifyPending } from '../hooks/useVerifyPending';
 import { PendingVerification } from '../components/auth/PendingVerification';
 
 const VerifyPending: React.FC = () => {
-  const { loading, pendingEmail, handleResend, handleTryLogin } =
-    useVerifyPending();
+  const { loading, handleResend } = useVerifyPending();
 
-  return (
-    <PendingVerification
-      pendingEmail={pendingEmail}
-      loading={loading}
-      onResend={handleResend}
-      onTryLogin={handleTryLogin}
-    />
-  );
+  return <PendingVerification loading={loading} onResend={handleResend} />;
 };
 
 export default VerifyPending;

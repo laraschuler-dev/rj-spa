@@ -46,6 +46,10 @@ const PostDetailsPage: React.FC = () => {
   const [openCommentId, setOpenCommentId] = useState<number | null>(null);
   const [showComments, setShowComments] = useState(false);
 
+  // ✅ NOVO ESTADO PARA DELETE
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [postWasDeleted, setPostWasDeleted] = useState(false); // ✅ NOVO ESTADO
+
   // ✅ DEBUG: log do post quando carrega
   useEffect(() => {
     if (post) {
@@ -150,8 +154,13 @@ const PostDetailsPage: React.FC = () => {
     }
   };
 
+  // ✅ NOVA FUNÇÃO DE DELETE SEM POPUP E SEM MENSAGEM DE ERRO
   const handleDelete = async (postId: number, shareId?: number) => {
-    if (!window.confirm('Tem certeza que deseja excluir este post?')) return;
+    if (isDeleting) return; // Previne múltiplos cliques
+    
+    setIsDeleting(true);
+    setPostWasDeleted(true); // ✅ MARCA QUE O POST FOI EXCLUÍDO
+    
     try {
       if (shareId) {
         await deletePost(postId, shareId);
@@ -159,11 +168,21 @@ const PostDetailsPage: React.FC = () => {
         await deletePost(postId);
       }
       removePost(postId, shareId);
-      toast.success('Post excluído com sucesso!');
+      
+      // ✅ Feedback visual suave
+      toast.success('Post excluído com sucesso!', {
+        position: "top-center",
+        autoClose: 2000,
+      });
+      
+      // ✅ Redireciona imediatamente sem esperar
       navigate('/feed');
+      
     } catch (err) {
       console.error(err);
       toast.error('Erro ao excluir o post!');
+      setIsDeleting(false);
+      setPostWasDeleted(false); // ✅ RESETA SE HOUVER ERRO
     }
   };
 
@@ -186,7 +205,7 @@ const PostDetailsPage: React.FC = () => {
   };
 
   // ✅ LOADING MELHORADO com mensagem
-  if (loading) {
+  if (loading && !postWasDeleted) { // ✅ SÓ MOSTRA LOADING SE NÃO FOI EXCLUÍDO
     return (
       <div className="max-w-[600px] mx-auto p-4">
         <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
@@ -198,8 +217,8 @@ const PostDetailsPage: React.FC = () => {
     );
   }
 
-  // ✅ ERROR MELHORADO
-  if (error || !post) {
+  // ✅ ERROR MELHORADO - NÃO MOSTRA ERRO SE O POST FOI EXCLUÍDO
+  if ((error || !post) && !postWasDeleted) {
     return (
       <div className="max-w-[600px] mx-auto p-4">
         <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
@@ -214,6 +233,19 @@ const PostDetailsPage: React.FC = () => {
             <FiRefreshCw size={16} />
             Tentar novamente
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ✅ SE O POST FOI EXCLUÍDO, MOSTRA APENAS O LOADING ATÉ REDIRECIONAR
+  if (postWasDeleted) {
+    return (
+      <div className="max-w-[600px] mx-auto p-4">
+        <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
+        <div className="flex justify-center items-center py-12 flex-col">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+          <span className="text-gray-600">Redirecionando...</span>
         </div>
       </div>
     );
@@ -262,6 +294,8 @@ const PostDetailsPage: React.FC = () => {
         showComments={showComments}
         onComment={handleCommentAction}
         highlightedCommentId={openCommentId}
+        // ✅ PROP PARA INDICAR QUE ESTÁ DELETANDO
+        isDeleting={isDeleting}
       />
 
       {/* Modais */}

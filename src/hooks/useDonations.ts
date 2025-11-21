@@ -12,6 +12,7 @@ export function useDonations() {
     toggleLikePost,
     hasMore,
     loading,
+    resetPosts,
   } = usePostStore();
 
   // 👇 Filtra apenas doações ORIGINAIS (categoria 1)
@@ -59,6 +60,7 @@ export function useDonations() {
   };
 
   const refreshDonations = async () => {
+    resetPosts();
     await fetchDonations(true);
   };
 

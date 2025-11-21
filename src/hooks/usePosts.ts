@@ -2,11 +2,13 @@ import { useEffect } from 'react';
 import { usePostStore } from '../stores/postStore';
 
 export function usePosts() {
-  const { posts, fetchPosts, refreshPosts, hasMore, loading } = usePostStore();
+  const { posts, fetchPosts, refreshPosts, hasMore, loading, resetPosts } =
+    usePostStore();
 
   useEffect(() => {
+    resetPosts();
     fetchPosts(true);
-  }, [fetchPosts]);
+  }, [fetchPosts, resetPosts]);
 
   return {
     posts,

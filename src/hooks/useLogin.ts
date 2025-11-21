@@ -2,8 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import useAuthStore from '../stores/authStore';
 import api from '../services/api';
+import useAuthStore from '../stores/authStore';
 
 export const useLogin = () => {
   const [formData, setFormData] = useState({ emailOrPhone: '', password: '' });
@@ -58,14 +58,8 @@ export const useLogin = () => {
         const email = formData.emailOrPhone.includes('@')
           ? formData.emailOrPhone
           : null;
-
-        if (email) {
-          localStorage.setItem('pendingEmail', email);
-          navigate('/verify-pending');
-        } else {
-          // ✅ NOVO: Redireciona para recuperação
-          navigate('/recover-verification');
-        }
+        if (email) localStorage.setItem('pendingEmail', email);
+        navigate('/verify-pending');
         return;
       }
 

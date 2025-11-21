@@ -14,6 +14,7 @@ import AvatarInitials from './ui/AvatarInitials';
 import { EngagementCounters } from './ui/EngagementCounters';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { FaRetweet, FaShare } from 'react-icons/fa';
 
 interface PostCardProps {
   id: number;
@@ -272,10 +273,11 @@ const PostCard: React.FC<PostCardProps> = ({
         <div className="relative flex flex-col gap-1 text-sm text-gray-500 mb-3 border-b pb-2">
           <div className="relative flex items-center gap-3">
             <div className="flex-shrink-0">{renderSharedByAvatar()}</div>
-            <span className="text-sm flex-1 min-w-0">
-              Compartilhado por {renderSharedByName()} •{' '}
+            <span className="text-sm flex-1 min-w-0 flex items-center gap-1">
+              <FaShare className="w-3 h-3 text-gray-500 flex-shrink-0" />
+              <span className="font-medium">{renderSharedByName()}</span>
               <span className="text-xs text-gray-400">
-                {formatTimeAgo(safeSharedAt.toISOString())}
+                • {formatTimeAgo(safeSharedAt.toISOString())}
               </span>
             </span>
 
