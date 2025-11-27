@@ -38,7 +38,6 @@ const ProfileView: React.FC = () => {
   const targetUserId = urlUserId ? parseInt(urlUserId) : currentUser?.id;
   const isOwnProfile = !urlUserId || currentUser?.id === targetUserId;
 
-  // ✅ CORRETO: Chamar TODOS os hooks incondicionalmente no topo
   const ownProfileData = useProfile(); // Sempre chamado
   const otherProfileData = useUserProfile(targetUserId); // Sempre chamado, mesmo quando undefined
   const {
@@ -49,13 +48,16 @@ const ProfileView: React.FC = () => {
     loading: postsLoading,
   } = useProfilePosts(targetUserId);
 
-  // ✅ Agora escolha os dados baseado na condição DEPOIS dos hooks
   const profileData = isOwnProfile ? ownProfileData : otherProfileData;
 
-  // ✅ Extraia user, profile, loading E refreshFollowStats do profileData
-  const { user, profile, loading, refreshFollowStats } = profileData;
+  const user = profileData.user;
+  const profile = profileData.profile;
+  const loading = profileData.loading;
 
-  // ✅ ADICIONE: getFollowers e getFollowing
+  const refreshFollowStats = !isOwnProfile
+    ? (profileData as any).refreshFollowStats
+    : undefined;
+
   const { getFollowers, getFollowing } = useFollow();
 
   useEffect(() => {
@@ -266,7 +268,7 @@ const ProfileView: React.FC = () => {
           )}
         </div>
 
-        {/* Seção de Follow - Agora com melhor espaçamento */}
+        {/* Seção de Follow */}
         <div className="border-t border-gray-100 pt-6">
           {/* Estatísticas de Follow */}
           <div className="mb-4">
@@ -290,12 +292,8 @@ const ProfileView: React.FC = () => {
                   );
 
                   if (!isOwnProfile && refreshFollowStats) {
-                    console.log(
-                      '🔄 [ProfileView] Chamando refreshFollowStats...'
-                    );
                     await refreshFollowStats();
                   } else {
-                    console.log('🔄 [ProfileView] Recarregando página...');
                     setTimeout(() => {
                       window.location.reload();
                     }, 800);
@@ -567,11 +565,6 @@ const ProfileView: React.FC = () => {
         onClose={() => setShowFollowersModal(false)}
         users={followers}
         title="Seguidores"
-        onUserClick={(userId) => {
-          setShowFollowersModal(false);
-          // Navega para o perfil do usuário
-          // navigate(`/profile/${userId}`);
-        }}
         onFollowChange={updateUserFollowStatus}
       />
 
@@ -580,11 +573,6 @@ const ProfileView: React.FC = () => {
         onClose={() => setShowFollowingModal(false)}
         users={following}
         title="Seguindo"
-        onUserClick={(userId) => {
-          setShowFollowingModal(false);
-          // Navega para o perfil do usuário
-          // navigate(`/profile/${userId}`);
-        }}
         onFollowChange={updateUserFollowStatus}
       />
     </main>

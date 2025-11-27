@@ -18,6 +18,7 @@ interface PostPreviewCardProps {
     title?: string;
     isUnavailable?: boolean;
     originalAuthorDeleted?: boolean;
+    originalPostDeleted?: boolean;
   };
   content?: string;
   images?: { id: number; url: string }[];

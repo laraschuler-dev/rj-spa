@@ -93,9 +93,6 @@ const AccountSettings: React.FC = () => {
           showUnlinkModal={socialConnections.showUnlinkModal}
           onShowUnlinkModalChange={socialConnections.setShowUnlinkModal}
           isUnlinking={socialConnections.isLoading}
-          onGoogleLinkSuccess={(idToken: string) =>
-            socialConnections.linkGoogleAccount(idToken)
-          }
         />
 
         <DeleteAccountSection

@@ -13,14 +13,11 @@ export const useNotifications = () => {
   } = useNotificationStore();
 
   const initializeNotifications = useCallback(async () => {
-    console.log('[useNotifications] Inicializando notificações...');
     await fetchUnreadCount();
     await fetchNotifications(true);
-    console.log('[useNotifications] Finalizado initializeNotifications');
   }, [fetchNotifications, fetchUnreadCount]);
 
   useEffect(() => {
-    // Evita buscar contador novamente se o hook for re-renderizado imediatamente após markAllAsRead
     const timeout = setTimeout(() => {
       initializeNotifications();
     }, 300);

@@ -106,11 +106,8 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     // ✅ NOTIFICAÇÃO DE COMMENT COM comment_id - BUSCA O COMENTÁRIO
     if (notification.type === 'COMMENT' && notification.post?.comment_id) {
       try {
-        // Busca detalhes do comentário
-        const commentResponse = await axios.get(
-          `/posts/comments/${notification.post.comment_id}`
-        );
-        const comment = commentResponse.data;
+        // Busca detalhes do comentário (não precisa armazenar em variável)
+        await axios.get(`/posts/comments/${notification.post.comment_id}`);
 
         // Navega para a página de detalhes do post com o comentário aberto
         if (notification.post.share_id) {

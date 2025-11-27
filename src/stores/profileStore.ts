@@ -38,7 +38,7 @@ export interface ProfileState {
   decrementFollowing: () => void;
 }
 
-export const useProfileStore = create<ProfileState>((set, get) => ({
+export const useProfileStore = create<ProfileState>((set) => ({
   user: null,
   profile: null,
   loading: false,

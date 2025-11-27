@@ -2,7 +2,6 @@
 import { useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
 import api from '../services/api';
-import { useProfileStore } from '../stores/profileStore';
 import { useAuth } from './useAuth';
 
 export interface UserFollowerInfo {
@@ -23,7 +22,6 @@ export interface FollowStats {
 export const useFollow = () => {
   const [loading, setLoading] = useState(false);
   const { token } = useAuth();
-  const { updateFollowStats } = useProfileStore();
 
   // 👇 CORREÇÃO: useCallback em todas as funções
   const followUser = useCallback(
@@ -115,7 +113,6 @@ export const useFollow = () => {
         const response = await api.get(`/follow/${userId}/stats`);
         return response.data;
       } catch (error) {
-        console.error('Erro ao carregar estatísticas de follow');
         return null;
       }
     },

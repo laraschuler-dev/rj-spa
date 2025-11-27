@@ -18,9 +18,6 @@ interface SocialConnectionsSectionProps {
   isUnlinking: boolean;
 }
 
-// components/account-settings/sections/SocialConnectionsSection.tsx
-// ... imports e interface
-
 export const SocialConnectionsSection: React.FC<
   SocialConnectionsSectionProps
 > = ({

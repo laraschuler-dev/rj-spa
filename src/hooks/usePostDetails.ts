@@ -29,10 +29,6 @@ export const usePostDetails = (postId: number, shareId?: number) => {
       setError(null);
 
       try {
-        console.log('🔄 usePostDetails: Buscando post fresco...', {
-          postId,
-          shareId,
-        });
         await fetchPostDetails(postId, shareId);
       } catch (err) {
         console.error('❌ Erro ao carregar post:', err);
@@ -43,7 +39,7 @@ export const usePostDetails = (postId: number, shareId?: number) => {
     };
 
     loadPost();
-  }, [postId, shareId, fetchPostDetails]); // ✅ Remove `post` das dependências
+  }, [postId, shareId, fetchPostDetails]);
 
   return {
     post,

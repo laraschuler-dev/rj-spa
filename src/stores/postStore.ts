@@ -55,7 +55,6 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
 
   // No postStore.ts - método updatePost (ATUALIZADO)
   updatePost: (updatedPost: PostListItem, addIfNotExists = false) => {
-    console.log('📝 updatePost chamado com:', updatedPost);
 
     set((state) => {
       const key = updatedPost.sharedBy?.shareId
@@ -236,15 +235,8 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
 
   fetchPostDetails: async (postId: number, shareId?: number) => {
     try {
-      console.log('🔄 STORE: Buscando post com contadores...', {
-        postId,
-        shareId,
-      });
-
       const params = shareId ? { shareId } : undefined;
       const res = await axios.get(`/posts/${postId}`, { params });
-
-      console.log('📥 STORE: Resposta completa da API:', res.data);
 
       const fetchedPost = res.data;
 
@@ -283,15 +275,6 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
           (shareId ? `share-${shareId}` : `post-${postId}`),
       };
 
-      console.log('📊 STORE: Post normalizado COM CONTADORES:', {
-        id: normalizedPost.id,
-        likesCount: normalizedPost.likesCount,
-        commentsCount: normalizedPost.commentsCount,
-        sharesCount: normalizedPost.sharesCount,
-        attendanceCount: normalizedPost.attendanceCount,
-      });
-
-      // ✅ ATUALIZA na store SUBSTITUINDO o post antigo
       set((state) => {
         const key = shareId ? `share-${shareId}` : `post-${postId}`;
 

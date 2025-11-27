@@ -157,10 +157,10 @@ const PostDetailsPage: React.FC = () => {
   // ✅ NOVA FUNÇÃO DE DELETE SEM POPUP E SEM MENSAGEM DE ERRO
   const handleDelete = async (postId: number, shareId?: number) => {
     if (isDeleting) return; // Previne múltiplos cliques
-    
+
     setIsDeleting(true);
     setPostWasDeleted(true); // ✅ MARCA QUE O POST FOI EXCLUÍDO
-    
+
     try {
       if (shareId) {
         await deletePost(postId, shareId);
@@ -168,16 +168,15 @@ const PostDetailsPage: React.FC = () => {
         await deletePost(postId);
       }
       removePost(postId, shareId);
-      
+
       // ✅ Feedback visual suave
       toast.success('Post excluído com sucesso!', {
-        position: "top-center",
+        position: 'top-center',
         autoClose: 2000,
       });
-      
+
       // ✅ Redireciona imediatamente sem esperar
       navigate('/feed');
-      
     } catch (err) {
       console.error(err);
       toast.error('Erro ao excluir o post!');
@@ -205,7 +204,8 @@ const PostDetailsPage: React.FC = () => {
   };
 
   // ✅ LOADING MELHORADO com mensagem
-  if (loading && !postWasDeleted) { // ✅ SÓ MOSTRA LOADING SE NÃO FOI EXCLUÍDO
+  if (loading && !postWasDeleted) {
+    // ✅ SÓ MOSTRA LOADING SE NÃO FOI EXCLUÍDO
     return (
       <div className="max-w-[600px] mx-auto p-4">
         <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
@@ -251,6 +251,10 @@ const PostDetailsPage: React.FC = () => {
     );
   }
 
+  if (!post) {
+    return null; // ou uma mensagem de fallback
+  }
+
   return (
     <div className="max-w-[600px] mx-auto p-4">
       <div className="mb-6"></div>
@@ -290,11 +294,9 @@ const PostDetailsPage: React.FC = () => {
         onEdit={(postId, shareId) => setEditingPost({ id: postId, shareId })}
         isPostOwner={post.isPostOwner}
         isShareOwner={post.isShareOwner}
-        // ✅ NOVAS PROPS PARA CONTROLAR COMENTÁRIOS
         showComments={showComments}
         onComment={handleCommentAction}
         highlightedCommentId={openCommentId}
-        // ✅ PROP PARA INDICAR QUE ESTÁ DELETANDO
         isDeleting={isDeleting}
       />
 

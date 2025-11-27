@@ -14,7 +14,7 @@ import AvatarInitials from './ui/AvatarInitials';
 import { EngagementCounters } from './ui/EngagementCounters';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { FaRetweet, FaShare } from 'react-icons/fa';
+import { FaShare } from 'react-icons/fa';
 
 interface PostCardProps {
   id: number;
@@ -61,6 +61,7 @@ interface PostCardProps {
   attendanceCount?: number;
   showComments?: boolean;
   highlightedCommentId?: number | null;
+  isDeleting?: boolean;
 }
 
 const PostCard: React.FC<PostCardProps> = ({

@@ -11,11 +11,8 @@ export function useProfile() {
   const baseData = useProfileBase();
 
   useEffect(() => {
-    console.log('🟢 useProfile hook executado, token:', token);
-
     const fetchProfile = async () => {
       if (!token) {
-        console.log('⚠️ token ausente, abortando fetchProfile');
         return;
       }
 
@@ -24,8 +21,6 @@ export function useProfile() {
         const res = await api.get('/profile', {
           headers: { Authorization: `Bearer ${token}` },
         });
-
-        console.log('🔍 Resposta completa da API /profile:', res.data);
 
         const userData = {
           id: res.data.profile?.user_id,
@@ -43,10 +38,6 @@ export function useProfile() {
           followStats: res.data.followStats,
         };
 
-        console.log('🔍 Dados extraídos para store:', {
-          userData,
-          profileData,
-        });
         setProfile(userData, profileData);
       } catch (err) {
         console.error('🔴 Erro ao buscar perfil:', err);
