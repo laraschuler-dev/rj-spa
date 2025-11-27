@@ -11,7 +11,12 @@ export const useLogin = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/feed';
+
+  // ✅ CORREÇÃO: Aceita tanto string quanto objeto com pathname
+  const from =
+    typeof location.state?.from === 'string'
+      ? location.state.from
+      : location.state?.from?.pathname || '/feed';
 
   const setToken = useAuthStore((state) => state.setToken);
   const validateToken = useAuthStore((state) => state.validateToken);

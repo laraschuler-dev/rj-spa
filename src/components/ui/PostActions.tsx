@@ -21,7 +21,7 @@ interface PostActionsProps {
   onComment?: () => void;
   onShare?: () => void;
   onAttend?: () => void;
-  isAttending?: boolean; // ✅ Já está na interface
+  isAttending?: boolean;
   loadingAttend?: boolean;
 }
 
@@ -63,7 +63,6 @@ const PostActions: React.FC<PostActionsProps> = ({
   const handleLike = async () => {
     try {
       if (onLike) {
-        // ✅ Remove o await para resposta mais rápida
         onLike(post.id, post.sharedBy?.shareId);
       }
     } catch (error) {

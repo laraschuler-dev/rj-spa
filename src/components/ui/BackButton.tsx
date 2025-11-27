@@ -1,20 +1,31 @@
-import { Link } from 'react-router-dom';
+// BackButton.tsx - VERSÃO COM DEBUG
+import { useNavigate } from 'react-router-dom';
 import { MdArrowBackIos } from 'react-icons/md';
+import { useScrollStore } from '../../stores/scrollStore';
 
-interface BackButtonProps {
-  to: string;
-  label?: string;
-  className?: string;
-}
+const BackButton: React.FC<{ className?: string }> = ({ className }) => {
+  const navigate = useNavigate();
+  const targetSection = useScrollStore((s) => s.targetSection);
 
-const BackButton: React.FC<BackButtonProps> = ({ to, className }) => {
+  const handleBack = () => {
+    console.log('🔙 BackButton - targetSection:', targetSection);
+
+    // Se existe um target definido na store -> voltar pra home e deixar a Home scrolar
+    if (targetSection) {
+      console.log('🎯 Indo para home com seção:', targetSection);
+      navigate('/', { replace: true });
+      return;
+    }
+
+    // Caso contrário, segue o comportamento padrão de "voltar"
+    console.log('🔁 Comportamento padrão: navegando -1');
+    navigate(-1);
+  };
+
   return (
-    <Link
-      to={to}
-      className={`flex items-center transition-colors duration-200 ${className}`}
-    >
-      <MdArrowBackIos className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-[#004AAD] hover:text-[#003080]" />
-    </Link>
+    <button onClick={handleBack} className={className}>
+      <MdArrowBackIos className="w-7 h-7 text-[#004AAD] focus:outline-none" />
+    </button>
   );
 };
 

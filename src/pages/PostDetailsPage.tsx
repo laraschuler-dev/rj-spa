@@ -208,7 +208,7 @@ const PostDetailsPage: React.FC = () => {
     // ✅ SÓ MOSTRA LOADING SE NÃO FOI EXCLUÍDO
     return (
       <div className="max-w-[600px] mx-auto p-4">
-        <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
+        <BackButton className="fixed top-6 left-6 z-50" />
         <div className="flex justify-center items-center py-12 flex-col">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
           <span className="text-gray-600">Carregando post...</span>
@@ -221,7 +221,7 @@ const PostDetailsPage: React.FC = () => {
   if ((error || !post) && !postWasDeleted) {
     return (
       <div className="max-w-[600px] mx-auto p-4">
-        <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
+        <BackButton className="fixed top-6 left-6 z-50" />
         <div className="text-center py-12">
           <div className="text-red-500 text-lg mb-4">
             {error || 'Post não encontrado'}
@@ -242,7 +242,7 @@ const PostDetailsPage: React.FC = () => {
   if (postWasDeleted) {
     return (
       <div className="max-w-[600px] mx-auto p-4">
-        <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
+        <BackButton className="fixed top-6 left-6 z-50" />
         <div className="flex justify-center items-center py-12 flex-col">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
           <span className="text-gray-600">Redirecionando...</span>
@@ -258,7 +258,7 @@ const PostDetailsPage: React.FC = () => {
   return (
     <div className="max-w-[600px] mx-auto p-4">
       <div className="mb-6"></div>
-      <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
+      <BackButton className="fixed top-6 left-6 z-50" />
 
       {/* Post em modo expandido */}
       <PostCard

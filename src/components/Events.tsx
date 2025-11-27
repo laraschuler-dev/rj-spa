@@ -8,15 +8,44 @@ import { useHomeEvents } from '../hooks/useHomeData';
 import { resolveImageUrl } from '../utils/resolveImageUrl';
 import formatDateBR from '../utils/formatDateBR';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
+import { toast } from 'react-toastify';
+import { useScrollStore } from '../stores/scrollStore';
 
 export default function Eventos() {
   const { events, loading, error } = useHomeEvents(6);
   const [imageErrors, setImageErrors] = useState<{ [key: string]: boolean }>(
     {}
   );
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth(); // ✅ Adicionar hook de autenticação
 
   const handleImageError = (id: string) => {
     setImageErrors((prev) => ({ ...prev, [id]: true }));
+  };
+
+  const setScrollTarget = useScrollStore((s) => s.setScrollTarget);
+
+  const handleEventClick = (event: any) => {
+    const postId = event.postId || event.id;
+    const targetUrl = `/post/${postId}`;
+
+    if (!isAuthenticated) {
+      toast.info('Faça login para ver os detalhes do evento');
+      navigate('/login', {
+        state: {
+          from: targetUrl,
+        },
+      });
+      return;
+    }
+
+    // grava na store QUAL seção e qual posição de scroll (apenas aqui)
+    setScrollTarget('events', window.scrollY);
+
+    // navega para detalhes normalmente
+    navigate(targetUrl);
   };
 
   if (loading) {
@@ -122,7 +151,9 @@ export default function Eventos() {
                   </div>
 
                   <div className="mt-2">
-                    <CardButton>Saiba Mais</CardButton>
+                    <CardButton onClick={() => handleEventClick(event)}>
+                      Saiba Mais
+                    </CardButton>
                   </div>
                 </div>
               </div>

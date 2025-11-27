@@ -7,14 +7,44 @@ import CardButton from './ui/CardButton';
 import { useHomeServices } from '../hooks/useHomeData';
 import { resolveImageUrl } from '../utils/resolveImageUrl';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
+import { toast } from 'react-toastify';
+import { useScrollStore } from '../stores/scrollStore';
 
 export default function Services() {
   const { services, loading, error } = useHomeServices(6);
   const [imageErrors, setImageErrors] = useState<{ [key: string]: boolean }>(
     {}
   );
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth(); // Usar o hook de autenticação
+
   const handleImageError = (id: string) => {
     setImageErrors((prev) => ({ ...prev, [id]: true }));
+  };
+
+  const setScrollTarget = useScrollStore((s) => s.setScrollTarget);
+
+  const handleServiceClick = (service: any) => {
+    const postId = service.postId || service.id;
+    const targetUrl = `/post/${postId}`;
+
+    if (!isAuthenticated) {
+      toast.info('Faça login para ver os detalhes do serviço');
+      navigate('/login', {
+        state: {
+          from: targetUrl,
+        },
+      });
+      return;
+    }
+
+    // grava na store QUAL seção e qual posição de scroll (apenas aqui)
+    setScrollTarget('services', window.scrollY);
+
+    // navega para detalhes normalmente
+    navigate(targetUrl);
   };
 
   if (loading) {
@@ -167,7 +197,9 @@ export default function Services() {
                   </div>
 
                   <div className="mt-2">
-                    <CardButton>Saiba Mais</CardButton>
+                    <CardButton onClick={() => handleServiceClick(service)}>
+                      Saiba Mais
+                    </CardButton>
                   </div>
                 </div>
               </div>
