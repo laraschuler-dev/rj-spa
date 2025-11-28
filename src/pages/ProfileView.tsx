@@ -222,7 +222,7 @@ const ProfileView: React.FC = () => {
 
   return (
     <main className="min-h-screen bg-background px-4 py-12">
-      <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
+      <BackButton className="fixed top-6 left-6 z-50" />
 
       {/* Card de perfil */}
       <div className="w-full max-w-[600px] bg-white p-8 rounded-2xl shadow-lg text-center mx-auto">
