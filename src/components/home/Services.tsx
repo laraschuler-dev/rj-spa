@@ -18,7 +18,10 @@ export default function Services() {
     {}
   );
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth(); // Usar o hook de autenticação
+  const { isAuthenticated } = useAuth();
+  const [loadingButtons, setLoadingButtons] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   const handleImageError = (id: string) => {
     setImageErrors((prev) => ({ ...prev, [id]: true }));
@@ -26,7 +29,7 @@ export default function Services() {
 
   const setScrollTarget = useScrollStore((s) => s.setScrollTarget);
 
-  const handleServiceClick = (service: any) => {
+  const handleServiceClick = async (service: any) => {
     const postId = service.postId || service.id;
     const targetUrl = `/post/${postId}`;
 
@@ -40,11 +43,21 @@ export default function Services() {
       return;
     }
 
-    // grava na store QUAL seção e qual posição de scroll (apenas aqui)
-    setScrollTarget('services', window.scrollY);
+    // ✅ Ativa loading para este botão específico
+    setLoadingButtons((prev) => ({ ...prev, [service.id]: true }));
 
-    // navega para detalhes normalmente
-    navigate(targetUrl);
+    try {
+      // grava na store QUAL seção e qual posição de scroll
+      setScrollTarget('services', window.scrollY);
+
+      // navega para detalhes normalmente
+      navigate(targetUrl);
+    } catch (error) {
+      console.error('Erro ao navegar:', error);
+    } finally {
+      // ✅ Desativa loading (caso a navegação falhe)
+      setLoadingButtons((prev) => ({ ...prev, [service.id]: false }));
+    }
   };
 
   if (loading) {
@@ -197,7 +210,11 @@ export default function Services() {
                   </div>
 
                   <div className="mt-2">
-                    <CardButton onClick={() => handleServiceClick(service)}>
+                    <CardButton
+                      onClick={() => handleServiceClick(service)}
+                      loading={loadingButtons[service.id]} // ✅ Passa o estado de loading
+                      loadingText="Abrindo..."
+                    >
                       Saiba Mais
                     </CardButton>
                   </div>

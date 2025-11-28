@@ -19,7 +19,10 @@ export default function Eventos() {
     {}
   );
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth(); // ✅ Adicionar hook de autenticação
+  const { isAuthenticated } = useAuth();
+  const [loadingButtons, setLoadingButtons] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   const handleImageError = (id: string) => {
     setImageErrors((prev) => ({ ...prev, [id]: true }));
@@ -27,7 +30,7 @@ export default function Eventos() {
 
   const setScrollTarget = useScrollStore((s) => s.setScrollTarget);
 
-  const handleEventClick = (event: any) => {
+  const handleEventClick = async (event: any) => {
     const postId = event.postId || event.id;
     const targetUrl = `/post/${postId}`;
 
@@ -41,11 +44,18 @@ export default function Eventos() {
       return;
     }
 
-    // grava na store QUAL seção e qual posição de scroll (apenas aqui)
-    setScrollTarget('events', window.scrollY);
+    // ✅ Ativa loading para este botão específico
+    setLoadingButtons((prev) => ({ ...prev, [event.id]: true }));
 
-    // navega para detalhes normalmente
-    navigate(targetUrl);
+    try {
+      setScrollTarget('events', window.scrollY);
+      navigate(targetUrl);
+    } catch (error) {
+      console.error('Erro ao navegar:', error);
+    } finally {
+      // ✅ Desativa loading (caso a navegação falhe)
+      setLoadingButtons((prev) => ({ ...prev, [event.id]: false }));
+    }
   };
 
   if (loading) {
@@ -202,7 +212,11 @@ export default function Eventos() {
                   </div>
 
                   <div className="mt-2">
-                    <CardButton onClick={() => handleEventClick(event)}>
+                    <CardButton
+                      onClick={() => handleEventClick(event)}
+                      loading={loadingButtons[event.id]} // ✅ Passa o estado de loading
+                      loadingText="Abrindo..."
+                    >
                       Saiba Mais
                     </CardButton>
                   </div>
