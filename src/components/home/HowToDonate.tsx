@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
-import Typography from './ui/Typography';
-import Button from './ui/Button';
+import Typography from '../ui/Typography';
+import Button from '../ui/Button';
 import { toast } from 'react-toastify';
 
 const HowToDonate = () => {

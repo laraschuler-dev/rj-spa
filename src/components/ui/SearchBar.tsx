@@ -1,11 +1,11 @@
 // src/components/SearchBar.tsx
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { useUserSearch } from '../hooks/useUserSearch';
+import { useUserSearch } from '../../hooks/useUserSearch';
 import { Link } from 'react-router-dom';
-import { resolveImageUrl } from '../utils/resolveImageUrl';
+import { resolveImageUrl } from '../../utils/resolveImageUrl';
 import { FiSearch, FiX } from 'react-icons/fi';
-import { translateProfileType } from '../utils/translateProfileType';
-import AvatarInitials from './ui/AvatarInitials';
+import { translateProfileType } from '../../utils/translateProfileType';
+import AvatarInitials from './AvatarInitials';
 
 const SearchBar: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');

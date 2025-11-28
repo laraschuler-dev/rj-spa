@@ -1,13 +1,13 @@
 // Home.tsx - VERSÃO COM DEBUG
 import React, { useEffect } from 'react';
 import Layout from '../components/layout/Layout';
-import Introduction from '../components/Introduction';
-import AboutUs from '../components/AboutUs';
-import Events from '../components/Events';
-import Services from '../components/Services';
-import HowToDonate from '../components/HowToDonate';
-import Contact from '../components/Contact';
-import Information from '../components/Information';
+import Introduction from '../components/home/Introduction';
+import AboutUs from '../components/home/AboutUs';
+import Events from '../components/home/Events';
+import Services from '../components/home/Services';
+import HowToDonate from '../components/home/HowToDonate';
+import Contact from '../components/home/Contact';
+import Information from '../components/home/Information';
 import { useScrollStore } from '../stores/scrollStore';
 
 const Home: React.FC = () => {

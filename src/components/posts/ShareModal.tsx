@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import Typography from './ui/Typography';
-import SubmitButton from './ui/SubmitButton';
-import CancelButton from './ui/CancelButton';
+import Typography from '../ui/Typography';
+import SubmitButton from '../ui/SubmitButton';
+import CancelButton from '../ui/CancelButton';
 import { FiX } from 'react-icons/fi';
 
 interface ShareModalProps {

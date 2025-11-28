@@ -1,8 +1,8 @@
 import React from 'react';
 import PostCard from './PostCard';
-import { usePostStore } from '../stores/postStore';
-import { usePostDetails } from '../hooks/usePostDetails';
-import { useEventAttendance } from '../hooks/useEventAttendance';
+import { usePostStore } from '../../stores/postStore';
+import { usePostDetails } from '../../hooks/usePostDetails';
+import { useEventAttendance } from '../../hooks/useEventAttendance';
 import { FiX } from 'react-icons/fi';
 
 interface PostModalProps {

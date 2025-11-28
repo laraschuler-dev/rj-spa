@@ -2,18 +2,18 @@ import React, { useState } from 'react';
 import { CgProfile } from 'react-icons/cg';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
-import Typography from './ui/Typography';
-import { resolveImageUrl } from '../utils/resolveImageUrl';
-import PostActions from './ui/PostActions';
-import CommentSection from './comments/CommentSection';
-import { formatTimeAgo } from '../utils/formatTimeAgo';
-import formatDateBR from '../utils/formatDateBR';
-import PostMenuButton from './ui/PostMenuButton';
-import { useEventAttendance } from '../hooks/useEventAttendance';
-import AvatarInitials from './ui/AvatarInitials';
-import { EngagementCounters } from './ui/EngagementCounters';
+import Typography from '../ui/Typography';
+import { resolveImageUrl } from '../../utils/resolveImageUrl';
+import PostActions from '../ui/PostActions';
+import CommentSection from '../comments/CommentSection';
+import { formatTimeAgo } from '../../utils/formatTimeAgo';
+import formatDateBR from '../../utils/formatDateBR';
+import PostMenuButton from '../ui/PostMenuButton';
+import { useEventAttendance } from '../../hooks/useEventAttendance';
+import AvatarInitials from '../ui/AvatarInitials';
+import { EngagementCounters } from '../ui/EngagementCounters';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth';
 import { FaShare } from 'react-icons/fa';
 
 interface PostCardProps {
@@ -303,7 +303,6 @@ const PostCard: React.FC<PostCardProps> = ({
           )}
         </div>
       )}
-
       {/* Cabeçalho do post original */}
       <div className="relative flex justify-between items-start">
         <div className="flex items-center gap-2">
@@ -330,7 +329,6 @@ const PostCard: React.FC<PostCardProps> = ({
           />
         )}
       </div>
-
       {/* ... resto do componente permanece igual ... */}
       {shouldShowUnavailableContent ? (
         <Typography
@@ -494,37 +492,41 @@ const PostCard: React.FC<PostCardProps> = ({
           )}
         </div>
       )}
-
+      {/* Ações */}
       {/* Ações */}
       {!shouldShowUnavailableContent && (
-        <PostActions
-          post={{
-            id,
-            categoryId,
-            sharedBy: sharedBy?.shareId
-              ? { shareId: sharedBy.shareId }
-              : undefined,
-          }}
-          isLiked={isLiked ?? false}
-          onLike={onLike}
-          onComment={handleCommentClick}
-          onShare={onShare}
-          onAttend={toggleAttendance} // ✅ usa hook
-          isAttending={status.attending} // ✅ vem do hook
-          loadingAttend={loading} // opcional: se quiser desabilitar botão enquanto envia
-        />
-      )}
+        <div className={expanded ? 'border-t pt-3 space-y-2' : ''}>
+          {/* ✅ Contadores APENAS no modo expandido, dentro do mesmo container */}
+          {expanded && (
+            <EngagementCounters
+              likesCount={likesCount}
+              commentsCount={commentsCount}
+              sharesCount={sharesCount}
+              attendanceCount={attendanceCount}
+              categoryId={categoryId}
+              compact={true}
+            />
+          )}
 
-      {expanded && !shouldShowUnavailableContent && (
-        <EngagementCounters
-          likesCount={likesCount}
-          commentsCount={commentsCount}
-          sharesCount={sharesCount}
-          attendanceCount={attendanceCount}
-          categoryId={categoryId}
-        />
+          {/* ✅ Ações SEMPRE visíveis */}
+          <PostActions
+            post={{
+              id,
+              categoryId,
+              sharedBy: sharedBy?.shareId
+                ? { shareId: sharedBy.shareId }
+                : undefined,
+            }}
+            isLiked={isLiked ?? false}
+            onLike={onLike}
+            onComment={handleCommentClick}
+            onShare={onShare}
+            onAttend={toggleAttendance}
+            isAttending={status.attending}
+            loadingAttend={loading}
+          />
+        </div>
       )}
-
       {/* Comentários */}
       {showComments && !shouldShowUnavailableContent && (
         <div className="pt-4 border-t">

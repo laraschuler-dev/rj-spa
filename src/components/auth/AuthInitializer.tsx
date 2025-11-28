@@ -1,7 +1,7 @@
 // components/AuthInitializer.tsx
 import { ReactNode, useEffect } from 'react';
-import useAuthStore from '../stores/authStore';
-import { useAuthListener } from '../hooks/useAuthListener';
+import useAuthStore from '../../stores/authStore';
+import { useAuthListener } from '../../hooks/useAuthListener';
 
 interface Props {
   children: ReactNode;

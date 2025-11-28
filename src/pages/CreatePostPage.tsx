@@ -1,7 +1,7 @@
 // src/pages/posts/CreatePostPage.tsx
 import { useParams } from 'react-router-dom';
-import PostFormFactory from '../../components/posts/PostFormFactory';
-import { useCreatePost } from '../../hooks/useCreatePost';
+import PostFormFactory from '../components/posts/PostFormFactory';
+import { useCreatePost } from '../hooks/useCreatePost';
 
 const CreatePostPage = () => {
   const { categoryId } = useParams<{ categoryId: string }>();

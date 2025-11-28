@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
-import Button from './ui/Button';
-import Typography from './ui/Typography';
+import Button from '../ui/Button';
+import Typography from '../ui/Typography';
 import { Link } from 'react-router-dom';
 
 const Introduction = () => {

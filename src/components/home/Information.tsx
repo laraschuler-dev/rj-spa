@@ -7,8 +7,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import Typography from './ui/Typography';
-import Button from './ui/Button';
+import Typography from '../ui/Typography';
+import Button from '../ui/Button';
 import { Link } from 'react-router-dom';
 
 const data = [

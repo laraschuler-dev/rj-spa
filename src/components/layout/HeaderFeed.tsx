@@ -10,9 +10,9 @@ import {
   FiGift,
 } from 'react-icons/fi';
 import MobileMenuFeed from '../ui/MobileMenuFeed';
-import SearchBar from '../SearchBar';
-import SearchBarMobile from '../SearchBarMobile';
-import NotificationDropdown from '../NotificationDropdown';
+import SearchBar from '../ui/SearchBar';
+import SearchBarMobile from '../ui/SearchBarMobile';
+import NotificationDropdown from '../ui/NotificationDropdown';
 import { useNotifications } from '../../hooks/useNotifications';
 import { UserDropdownMenu } from '../ui/UserDropdownMenu';
 import { Sparkles } from 'lucide-react';

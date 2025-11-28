@@ -1,13 +1,13 @@
 // pages/DonationsPage.tsx
 import React, { useState } from 'react';
 import Layout from '../components/layout/Layout';
-import PostCard from '../components/PostCard';
-import ShareModal from '../components/ShareModal';
+import PostCard from '../components/posts/PostCard';
+import ShareModal from '../components/posts/ShareModal';
 import { useSharePost } from '../hooks/useSharePost';
 import { likePost } from '../hooks/useLikePost';
 import { useDeletePost } from '../hooks/useDeletePost';
 import { toast } from 'react-toastify';
-import PostModal from '../components/PostModal';
+import PostModal from '../components/posts/PostModal';
 import EditPostModal from '../components/posts/EditPostModal';
 import { useDonations } from '../hooks/useDonations';
 import Typography from '../components/ui/Typography';

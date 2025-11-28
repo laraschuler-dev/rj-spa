@@ -7,10 +7,10 @@ import {
   FaInstagram,
   FaLinkedin,
 } from 'react-icons/fa';
-import Typography from './ui/Typography';
-import SubmitButton from './ui/SubmitButton';
+import Typography from '../ui/Typography';
+import SubmitButton from '../ui/SubmitButton';
 import { toast } from 'react-toastify';
-import axios from '../services/api';
+import axios from '../../services/api';
 
 const Contact = () => {
   const [formData, setFormData] = useState({

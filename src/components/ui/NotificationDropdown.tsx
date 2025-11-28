@@ -10,14 +10,14 @@ import {
   FiUser,
   FiCalendar,
 } from 'react-icons/fi';
-import { useNotifications } from '../hooks/useNotifications';
-import { resolveImageUrl } from '../utils/resolveImageUrl';
+import { useNotifications } from '../../hooks/useNotifications';
+import { resolveImageUrl } from '../../utils/resolveImageUrl';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import Typography from './ui/Typography';
-import AvatarInitials from './ui/AvatarInitials';
-import { useScrollStore } from '../stores/scrollStore';
-import { useNotificationNavigation } from '../hooks/useNotificationNavigation';
+import Typography from './Typography';
+import AvatarInitials from './AvatarInitials';
+import { useScrollStore } from '../../stores/scrollStore';
+import { useNotificationNavigation } from '../../hooks/useNotificationNavigation';
 
 interface NotificationDropdownProps {
   isOpen: boolean;

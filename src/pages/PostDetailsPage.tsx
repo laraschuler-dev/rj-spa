@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import PostCard from '../components/PostCard';
-import ShareModal from '../components/ShareModal';
+import PostCard from '../components/posts/PostCard';
+import ShareModal from '../components/posts/ShareModal';
 import EditPostModal from '../components/posts/EditPostModal';
 import ShareEditModal from '../components/posts/ShareEditModal';
 import { usePostDetails } from '../hooks/usePostDetails';
