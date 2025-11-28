@@ -1,29 +1,61 @@
-// BackButton.tsx - VERSÃO COM DEBUG
-import { useNavigate } from 'react-router-dom';
+// BackButton.tsx - VERSÃO SEM BORDA AO CLICAR
+import { useNavigate, useLocation } from 'react-router-dom';
 import { MdArrowBackIos } from 'react-icons/md';
 import { useScrollStore } from '../../stores/scrollStore';
 
 const BackButton: React.FC<{ className?: string }> = ({ className }) => {
   const navigate = useNavigate();
-  const targetSection = useScrollStore((s) => s.targetSection);
+  const location = useLocation();
+  const {
+    targetSection,
+    shouldRestoreNotifications,
+    clearNotificationsRestore,
+  } = useScrollStore();
 
   const handleBack = () => {
-    console.log('🔙 BackButton - targetSection:', targetSection);
+    console.log('🔙 BackButton - Analisando navegação...');
+    console.log('📍 Localização atual:', location.pathname);
+    console.log('🎯 targetSection:', targetSection);
+    console.log('🔔 shouldRestoreNotifications:', shouldRestoreNotifications);
+    console.log('📦 State da location:', location.state);
 
-    // Se existe um target definido na store -> voltar pra home e deixar a Home scrolar
+    // ✅ PRIMEIRO: Verificar se veio de notificação (state do React Router)
+    const cameFromNotification = location.state?.fromNotification;
+
+    // ✅ SEGUNDO: Verificar store
+    if (shouldRestoreNotifications || cameFromNotification) {
+      console.log(
+        '🔔 BackButton - Voltando para feed com notificações abertas'
+      );
+
+      // Limpa o estado ANTES de navegar para evitar loops
+      clearNotificationsRestore();
+
+      // Navega para o feed - o HeaderFeed vai detectar e abrir notificações
+      navigate('/feed', {
+        replace: true,
+        state: { restoreNotifications: true }, // ✅ Estado extra para garantir
+      });
+      return;
+    }
+
+    // ✅ Comportamento para targetSection (existente)
     if (targetSection) {
-      console.log('🎯 Indo para home com seção:', targetSection);
       navigate('/', { replace: true });
       return;
     }
 
-    // Caso contrário, segue o comportamento padrão de "voltar"
-    console.log('🔁 Comportamento padrão: navegando -1');
+    // ✅ Comportamento padrão
+    console.log('🔁 BackButton - Navegação padrão (-1)');
     navigate(-1);
   };
 
   return (
-    <button onClick={handleBack} className={className}>
+    <button
+      onClick={handleBack}
+      className={`${className} focus:outline-none focus:ring-0 active:outline-none active:ring-0 hover:opacity-80 transition-opacity`}
+      aria-label="Voltar"
+    >
       <MdArrowBackIos className="w-7 h-7 text-[#004AAD] focus:outline-none" />
     </button>
   );

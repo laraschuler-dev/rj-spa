@@ -9,6 +9,7 @@ import {
 } from 'recharts';
 import Typography from './ui/Typography';
 import Button from './ui/Button';
+import { Link } from 'react-router-dom';
 
 const data = [
   { year: '2012', population: 104000 },
@@ -107,9 +108,10 @@ const Information = () => {
         </div>
       </div>
 
-      {/* Chamado para ação */}
-      <div className="text-center mt-12">
-        <Button variant="primary">Saiba Como Ajudar</Button>
+      <div className="mt-8 text-center">
+        <Link to="/login">
+          <Button variant="primary">Faça a Diferença</Button>
+        </Link>
       </div>
     </section>
   );

@@ -16,6 +16,7 @@ import NotificationDropdown from '../NotificationDropdown';
 import { useNotifications } from '../../hooks/useNotifications';
 import { UserDropdownMenu } from '../ui/UserDropdownMenu';
 import { Sparkles } from 'lucide-react';
+import { useScrollStore } from '../../stores/scrollStore';
 
 const HeaderFeed: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -43,6 +44,34 @@ const HeaderFeed: React.FC = () => {
       setHasMarkedOnOpen(true);
     }
   }, [isNotificationsOpen, hasMarkedOnOpen, markAllAsRead]);
+
+  const { shouldRestoreNotifications, clearNotificationsRestore } =
+    useScrollStore();
+
+  useEffect(() => {
+    console.log('🔔 HeaderFeed - Effect triggered', {
+      shouldRestoreNotifications,
+      pathname: location.pathname,
+      state: location.state,
+    });
+
+    // ✅ CONDIÇÃO MAIS ABRANGENTE - verifica store E state da location
+    const shouldOpenNotifications =
+      shouldRestoreNotifications || location.state?.restoreNotifications;
+
+    if (shouldOpenNotifications && location.pathname === '/feed') {
+      console.log('🎯 HeaderFeed - ABRINDO notificações automaticamente');
+      setIsNotificationsOpen(true);
+
+      // Limpa ambos os estados
+      clearNotificationsRestore();
+      // Limpa o state da location para evitar reabertura
+      window.history.replaceState(
+        { ...location.state, restoreNotifications: false },
+        ''
+      );
+    }
+  }, [shouldRestoreNotifications, location, clearNotificationsRestore]);
 
   return (
     <header className="bg-primary text-background py-4 px-4 md:px-6 flex items-center justify-between fixed top-0 left-0 w-full z-50 border-b border-primary-dark/20">

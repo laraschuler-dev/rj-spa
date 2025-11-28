@@ -10,14 +10,14 @@ import {
   FiUser,
   FiCalendar,
 } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../hooks/useNotifications';
 import { resolveImageUrl } from '../utils/resolveImageUrl';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import Typography from './ui/Typography';
 import AvatarInitials from './ui/AvatarInitials';
-import axios from 'axios';
+import { useScrollStore } from '../stores/scrollStore';
+import { useNotificationNavigation } from '../hooks/useNotificationNavigation';
 
 interface NotificationDropdownProps {
   isOpen: boolean;
@@ -28,19 +28,20 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   isOpen,
   onClose,
 }) => {
-  const navigate = useNavigate();
   const {
     notifications,
     unreadCount,
     loading,
     hasMore,
     fetchNotifications,
-    markAllAsRead, // ✅ AGORA MARCA COMO LIDA AO ABRIR
+    markAllAsRead,
   } = useNotifications();
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // ✅ MARCA COMO LIDA QUANDO ABRE O DROPDOWN
+  const { navigateToPostFromNotification } = useNotificationNavigation();
+
+  // MARCA COMO LIDA QUANDO ABRE O DROPDOWN
   useEffect(() => {
     if (isOpen && unreadCount > 0) {
       markAllAsRead();
@@ -99,62 +100,24 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
         return <FiBell className="w-4 h-4 text-blue-400" />;
     }
   };
-
   const handleNotificationClick = async (notification: any) => {
-    onClose();
+    console.log('🔔 NotificationDropdown - Clicou na notificação');
 
-    // ✅ NOTIFICAÇÃO DE COMMENT COM comment_id - BUSCA O COMENTÁRIO
-    if (notification.type === 'COMMENT' && notification.post?.comment_id) {
-      try {
-        // Busca detalhes do comentário (não precisa armazenar em variável)
-        await axios.get(`/posts/comments/${notification.post.comment_id}`);
-
-        // Navega para a página de detalhes do post com o comentário aberto
-        if (notification.post.share_id) {
-          navigate(
-            `/post/${notification.post.id}/share/${notification.post.share_id}`,
-            {
-              state: {
-                openCommentId: notification.post.comment_id,
-                scrollToComment: true,
-              },
-            }
-          );
-        } else {
-          navigate(`/post/${notification.post.id}`, {
-            state: {
-              openCommentId: notification.post.comment_id,
-              scrollToComment: true,
-            },
-          });
-        }
-      } catch (error) {
-        console.error('Erro ao buscar comentário:', error);
-        // Fallback: navega normal sem abrir comentário
-        navigateToPostNormal(notification);
-      }
-    }
-    // ✅ OUTRAS NOTIFICAÇÕES - COMPORTAMENTO NORMAL
-    else if (notification.post && notification.post.id) {
-      navigateToPostNormal(notification);
-    }
-
-    // Para notificações de FOLLOW
-    if (notification.type === 'FOLLOW' && notification.actor.id) {
-      navigate(`/profile/${notification.actor.id}`);
-    }
+    // ✅ DELEGA TUDO PARA O HOOK
+    await navigateToPostFromNotification(notification, onClose);
   };
 
-  // ✅ FUNÇÃO AUXILIAR PARA NAVEGAÇÃO NORMAL
-  const navigateToPostNormal = (notification: any) => {
-    if (notification.post.share_id) {
-      navigate(
-        `/post/${notification.post.id}/share/${notification.post.share_id}`
-      );
-    } else {
-      navigate(`/post/${notification.post.id}`);
-    }
-  };
+  // NotificationDropdown.tsx - DEBUG DA STORE
+  useEffect(() => {
+    const unsubscribe = useScrollStore.subscribe((state) =>
+      console.log(
+        '🔔 NotificationDropdown - Store atualizada:',
+        state.shouldRestoreNotifications
+      )
+    );
+
+    return unsubscribe;
+  }, []);
 
   return (
     <AnimatePresence>

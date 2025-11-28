@@ -49,15 +49,66 @@ export default function Eventos() {
   };
 
   if (loading) {
-    return <section>...Carregando...</section>;
+    return (
+      <section
+        id="events"
+        className="w-full py-12 px-4 md:px-8 bg-gray-50 mb-6"
+      >
+        <div className="max-w-3xl mx-auto text-center">
+          <Typography
+            variant="h1"
+            className="text-3xl md:text-5xl font-bold text-primary"
+          >
+            Eventos Disponíveis
+          </Typography>
+          <Typography variant="p" className="text-gray-600 mt-2">
+            Carregando eventos...
+          </Typography>
+        </div>
+      </section>
+    );
   }
 
   if (error) {
-    return <section>...Erro...</section>;
+    return (
+      <section
+        id="events"
+        className="w-full py-12 px-4 md:px-8 bg-gray-50 mb-6"
+      >
+        <div className="max-w-3xl mx-auto text-center">
+          <Typography
+            variant="h1"
+            className="text-3xl md:text-5xl font-bold text-primary"
+          >
+            Eventos Disponíveis
+          </Typography>
+          <Typography variant="p" className="text-red-600 mt-2">
+            {error}
+          </Typography>
+        </div>
+      </section>
+    );
   }
 
   if (events.length === 0) {
-    return <section>...Nenhum evento...</section>;
+    return (
+      <section
+        id="events"
+        className="w-full py-12 px-4 md:px-8 bg-gray-50 mb-6"
+      >
+        <div className="max-w-3xl mx-auto text-center">
+          <Typography
+            variant="h1"
+            className="text-3xl md:text-5xl font-bold text-primary"
+          >
+            Eventos Disponíveis
+          </Typography>
+          <Typography variant="p" className="text-gray-600 mt-2">
+            Nenhum evento disponível no momento.
+          </Typography>
+        </div>
+      </section>
+    );
   }
 
   return (
