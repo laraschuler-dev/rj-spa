@@ -1,4 +1,3 @@
-// src/components/posts/forms/HelpRequestPostForm.tsx
 import React, { useState, FormEvent, ChangeEvent } from 'react';
 import Typography from '../../ui/Typography';
 import SubmitButton from '../../ui/SubmitButton';
@@ -33,7 +32,6 @@ const HelpRequestPostForm: React.FC<HelpRequestPostFormProps> = ({
   const postId = initialData?.id;
   const { deleteImage } = useDeletePostImage(postId ?? 0);
 
-  // Estado para controlar o loading
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -42,7 +40,7 @@ const HelpRequestPostForm: React.FC<HelpRequestPostFormProps> = ({
     urgency: initialData?.urgency ?? '',
     deadline: initialData?.deadline ?? '',
     content: initialData?.content ?? '',
-    images: initialData?.images ?? [], // suporta {id, url} ou File
+    images: initialData?.images ?? [],
   });
 
   const handleChange = (
@@ -61,7 +59,7 @@ const HelpRequestPostForm: React.FC<HelpRequestPostFormProps> = ({
 
     try {
       const postData = new FormData();
-      postData.append('categoria_idcategoria', '4'); // HELP_REQUEST
+      postData.append('categoria_idcategoria', '4');
       postData.append('content', formData.content || formData.title);
 
       const metadata = {
@@ -87,7 +85,6 @@ const HelpRequestPostForm: React.FC<HelpRequestPostFormProps> = ({
 
       await onSubmit(postData);
     } catch (err: any) {
-      // Tratamento de erro padronizado
       if (err.response?.data?.error) {
         toast.error(err.response.data.error);
       } else if (err.request) {
@@ -98,7 +95,6 @@ const HelpRequestPostForm: React.FC<HelpRequestPostFormProps> = ({
         );
       }
     } finally {
-      // Reativa o botão após o envio (sucesso ou erro)
       setIsSubmitting(false);
     }
   };

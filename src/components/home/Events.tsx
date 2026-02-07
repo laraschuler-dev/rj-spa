@@ -44,7 +44,6 @@ export default function Eventos() {
       return;
     }
 
-    // ✅ Ativa loading para este botão específico
     setLoadingButtons((prev) => ({ ...prev, [event.id]: true }));
 
     try {
@@ -53,7 +52,6 @@ export default function Eventos() {
     } catch (error) {
       console.error('Erro ao navegar:', error);
     } finally {
-      // ✅ Desativa loading (caso a navegação falhe)
       setLoadingButtons((prev) => ({ ...prev, [event.id]: false }));
     }
   };
@@ -214,7 +212,7 @@ export default function Eventos() {
                   <div className="mt-2">
                     <CardButton
                       onClick={() => handleEventClick(event)}
-                      loading={loadingButtons[event.id]} // ✅ Passa o estado de loading
+                      loading={loadingButtons[event.id]}
                       loadingText="Abrindo..."
                     >
                       Saiba Mais

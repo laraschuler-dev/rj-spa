@@ -1,4 +1,3 @@
-// src/components/HeaderFeed.tsx
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -28,17 +27,14 @@ const HeaderFeed: React.FC = () => {
     fetchUnreadCount();
   }, [fetchUnreadCount]);
 
-  // Evita marcar notificações como lidas várias vezes por mesma abertura
   const [hasMarkedOnOpen, setHasMarkedOnOpen] = useState(false);
 
   useEffect(() => {
     if (!isNotificationsOpen) {
-      // Resetar controle ao fechar dropdown
       setHasMarkedOnOpen(false);
       return;
     }
 
-    // Só executa uma vez por abertura
     if (!hasMarkedOnOpen) {
       markAllAsRead();
       setHasMarkedOnOpen(true);
@@ -55,12 +51,10 @@ const HeaderFeed: React.FC = () => {
       state: location.state,
     });
 
-    // ✅ CONDIÇÃO MAIS ABRANGENTE - verifica store E state da location
     const shouldOpenNotifications =
       shouldRestoreNotifications || location.state?.restoreNotifications;
 
     if (shouldOpenNotifications && location.pathname === '/feed') {
-      console.log('🎯 HeaderFeed - ABRINDO notificações automaticamente');
       setIsNotificationsOpen(true);
 
       // Limpa ambos os estados
@@ -75,7 +69,6 @@ const HeaderFeed: React.FC = () => {
 
   return (
     <header className="bg-primary text-background py-4 px-4 md:px-6 flex items-center justify-between fixed top-0 left-0 w-full z-50 border-b border-primary-dark/20">
-      {/* Logo + Navegação Principal */}
       <div className="flex items-center gap-2 md:gap-10 flex-shrink-0">
         {/* Logo */}
         <Link
@@ -135,12 +128,10 @@ const HeaderFeed: React.FC = () => {
         </nav>
       </div>
 
-      {/* SearchBar - Centralizado com mais espaço */}
       <div className="hidden md:flex flex-1 max-w-2xl mx-10">
         <SearchBar />
       </div>
 
-      {/* Área do Usuário COM UserDropdownMenu */}
       <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
         <div className="md:hidden">
           <SearchBarMobile />
@@ -148,7 +139,6 @@ const HeaderFeed: React.FC = () => {
 
         {/* Ícones de Ação */}
         <div className="flex items-center gap-1 md:gap-2 bg-primary-dark/20 rounded-lg p-1">
-          {/* 🔔 Notificações */}
           <div className="relative">
             <button
               onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
@@ -169,13 +159,11 @@ const HeaderFeed: React.FC = () => {
             />
           </div>
 
-          {/* UserDropdownMenu*/}
           <div className="hidden md:block">
             <UserDropdownMenu variant="header" />
           </div>
         </div>
 
-        {/* Separador Visual */}
         <div className="hidden md:block h-5 w-px bg-primary-dark/50 mx-1"></div>
 
         {/* Menu Mobile */}
@@ -188,7 +176,6 @@ const HeaderFeed: React.FC = () => {
         </button>
       </div>
 
-      {/* Menu Mobile */}
       <MobileMenuFeed
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}

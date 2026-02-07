@@ -25,7 +25,6 @@ const PostModal: React.FC<PostModalProps> = ({
 }) => {
   const { toggleLikePost } = usePostStore();
 
-  // ✅ USA O MESMO HOOK QUE A PÁGINA DE DETALHES
   const { post, loading, error } = usePostDetails(postId, shareId);
 
   const { status, toggleAttendance: toggleAttendanceHook } = useEventAttendance(
@@ -99,7 +98,6 @@ const PostModal: React.FC<PostModalProps> = ({
     }
   };
 
-  // ✅ CORREÇÃO: Simplificar a lógica do author para deixar o PostCard cuidar dos avatares
   const author = {
     id: post.user?.id || post.author?.id || 0,
     name:
@@ -150,7 +148,6 @@ const PostModal: React.FC<PostModalProps> = ({
           isPostOwner={post.isPostOwner ?? false}
           isShareOwner={post.isShareOwner ?? false}
           onEdit={onEdit}
-          // ✅ AGORA OS CONTADORES VIRÃO DO HOOK usePostDetails
           likesCount={post.likesCount}
           commentsCount={post.commentsCount}
           sharesCount={post.sharesCount}

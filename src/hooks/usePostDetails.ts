@@ -8,7 +8,6 @@ export const usePostDetails = (postId: number, shareId?: number) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // ✅ SELETOR - deriva o post da store
   const post = posts.find((p) => {
     if (shareId) {
       return p.sharedBy?.shareId === shareId;
@@ -17,7 +16,6 @@ export const usePostDetails = (postId: number, shareId?: number) => {
     }
   });
 
-  // ✅ EFFECT - SEMPRE busca da API para garantir dados frescos
   useEffect(() => {
     const loadPost = async () => {
       if (!postId) {

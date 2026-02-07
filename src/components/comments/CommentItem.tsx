@@ -40,13 +40,11 @@ const CommentItem: React.FC<CommentItemProps> = ({
 
   return (
     <div
-      // ✅ ADICIONE APENAS ESTAS 2 LINHAS - NÃO MUDE NADA MAIS
       id={`comment-${comment.id}`}
       className={`bg-gray-100 p-3 rounded-xl flex items-start gap-3 transition-all duration-300 ${
         isHighlighted ? 'bg-yellow-50 border-l-4 border-yellow-400' : ''
       }`}
     >
-      {/* ✅ MANTENHA TUDO EXATAMENTE COMO ESTÁ ABAIXO */}
       {/* Avatar */}
       {comment.author.avatarUrl ? (
         <img

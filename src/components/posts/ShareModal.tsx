@@ -36,9 +36,8 @@ const ShareModal: React.FC<ShareModalProps> = ({
       await onShare(message);
       setMessage('');
 
-      // Se quiser usar onSave após compartilhar
       if (onSave) {
-        onSave({ message }); // exemplo de payload
+        onSave({ message });
       }
 
       onClose();

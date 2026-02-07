@@ -1,4 +1,3 @@
-// components/LoginForm.tsx
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Typography from '../ui/Typography';
@@ -23,12 +22,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   onSubmit,
 }) => (
   <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
-    {/* Título */}
     <Typography variant="h2" className="text-primary text-center mb-6">
       Bem-vindo de volta
     </Typography>
 
-    {/* Formulário de Login */}
     <form className="space-y-4" onSubmit={onSubmit}>
       <div>
         <label
@@ -60,7 +57,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         />
       </div>
 
-      {/* Link para "Esqueci minha senha" */}
       <div className="text-right">
         <Link
           to="/forgot-password"
@@ -70,18 +66,15 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </Link>
       </div>
 
-      {/* Botão de Entrar */}
       <SubmitButton loading={isSubmitting}>Entrar</SubmitButton>
     </form>
 
-    {/* Divisor */}
     <div className="flex items-center my-6">
       <hr className="flex-grow border-t border-gray-300" />
       <span className="mx-4 text-gray-500 text-sm">Ou se preferir</span>
       <hr className="flex-grow border-t border-gray-300" />
     </div>
 
-    {/* Google Login e Footer */}
     <div className="flex flex-col items-center justify-center max-w-md">
       <GoogleLoginButton />
     </div>

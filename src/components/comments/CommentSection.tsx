@@ -1,4 +1,3 @@
-// components/comments/CommentSection.tsx
 import React, { useEffect, useState } from 'react';
 import { useComments } from '../../hooks/useComments';
 import CommentItem from './CommentItem';
@@ -7,14 +6,13 @@ import { toast } from 'react-toastify';
 interface CommentSectionProps {
   postId: number;
   shareId?: number;
-  highlightedCommentId?: number | null; // ✅ INTERFACE ATUALIZADA
+  highlightedCommentId?: number | null;
 }
 
-// ✅ RECEBA A PROP highlightedCommentId NA FUNÇÃO
 const CommentSection: React.FC<CommentSectionProps> = ({
   postId,
   shareId,
-  highlightedCommentId, // ✅ ADICIONE ESTA LINHA
+  highlightedCommentId,
 }) => {
   const {
     comments,
@@ -33,17 +31,14 @@ const CommentSection: React.FC<CommentSectionProps> = ({
     fetchComments();
   }, [postId, shareId]);
 
-  // ✅ EFFECT PARA SCROLLAR E DESTACAR COMENTÁRIO
+  // SCROLLAR E DESTACAR COMENTÁRIO
   useEffect(() => {
     if (highlightedCommentId && comments.length > 0) {
-      console.log('🎯 Tentando highlight comentário:', highlightedCommentId);
-
       const timer = setTimeout(() => {
         const commentElement = document.getElementById(
           `comment-${highlightedCommentId}`
         );
         if (commentElement) {
-          console.log('✅ Comentário encontrado, fazendo scroll...');
           commentElement.scrollIntoView({
             behavior: 'smooth',
             block: 'center',

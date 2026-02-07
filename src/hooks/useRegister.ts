@@ -66,7 +66,7 @@ export const useRegister = () => {
         'Conta criada com sucesso! Verifique seu e-mail para ativar sua conta.'
       );
       localStorage.setItem('pendingEmail', formData.email);
-      navigate('/verify-pending');?*/
+      navigate('/verify-pending');*/
 
       toast.success('Conta criada com sucesso! Você já pode fazer login.');
       navigate('/login');

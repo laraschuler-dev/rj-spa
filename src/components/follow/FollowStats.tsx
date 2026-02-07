@@ -1,4 +1,3 @@
-// src/components/follow/FollowStats.tsx
 import React from 'react';
 import Typography from '../ui/Typography';
 

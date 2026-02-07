@@ -58,7 +58,7 @@ export const useLogin = () => {
     if (err.response?.data?.error) {
       const message = err.response.data.error;
 
-      if (message.toLowerCase().includes('não verificado')) {
+      /*if (message.toLowerCase().includes('não verificado')) {
         toast.warning('Verifique seu e-mail antes de entrar.');
         const email = formData.emailOrPhone.includes('@')
           ? formData.emailOrPhone
@@ -66,7 +66,7 @@ export const useLogin = () => {
         if (email) localStorage.setItem('pendingEmail', email);
         navigate('/verify-pending');
         return;
-      }
+      }*/
 
       toast.error(message);
     } else if (err.request) {

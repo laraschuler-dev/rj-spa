@@ -43,7 +43,6 @@ export default function Services() {
       return;
     }
 
-    // ✅ Ativa loading para este botão específico
     setLoadingButtons((prev) => ({ ...prev, [service.id]: true }));
 
     try {
@@ -55,7 +54,6 @@ export default function Services() {
     } catch (error) {
       console.error('Erro ao navegar:', error);
     } finally {
-      // ✅ Desativa loading (caso a navegação falhe)
       setLoadingButtons((prev) => ({ ...prev, [service.id]: false }));
     }
   };
@@ -169,7 +167,6 @@ export default function Services() {
           {services.map((service) => (
             <SwiperSlide key={service.id}>
               <div className="bg-white border rounded-lg shadow-md overflow-hidden flex flex-col h-full">
-                {/* Container da imagem com altura fixa mas proporção preservada */}
                 <div
                   className={`w-full aspect-[4/3] flex items-center justify-center rounded-t-lg overflow-hidden ${
                     !service.image || imageErrors[String(service.id)]
@@ -189,7 +186,6 @@ export default function Services() {
                   />
                 </div>
 
-                {/* Resto do conteúdo permanece igual */}
                 <div className="p-3 flex flex-col flex-1">
                   <div className="h-10 mb-1">
                     <Typography
@@ -212,7 +208,7 @@ export default function Services() {
                   <div className="mt-2">
                     <CardButton
                       onClick={() => handleServiceClick(service)}
-                      loading={loadingButtons[service.id]} // ✅ Passa o estado de loading
+                      loading={loadingButtons[service.id]}
                       loadingText="Abrindo..."
                     >
                       Saiba Mais
@@ -224,7 +220,6 @@ export default function Services() {
           ))}
         </Swiper>
 
-        {/* Botões de navegação - posicionados fora do card */}
         <div className="swiper-button-prev text-3xl absolute left-0 top-1/2 transform -translate-y-1/2 text-gray-700 hover:text-blue-600"></div>
         <div className="swiper-button-next text-3xl absolute right-0 top-1/2 transform -translate-y-1/2 text-gray-700 hover:text-blue-600"></div>
       </div>

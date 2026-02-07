@@ -1,4 +1,3 @@
-// components/posts/ShareEditModal.tsx
 import React, { useEffect, useState } from 'react';
 import Typography from '../ui/Typography';
 import PostPreviewCard from './PostPreviewCard';
@@ -8,13 +7,14 @@ import SubmitButton from '../ui/SubmitButton';
 import CancelButton from '../ui/CancelButton';
 import { usePostStore } from '../../stores/postStore';
 import { FiX } from 'react-icons/fi';
+import { toast } from 'react-toastify';
 
 interface ShareEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   postId: number;
   shareId: number;
-  onSave?: (updatedPost: any) => void; // ✅ adicionado
+  onSave?: (updatedPost: any) => void;
 }
 
 const ShareEditModal: React.FC<ShareEditModalProps> = ({
@@ -22,7 +22,7 @@ const ShareEditModal: React.FC<ShareEditModalProps> = ({
   onClose,
   postId,
   shareId,
-  onSave, // ✅ desestruturação
+  onSave,
 }) => {
   const { post, loading } = usePostDetails(postId, shareId);
   const [message, setMessage] = useState('');
@@ -41,8 +41,9 @@ const ShareEditModal: React.FC<ShareEditModalProps> = ({
       const updated = await editPost(formData);
 
       if (updated) {
-        updatePost(updated); // atualiza store
-        onSave?.(updated); // ✅ chama callback opcional
+        updatePost(updated);
+        onSave?.(updated);
+        toast.success('Post atualizado com sucesso!');
         onClose();
       }
     } catch (err) {
@@ -52,7 +53,6 @@ const ShareEditModal: React.FC<ShareEditModalProps> = ({
 
   if (!isOpen || loading || !post) return null;
 
-  // components/posts/ShareEditModal.tsx - VERSÃO COM FUNÇÃO AUXILIAR
   const getPostAuthor = () => {
     // 1. Se é post indisponível, respeita o que veio da API
     if (post.metadata?.isUnavailable) {
@@ -85,9 +85,8 @@ const ShareEditModal: React.FC<ShareEditModalProps> = ({
       className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-start p-4 overflow-auto"
       onClick={onClose}
     >
-      {/* ✅ MEIO-TERMO: max-w-lg (512px) - nem largo nem estreito */}
       <div
-        className="bg-white rounded-2xl w-full max-w-lg my-8" // ✅ max-w-lg
+        className="bg-white rounded-2xl w-full max-w-lg my-8"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-6 relative">

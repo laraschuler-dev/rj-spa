@@ -154,12 +154,11 @@ const PostDetailsPage: React.FC = () => {
     }
   };
 
-  // ✅ NOVA FUNÇÃO DE DELETE SEM POPUP E SEM MENSAGEM DE ERRO
   const handleDelete = async (postId: number, shareId?: number) => {
     if (isDeleting) return; // Previne múltiplos cliques
 
     setIsDeleting(true);
-    setPostWasDeleted(true); // ✅ MARCA QUE O POST FOI EXCLUÍDO
+    setPostWasDeleted(true);
 
     try {
       if (shareId) {
@@ -169,19 +168,17 @@ const PostDetailsPage: React.FC = () => {
       }
       removePost(postId, shareId);
 
-      // ✅ Feedback visual suave
       toast.success('Post excluído com sucesso!', {
         position: 'top-center',
         autoClose: 2000,
       });
 
-      // ✅ Redireciona imediatamente sem esperar
       navigate('/feed');
     } catch (err) {
       console.error(err);
       toast.error('Erro ao excluir o post!');
       setIsDeleting(false);
-      setPostWasDeleted(false); // ✅ RESETA SE HOUVER ERRO
+      setPostWasDeleted(false);
     }
   };
 
@@ -252,7 +249,7 @@ const PostDetailsPage: React.FC = () => {
   }
 
   if (!post) {
-    return null; // ou uma mensagem de fallback
+    return null;
   }
 
   return (
@@ -311,7 +308,6 @@ const PostDetailsPage: React.FC = () => {
             onSave={(updatedPost) => {
               updatePost(updatedPost);
               setEditingPost(null);
-              toast.success('Post atualizado com sucesso!');
             }}
           />
         ) : (
@@ -321,7 +317,6 @@ const PostDetailsPage: React.FC = () => {
             onSuccess={(updatedPost) => {
               updatePost(updatedPost);
               setEditingPost(null);
-              toast.success('Post atualizado com sucesso!');
             }}
           />
         ))}

@@ -95,7 +95,6 @@ const PostCard: React.FC<PostCardProps> = ({
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
 
-  // ✅ STATE INTERNO COM FALLBACK PARA CONTROLE EXTERNO
   const [internalShowComments, setInternalShowComments] = useState(false);
 
   const showComments =
@@ -115,7 +114,6 @@ const PostCard: React.FC<PostCardProps> = ({
     // Não permitir clique no próprio usuário
     if (userId === currentUser?.id) return;
 
-    // ✅ REDIRECIONAR PARA O PERFIL
     navigate(`/profile/${userId}`);
   };
 
@@ -134,7 +132,7 @@ const PostCard: React.FC<PostCardProps> = ({
   const isUnavailable = metadata?.isUnavailable ?? false;
   const shouldShowUnavailableContent = isUnavailable || isOriginalDeleted;
 
-  // ✅ Verifica se é post anônimo
+  // Verifica se é post anônimo
   const isAnonymousPost = categoryId === 2 && metadata?.isAnonymous;
 
   // Garante que sempre seja Date válido
@@ -165,7 +163,7 @@ const PostCard: React.FC<PostCardProps> = ({
         </div>
       );
     } else if (currentAuthor.avatarUrl) {
-      // ✅ Cenário 1: Com avatar - mostra imagem
+      // Cenário 1: Com avatar - mostra imagem
       return (
         <img
           src={resolveImageUrl(currentAuthor.avatarUrl)}
@@ -174,7 +172,7 @@ const PostCard: React.FC<PostCardProps> = ({
         />
       );
     } else {
-      // ✅ Cenário 2: Sem avatar - mostra iniciais
+      // Cenário 2: Sem avatar - mostra iniciais
       return (
         <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center border border-white">
           <AvatarInitials name={currentAuthor.name} />
@@ -220,7 +218,7 @@ const PostCard: React.FC<PostCardProps> = ({
     return '';
   };
 
-  // ✅ Função para verificar se o nome deve ser clicável
+  //Função para verificar se o nome deve ser clicável
   const shouldNameBeClickable = (userId: number) => {
     // Não é clicável se:
     // 1. É o próprio usuário
@@ -329,7 +327,7 @@ const PostCard: React.FC<PostCardProps> = ({
           />
         )}
       </div>
-      {/* ... resto do componente permanece igual ... */}
+
       {shouldShowUnavailableContent ? (
         <Typography
           variant="p"
@@ -492,11 +490,8 @@ const PostCard: React.FC<PostCardProps> = ({
           )}
         </div>
       )}
-      {/* Ações */}
-      {/* Ações */}
       {!shouldShowUnavailableContent && (
         <div className={expanded ? 'border-t pt-3 space-y-2' : ''}>
-          {/* ✅ Contadores APENAS no modo expandido, dentro do mesmo container */}
           {expanded && (
             <EngagementCounters
               likesCount={likesCount}
@@ -508,7 +503,6 @@ const PostCard: React.FC<PostCardProps> = ({
             />
           )}
 
-          {/* ✅ Ações SEMPRE visíveis */}
           <PostActions
             post={{
               id,

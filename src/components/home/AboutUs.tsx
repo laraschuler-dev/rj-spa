@@ -9,7 +9,7 @@ const AboutUs = () => {
       id="about"
       className="relative min-h-screen flex flex-col justify-center items-center text-center px-6 md:px-12 lg:px-24 pt-20 pb-20 mb-6"
     >
-      {/* Imagem de fundo com overlay - CAMINHO CORRIGIDO */}
+      {/* Imagem de fundo com overlay */}
       <div className="absolute inset-0 bg-[url('/img/about2.png')] bg-cover bg-center"></div>
       <div className="absolute inset-0 bg-black/50"></div>
 

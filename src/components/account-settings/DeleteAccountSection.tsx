@@ -1,4 +1,3 @@
-// components/account-settings/sections/DeleteAccountSection.tsx
 import React from 'react';
 import Typography from '../ui/Typography';
 import SubmitButton from '../ui/SubmitButton';
@@ -42,7 +41,6 @@ export const DeleteAccountSection: React.FC<DeleteAccountSectionProps> = ({
   const isDeleteDisabled = () => {
     const confirmationText = 'deletar minha conta';
 
-    // Verifica se o texto de confirmação está correto
     if (deleteData.confirmation.toLowerCase() !== confirmationText) {
       return true;
     }

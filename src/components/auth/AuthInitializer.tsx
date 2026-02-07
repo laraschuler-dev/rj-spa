@@ -1,4 +1,3 @@
-// components/AuthInitializer.tsx
 import { ReactNode, useEffect } from 'react';
 import useAuthStore from '../../stores/authStore';
 import { useAuthListener } from '../../hooks/useAuthListener';
@@ -9,7 +8,7 @@ interface Props {
 
 export default function AuthInitializer({ children }: Props) {
   const { token, validateToken } = useAuthStore();
-  useAuthListener(); // Gerencia redirecionamentos
+  useAuthListener();
 
   useEffect(() => {
     const checkToken = async () => {

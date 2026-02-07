@@ -1,4 +1,3 @@
-// src/components/follow/FollowListModal.tsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserFollowerInfo } from '../../hooks/useFollow';
@@ -34,13 +33,10 @@ const FollowListModal: React.FC<FollowListModalProps> = ({
     // Não permitir clique no próprio usuário
     if (userId === currentUser?.id) return;
 
-    // ✅ REDIRECIONAR PARA O PERFIL
     navigate(`/profile/${userId}`);
 
-    // Fechar o modal após o clique
     onClose();
 
-    // Chamar callback se existir
     onUserClick?.(userId);
   };
 
@@ -58,7 +54,7 @@ const FollowListModal: React.FC<FollowListModalProps> = ({
             </Typography>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 transition-colors p-1 rounded-lg hover:bg-gray-100 focus:outline-none" // ✅ REMOVE BORDA DE FOCO
+              className="text-gray-500 hover:text-gray-700 transition-colors p-1 rounded-lg hover:bg-gray-100 focus:outline-none"
             >
               <svg
                 className="w-6 h-6"
@@ -88,11 +84,8 @@ const FollowListModal: React.FC<FollowListModalProps> = ({
                 key={user.id}
                 className="w-full p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors"
               >
-                {/* ✅ LAYOUT FLEX COM QUEBRA CONTROLADA */}
                 <div className="flex items-center justify-between gap-3 w-full">
-                  {/* Lado esquerdo: Avatar + Info */}
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    {/* Avatar */}
                     <button
                       onClick={() => handleUserClick(user.id)}
                       className="flex-shrink-0 hover:opacity-80 transition-opacity focus:outline-none"
@@ -135,7 +128,6 @@ const FollowListModal: React.FC<FollowListModalProps> = ({
                     </button>
                   </div>
 
-                  {/* Lado direito: Botão (sempre visível) */}
                   <div className="flex-shrink-0 ml-2">
                     {currentUser && user.id !== currentUser.id ? (
                       <FollowButton

@@ -1,4 +1,3 @@
-// src/components/posts/forms/ComplaintPostForm.tsx
 import React, { useState, FormEvent } from 'react';
 import Typography from '../../ui/Typography';
 import SubmitButton from '../../ui/SubmitButton';
@@ -53,14 +52,13 @@ const ComplaintPostForm: React.FC<ComplaintPostFormProps> = ({
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    // Impede múltiplos envios
     if (isSubmitting) return;
 
     setIsSubmitting(true);
 
     try {
       const postData = new FormData();
-      postData.append('categoria_idcategoria', '2'); // Complaint
+      postData.append('categoria_idcategoria', '2');
       postData.append('content', formData.description);
 
       const metadata = {
@@ -85,7 +83,6 @@ const ComplaintPostForm: React.FC<ComplaintPostFormProps> = ({
 
       await onSubmit(postData);
     } catch (err: any) {
-      // Tratamento de erro similar ao Login
       if (err.response?.data?.error) {
         toast.error(err.response.data.error);
       } else if (err.request) {
@@ -96,7 +93,6 @@ const ComplaintPostForm: React.FC<ComplaintPostFormProps> = ({
         );
       }
     } finally {
-      // Reativa o botão após o envio (sucesso ou erro)
       setIsSubmitting(false);
     }
   };

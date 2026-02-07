@@ -1,7 +1,6 @@
 // hooks/useEditPost.ts
 import { useState } from 'react';
 import axios from '../services/api';
-import { toast } from 'react-toastify';
 import { PostListItem } from '../types/Post';
 
 interface UseEditPostProps {
@@ -21,10 +20,8 @@ export const useEditPost = ({ postId, shareId }: UseEditPostProps) => {
         data,
         params
       );
-      toast.success('Post atualizado com sucesso!');
       return updatedPost;
     } catch (error: any) {
-      toast.error('Erro ao atualizar o post.');
       console.error(error);
       return null;
     } finally {
