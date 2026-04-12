@@ -1,4 +1,3 @@
-// Sidebar.tsx - VERSÃO COM ESPAÇAMENTO AJUSTADO
 import { Link } from 'react-router-dom';
 import {
   FiHeart,
@@ -17,26 +16,22 @@ import { PiStudent } from 'react-icons/pi';
 function Sidebar() {
   return (
     <div className="hidden md:flex">
-      {/* Container fixo que sempre ocupa a altura da tela */}
       <div
         className="sticky top-16"
         style={{
           height: 'calc(100vh - 64px)',
-          width: '256px', // 64 * 4
+          width: '256px',
         }}
       >
-        <aside className="w-64 bg-sidebar text-white h-full p-6 shadow-lg flex flex-col">
+        <aside className="w-64 bg-gradient-to-b from-sidebar to-sidebar/50 text-white h-full p-6 flex flex-col shadow-lg">
+          {' '}
           <h2 className="text-2xl mt-6 mb-6">Ações</h2>{' '}
-          {/* ← Reduzi o mb-6 para mb-4 */}
           <nav className="flex flex-col gap-2 flex-1">
-            {' '}
-            {/* ← Reduzi o gap-4 para gap-2 */}
             <Link
               to="/posts/create/5"
               className="flex items-center gap-2 text-lg hover:text-accent transition-colors py-1.5"
             >
               <FiHeart size={18} /> Quero Voluntariar{' '}
-              {/* ← Reduzi size 20 para 18 */}
             </Link>
             <Link
               to="/posts/create/1"

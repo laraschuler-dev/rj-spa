@@ -1,14 +1,14 @@
 // Feed.tsx
 import React, { useEffect, useState } from 'react';
 import Layout from '../components/layout/Layout';
-import PostCard from '../components/PostCard';
-import ShareModal from '../components/ShareModal';
+import PostCard from '../components/posts/PostCard';
+import ShareModal from '../components/posts/ShareModal';
 import { usePostStore } from '../stores/postStore';
 import { useSharePost } from '../hooks/useSharePost';
 import { likePost } from '../hooks/useLikePost';
 import { useDeletePost } from '../hooks/useDeletePost';
 import { toast } from 'react-toastify';
-import PostModal from '../components/PostModal';
+import PostModal from '../components/posts/PostModal';
 import EditPostModal from '../components/posts/EditPostModal';
 import ShareEditModal from '../components/posts/ShareEditModal';
 import { usePosts } from '../hooks/usePosts';
@@ -52,7 +52,6 @@ const Feed: React.FC = () => {
     setShareModalOpen(false);
   };
 
-  // Compartilhar
   const handleShare = async (message?: string) => {
     if (!postToShare) return;
 
@@ -60,11 +59,18 @@ const Feed: React.FC = () => {
       const originalPostId = postToShare.sharedBy
         ? postToShare.sharedBy.postId
         : postToShare.id;
-      const sharedPostDTO = await sharePost(originalPostId, message);
-      addPost(sharedPostDTO); // store como única fonte da verdade
+
+      // ✅ DETERMINA se é compartilhamento de compartilhamento
+      const shareIdToSend = postToShare.sharedBy?.shareId;
+
+      const sharedPostDTO = await sharePost(
+        originalPostId,
+        message,
+        shareIdToSend
+      );
+      addPost(sharedPostDTO);
     } catch (err) {
       console.error(err);
-      toast.error('Erro ao compartilhar o post');
     } finally {
       closeShareModal();
     }
@@ -87,6 +93,11 @@ const Feed: React.FC = () => {
       toast.error('Erro ao excluir o post!');
     }
   };
+
+  useEffect(() => {
+    if (shareModalOpen && selectedPost) setSelectedPost(null);
+    if (selectedPost && shareModalOpen) setShareModalOpen(false);
+  }, [shareModalOpen, selectedPost]);
 
   return (
     <Layout variant="feed">
@@ -186,7 +197,6 @@ const Feed: React.FC = () => {
 
             if (!post) return;
 
-            // ✅ CORREÇÃO: Garantir que currentLiked seja boolean
             const currentLiked = post.liked ?? false; // ← Use false como padrão se for undefined
             toggleLikePost(postIdToSend, !currentLiked, shareIdToSend);
 
@@ -197,7 +207,6 @@ const Feed: React.FC = () => {
                 toggleLikePost(postIdToSend, liked, shareIdToSend);
               }
             } catch (err) {
-              // ✅ CORREÇÃO: Usar o mesmo currentLiked garantido como boolean
               toggleLikePost(postIdToSend, currentLiked, shareIdToSend);
               console.error('Erro ao curtir/descurtir post:', err);
             }
@@ -208,7 +217,14 @@ const Feed: React.FC = () => {
                 ? p.sharedBy?.shareId === selectedPost.shareId
                 : p.id === selectedPost.id && !p.sharedBy
             );
-            if (post) openShareModal(post);
+
+            if (post) {
+              // Fecha o modal de detalhes
+              setSelectedPost(null);
+
+              // Abre o modal de compartilhamento
+              setTimeout(() => openShareModal(post), 300);
+            }
           }}
           onDelete={handleDelete}
           onEdit={(postId, shareId) => setEditingPost({ id: postId, shareId })}

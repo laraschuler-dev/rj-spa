@@ -20,6 +20,7 @@ import {
 import { PiStudent } from 'react-icons/pi';
 import { useState, useEffect } from 'react';
 import { UserDropdownMobile } from './UserDropdownMobile';
+import { Sparkles } from 'lucide-react';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -132,24 +133,27 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
       animate={{ x: isOpen ? '0%' : '100%' }}
       exit={{ x: '100%' }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      className="fixed top-0 right-0 w-64 h-full bg-primary text-background shadow-lg z-50 p-6 flex flex-col overflow-y-auto"
+      className="fixed top-0 right-0 w-64 h-full bg-gradient-to-b from-primary to-primary/95 text-background shadow-lg z-50 p-6 flex flex-col overflow-y-auto"
     >
       {/* Botão de Fechar */}
       <button
-        className="absolute top-4 right-4 text-background text-3xl z-50"
+        className="absolute top-4 right-4 text-background text-3xl z-50 focus:outline-none"
         onClick={onClose}
         aria-label="Fechar menu"
       >
         <IoMdClose />
       </button>
 
-      {/* Logo */}
-      <h2
-        className="text-xl font-heading font-bold hover:text-accent transition-colors mb-4 mt-8 cursor-pointer"
-        onClick={handleLogoClick}
-      >
-        Redefinindo Jornadas
-      </h2>
+      <div className="flex justify-center mt-6 mb-4">
+        <Link
+          to="/"
+          onClick={handleLogoClick}
+          className="flex items-center gap-1.5 text-base font-heading font-bold cursor-pointer text-white bg-primary hover:bg-gradient-to-r hover:from-primary hover:to-accent/30 transition-all duration-300 whitespace-nowrap px-2 py-1.5 rounded-lg border border-accent shadow-md hover:shadow-lg"
+        >
+          <Sparkles className="w-3 h-3" />
+          Redefinindo Jornadas
+        </Link>
+      </div>
 
       {/* UserDropdownMobile - QUANDO AUTENTICADO */}
       {isAuthenticated ? (
@@ -314,7 +318,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <span>Anunciar Vaga</span>
           </Link>
           <Link
-            to={isAuthenticated ? '/posts/complaint' : '/login'}
+            to={isAuthenticated ? '/posts/create/2' : '/login'}
             onClick={onClose}
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-dark hover:text-accent transition-all duration-200"
           >

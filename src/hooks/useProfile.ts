@@ -1,31 +1,29 @@
 // src/hooks/useProfile.ts
 import { useEffect } from 'react';
-import { useProfileStore } from '../stores/profileStore';
 import useAuthStore from '../stores/authStore';
 import api from '../services/api';
+import { useProfileBase } from './useProfileBase';
+import { useProfileStore } from '../stores/profileStore';
 
-// src/hooks/useProfile.ts
 export function useProfile() {
   const { token } = useAuthStore();
-  const { user, profile, loading, setProfile, clearProfile, setLoading } =
-    useProfileStore();
+  const { setProfile, clearProfile, setLoading } = useProfileStore();
+  const baseData = useProfileBase();
 
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!token) return;
+      if (!token) {
+        return;
+      }
 
       try {
         setLoading(true);
-
         const res = await api.get('/profile', {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        console.log('🔍 Resposta completa da API /profile:', res.data);
-
-        // ✅ CORREÇÃO: Pegar o ID do lugar correto
         const userData = {
-          id: res.data.profile?.user_id, // ← Agora pega de profile.user_id
+          id: res.data.profile?.user_id,
           name: res.data.name,
           email: res.data.email,
           fone: res.data.fone,
@@ -37,13 +35,12 @@ export function useProfile() {
           bio: res.data.profile?.bio,
           city: res.data.profile?.city,
           state: res.data.profile?.state,
+          followStats: res.data.followStats,
         };
-
-        console.log('🔍 Dados extraídos:', { userData, profileData });
 
         setProfile(userData, profileData);
       } catch (err) {
-        console.error('Erro ao buscar perfil:', err);
+        console.error('🔴 Erro ao buscar perfil:', err);
         clearProfile();
       } finally {
         setLoading(false);
@@ -53,5 +50,5 @@ export function useProfile() {
     fetchProfile();
   }, [token, setProfile, clearProfile, setLoading]);
 
-  return { user, profile, loading };
+  return baseData;
 }

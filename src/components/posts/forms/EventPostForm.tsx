@@ -1,4 +1,3 @@
-// src/components/posts/forms/EventPostForm.tsx
 import React, { useState, FormEvent } from 'react';
 import Typography from '../../ui/Typography';
 import SubmitButton from '../../ui/SubmitButton';
@@ -31,7 +30,6 @@ const EventPostForm: React.FC<EventPostFormProps> = ({
   const postId = initialData?.id;
   const { deleteImage } = useDeletePostImage(postId ?? 0);
 
-  // Estado para controlar o loading
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -39,7 +37,7 @@ const EventPostForm: React.FC<EventPostFormProps> = ({
     content: initialData?.content ?? '',
     location: initialData?.location ?? '',
     date: initialData?.date ?? '',
-    images: initialData?.images ?? [], // suporta {id, url} ou File
+    images: initialData?.images ?? [],
   });
 
   const handleChange = (
@@ -58,7 +56,7 @@ const EventPostForm: React.FC<EventPostFormProps> = ({
 
     try {
       const postData = new FormData();
-      postData.append('categoria_idcategoria', '8'); // EVENT
+      postData.append('categoria_idcategoria', '8');
       postData.append('content', formData.content || formData.title);
 
       const metadata = {
@@ -83,7 +81,6 @@ const EventPostForm: React.FC<EventPostFormProps> = ({
 
       await onSubmit(postData);
     } catch (err: any) {
-      // Tratamento de erro padronizado
       if (err.response?.data?.error) {
         toast.error(err.response.data.error);
       } else if (err.request) {
@@ -94,7 +91,6 @@ const EventPostForm: React.FC<EventPostFormProps> = ({
         );
       }
     } finally {
-      // Reativa o botão após o envio (sucesso ou erro)
       setIsSubmitting(false);
     }
   };

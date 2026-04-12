@@ -11,13 +11,15 @@ export function useProfilePosts(userId: number | undefined) {
     refreshUserPosts,
     hasMore,
     loading,
+    resetPosts,
   } = usePostStore();
 
   const refreshPosts = useCallback(() => {
     if (userId && currentUser?.id) {
+      resetPosts();
       return refreshUserPosts(userId, currentUser.id);
     }
-  }, [userId, currentUser?.id, refreshUserPosts]);
+  }, [userId, currentUser?.id, refreshUserPosts, resetPosts]);
 
   // Carrega posts inicialmente
   useEffect(() => {

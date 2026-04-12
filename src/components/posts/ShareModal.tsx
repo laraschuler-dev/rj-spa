@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import Typography from './ui/Typography';
-import SubmitButton from './ui/SubmitButton';
-import CancelButton from './ui/CancelButton';
+import Typography from '../ui/Typography';
+import SubmitButton from '../ui/SubmitButton';
+import CancelButton from '../ui/CancelButton';
 import { FiX } from 'react-icons/fi';
 
 interface ShareModalProps {
@@ -24,7 +24,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
   onSave,
 }) => {
   const [message, setMessage] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false); // Estado de loading
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleShare = async () => {
     // Impede múltiplos cliques
@@ -36,9 +36,8 @@ const ShareModal: React.FC<ShareModalProps> = ({
       await onShare(message);
       setMessage('');
 
-      // Se quiser usar onSave após compartilhar
       if (onSave) {
-        onSave({ message }); // exemplo de payload
+        onSave({ message });
       }
 
       onClose();
@@ -53,7 +52,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-start pt-20 overflow-auto"
+      className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex justify-center items-start pt-20 overflow-auto"
       onClick={onClose}
     >
       <div

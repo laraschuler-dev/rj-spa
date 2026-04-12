@@ -1,13 +1,13 @@
 // pages/DonationsPage.tsx
 import React, { useState } from 'react';
 import Layout from '../components/layout/Layout';
-import PostCard from '../components/PostCard';
-import ShareModal from '../components/ShareModal';
+import PostCard from '../components/posts/PostCard';
+import ShareModal from '../components/posts/ShareModal';
 import { useSharePost } from '../hooks/useSharePost';
 import { likePost } from '../hooks/useLikePost';
 import { useDeletePost } from '../hooks/useDeletePost';
 import { toast } from 'react-toastify';
-import PostModal from '../components/PostModal';
+import PostModal from '../components/posts/PostModal';
 import EditPostModal from '../components/posts/EditPostModal';
 import { useDonations } from '../hooks/useDonations';
 import Typography from '../components/ui/Typography';
@@ -63,6 +63,11 @@ const DonationsPage: React.FC = () => {
       toast.error('Erro ao excluir a doação!');
     }
   };
+
+  React.useEffect(() => {
+    if (shareModalOpen && selectedPost) setSelectedPost(null);
+    if (selectedPost && shareModalOpen) setShareModalOpen(false);
+  }, [shareModalOpen, selectedPost]);
 
   return (
     <Layout variant="feed">
@@ -169,8 +174,14 @@ const DonationsPage: React.FC = () => {
             }
           }}
           onShare={() => {
-            const donation = donations.find((d) => d.id === selectedPost);
-            if (donation) openShareModal(donation);
+            const donation = donations.find((e) => e.id === selectedPost);
+            if (donation) {
+              // Fecha o modal de detalhes
+              setSelectedPost(null);
+
+              // Abre o modal de compartilhamento com leve delay
+              setTimeout(() => openShareModal(donation), 300);
+            }
           }}
           onDelete={() => handleDelete(selectedPost)}
           onEdit={(postId) => setEditingPost(postId)}

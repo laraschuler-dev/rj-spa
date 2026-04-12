@@ -7,10 +7,10 @@ import {
   FaInstagram,
   FaLinkedin,
 } from 'react-icons/fa';
-import Typography from './ui/Typography';
-import SubmitButton from './ui/SubmitButton';
+import Typography from '../ui/Typography';
+import SubmitButton from '../ui/SubmitButton';
 import { toast } from 'react-toastify';
-import axios from '../services/api';
+import axios from '../../services/api';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -19,7 +19,6 @@ const Contact = () => {
     message: '',
   });
 
-  // Estado para controlar o loading
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (
@@ -46,7 +45,6 @@ const Contact = () => {
         'Erro ao enviar mensagem. Tente novamente mais tarde.';
       toast.error(msg);
     } finally {
-      // Reativa o botão após o envio (sucesso ou erro)
       setIsSubmitting(false);
     }
   };

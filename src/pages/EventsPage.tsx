@@ -1,13 +1,13 @@
 // pages/EventsPage.tsx - VERSÃO SIMPLIFICADA
 import React, { useState } from 'react';
 import Layout from '../components/layout/Layout';
-import PostCard from '../components/PostCard';
-import ShareModal from '../components/ShareModal';
+import PostCard from '../components/posts/PostCard';
+import ShareModal from '../components/posts/ShareModal';
 import { useSharePost } from '../hooks/useSharePost';
 import { likePost } from '../hooks/useLikePost';
 import { useDeletePost } from '../hooks/useDeletePost';
 import { toast } from 'react-toastify';
-import PostModal from '../components/PostModal';
+import PostModal from '../components/posts/PostModal';
 import EditPostModal from '../components/posts/EditPostModal';
 import { useEvents } from '../hooks/useEvents';
 import Typography from '../components/ui/Typography';
@@ -63,6 +63,11 @@ const EventsPage: React.FC = () => {
       toast.error('Erro ao excluir o evento!');
     }
   };
+
+  React.useEffect(() => {
+    if (shareModalOpen && selectedPost) setSelectedPost(null);
+    if (selectedPost && shareModalOpen) setShareModalOpen(false);
+  }, [shareModalOpen, selectedPost]);
 
   return (
     <Layout variant="feed">
@@ -168,15 +173,21 @@ const EventsPage: React.FC = () => {
           }}
           onShare={() => {
             const event = events.find((e) => e.id === selectedPost);
-            if (event) openShareModal(event);
+            if (event) {
+              // Fecha o modal de detalhes
+              setSelectedPost(null);
+
+              // Abre o modal de compartilhamento com leve delay
+              setTimeout(() => openShareModal(event), 300);
+            }
           }}
           onDelete={() => handleDelete(selectedPost)}
-          onEdit={(postId) => setEditingPost(postId)} // 👈 Apenas ID
+          onEdit={(postId) => setEditingPost(postId)}
         />
       )}
 
       {editingPost && (
-        <EditPostModal // 👈 SEM ShareEditModal (não há compartilhamentos)
+        <EditPostModal
           postId={editingPost}
           onClose={() => setEditingPost(null)}
           onSuccess={(updatedEvent) => {

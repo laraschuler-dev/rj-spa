@@ -1,4 +1,3 @@
-// CampaignPostForm.tsx
 import React, { useState, FormEvent } from 'react';
 import Typography from '../../../components/ui/Typography';
 import SubmitButton from '../../../components/ui/SubmitButton';
@@ -86,7 +85,6 @@ const CampaignPostForm: React.FC<CampaignPostFormProps> = ({
       console.log('Submitting post data:', postData);
       await onSubmit(postData);
     } catch (err: any) {
-      // Tratamento de erro padronizado
       if (err.response?.data?.error) {
         toast.error(err.response.data.error);
       } else if (err.request) {
@@ -97,7 +95,6 @@ const CampaignPostForm: React.FC<CampaignPostFormProps> = ({
         );
       }
     } finally {
-      // Reativa o botão após o envio (sucesso ou erro)
       setIsSubmitting(false);
     }
   };

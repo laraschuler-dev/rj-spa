@@ -1,4 +1,3 @@
-// components/posts/EditPostModal.tsx
 import React, { useEffect, useState } from 'react';
 import axios from '../../services/api';
 import PostFormFactory from './PostFormFactory';
@@ -76,10 +75,10 @@ const EditPostModal: React.FC<EditPostModalProps> = ({
 
               try {
                 const updatedPost = await editPost(formData);
-                console.log('✅ Resposta da API após editar:', updatedPost);
 
                 if (updatedPost) {
                   updatePost(updatedPost);
+                  toast.success('Post atualizado com sucesso!');
                   onClose();
                 }
               } catch (error) {

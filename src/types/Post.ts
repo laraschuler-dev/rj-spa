@@ -55,4 +55,9 @@ export interface PostListItem {
   };
   isPostOwner?: boolean;
   isShareOwner?: boolean;
+
+  likesCount?: number;
+  commentsCount?: number;
+  sharesCount?: number;
+  attendanceCount?: number;
 }

@@ -9,7 +9,7 @@ import React from 'react';
  */
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-primary text-background py-6 text-center shadow-md">
+    <footer className="bg-gradient-to-b from-primary to-primary/95 text-background py-6 text-center shadow-md border-t border-primary-dark/20">
       <p className="text-sm font-body">
         &copy; {new Date().getFullYear()} Redefinindo Jornadas. Todos os
         direitos reservados.

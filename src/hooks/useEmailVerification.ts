@@ -1,0 +1,36 @@
+// hooks/useEmailVerification.ts
+import { useEffect, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import api from '../services/api';
+
+export const useEmailVerification = () => {
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+  const hasVerified = useRef(false);
+
+  useEffect(() => {
+    const verifyEmail = async () => {
+      if (hasVerified.current) return;
+      hasVerified.current = true;
+
+      const token = params.get('token');
+      if (!token) {
+        toast.error('Token inválido.');
+        navigate('/login');
+        return;
+      }
+
+      try {
+        await api.post('/auth/verify-email', { token });
+        toast.success('E-mail verificado com sucesso!');
+        navigate('/login');
+      } catch {
+        toast.error('Link expirado ou inválido.');
+        navigate('/verify-pending');
+      }
+    };
+
+    verifyEmail();
+  }, [params, navigate]);
+};
