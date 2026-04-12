@@ -1,4 +1,3 @@
-// src/components/posts/forms/DonationPostForm.tsx
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import Typography from '../../ui/Typography';
 import SubmitButton from '../../ui/SubmitButton';
@@ -35,7 +34,6 @@ const DonationPostForm: React.FC<DonationPostFormProps> = ({
   const postId = initialData?.id;
   const { deleteImage } = useDeletePostImage(postId ?? 0);
 
-  // Estado para controlar o loading
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -46,7 +44,7 @@ const DonationPostForm: React.FC<DonationPostFormProps> = ({
     customCondition: initialData?.customCondition ?? '',
     location: initialData?.location ?? '',
     availability: initialData?.availability ?? '',
-    images: initialData?.images ?? [], // já suporta {id, url} ou File
+    images: initialData?.images ?? [],
   });
 
   const handleChange = (
@@ -65,7 +63,7 @@ const DonationPostForm: React.FC<DonationPostFormProps> = ({
 
     try {
       const postData = new FormData();
-      postData.append('categoria_idcategoria', '1'); // DONATION
+      postData.append('categoria_idcategoria', '1');
       postData.append('content', formData.content);
 
       const metadata = {
@@ -96,7 +94,6 @@ const DonationPostForm: React.FC<DonationPostFormProps> = ({
 
       await onSubmit(postData);
     } catch (err: any) {
-      // Tratamento de erro padronizado
       if (err.response?.data?.error) {
         toast.error(err.response.data.error);
       } else if (err.request) {
@@ -107,7 +104,6 @@ const DonationPostForm: React.FC<DonationPostFormProps> = ({
         );
       }
     } finally {
-      // Reativa o botão após o envio (sucesso ou erro)
       setIsSubmitting(false);
     }
   };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // ← Adicione useEffect
+import React, { useState, useEffect } from 'react';
 import { Link as ScrollLink } from 'react-scroll';
 import { CgLogIn } from 'react-icons/cg';
 import { FiMenu } from 'react-icons/fi';
@@ -10,11 +10,11 @@ import { Sparkles } from 'lucide-react';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('introduction'); // ← Estado para seção ativa
+  const [activeSection, setActiveSection] = useState('introduction');
   const token = useAuthStore((state) => state.token);
   const isAuthenticated = !!token;
 
-  // Detecta qual seção está visível (simplificado)
+  // Detecta qual seção está visível
   useEffect(() => {
     const handleScroll = () => {
       const sections = [
@@ -55,8 +55,6 @@ const Header: React.FC = () => {
       )}
       {/* Navegação Desktop COM ESTADO ATIVO */}
       <nav className="hidden md:flex items-center gap-0 bg-primary-dark/20 rounded-lg p-1">
-        {' '}
-        {/* ← Adicionei container estilizado */}
         <ScrollLink
           to="about"
           smooth={true}
@@ -150,11 +148,11 @@ const Header: React.FC = () => {
       {/* Botão Menu Hambúrguer (Mobile) */}
       {!isMenuOpen && (
         <button
-          className="md:hidden p-2 rounded hover:bg-primary-dark/50 transition-all duration-200" // ← Estilo consistente
+          className="md:hidden p-2 rounded hover:bg-primary-dark/50 transition-all duration-200"
           onClick={() => setIsMenuOpen(true)}
           aria-label="Abrir menu"
         >
-          <FiMenu size={22} /> {/* ← Ícone menor */}
+          <FiMenu size={22} />
         </button>
       )}
       {/* Menu Mobile */}

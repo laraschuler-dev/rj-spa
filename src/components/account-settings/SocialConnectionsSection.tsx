@@ -1,4 +1,3 @@
-// components/account-settings/sections/SocialConnectionsSection.tsx
 import React from 'react';
 import Typography from '../ui/Typography';
 import GoogleLinkButton from '../ui/GoogleLinkButton';
@@ -17,9 +16,6 @@ interface SocialConnectionsSectionProps {
   onShowUnlinkModalChange: (show: boolean) => void;
   isUnlinking: boolean;
 }
-
-// components/account-settings/sections/SocialConnectionsSection.tsx
-// ... imports e interface
 
 export const SocialConnectionsSection: React.FC<
   SocialConnectionsSectionProps
@@ -85,7 +81,6 @@ export const SocialConnectionsSection: React.FC<
         {isOpen && (
           <div className="px-6 py-4 space-y-6">
             <div className="flex flex-col items-center text-center md:flex-row md:items-center md:justify-between py-3 border-b border-gray-100 gap-4">
-              {/* Ícone e textos */}
               <div className="flex flex-col items-center md:flex-row md:items-center md:space-x-3">
                 <div className="w-9 h-9 bg-white border border-gray-300 rounded-full flex items-center justify-center shadow-sm">
                   <FcGoogle size={22} />
@@ -121,7 +116,6 @@ export const SocialConnectionsSection: React.FC<
               </div>
             </div>
 
-            {/* Informações contextuais */}
             <div
               className={`p-4 rounded-lg ${
                 connections.hasGoogle ? 'bg-green-50' : 'bg-blue-50'

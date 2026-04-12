@@ -1,4 +1,3 @@
-// src/components/follow/FollowListModal.tsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserFollowerInfo } from '../../hooks/useFollow';
@@ -34,13 +33,10 @@ const FollowListModal: React.FC<FollowListModalProps> = ({
     // Não permitir clique no próprio usuário
     if (userId === currentUser?.id) return;
 
-    // ✅ REDIRECIONAR PARA O PERFIL
     navigate(`/profile/${userId}`);
 
-    // Fechar o modal após o clique
     onClose();
 
-    // Chamar callback se existir
     onUserClick?.(userId);
   };
 
@@ -51,9 +47,6 @@ const FollowListModal: React.FC<FollowListModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] overflow-hidden focus:outline-none">
-        {' '}
-        {/* ✅ REMOVE BORDA DE FOCO */}
-        {/* Header */}
         <div className="border-b border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <Typography variant="h2" className="text-lg font-semibold">
@@ -61,7 +54,7 @@ const FollowListModal: React.FC<FollowListModalProps> = ({
             </Typography>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 transition-colors p-1 rounded-lg hover:bg-gray-100 focus:outline-none" // ✅ REMOVE BORDA DE FOCO
+              className="text-gray-500 hover:text-gray-700 transition-colors p-1 rounded-lg hover:bg-gray-100 focus:outline-none"
             >
               <svg
                 className="w-6 h-6"
@@ -89,69 +82,70 @@ const FollowListModal: React.FC<FollowListModalProps> = ({
             users.map((user) => (
               <div
                 key={user.id}
-                className="w-full p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors flex items-center justify-between"
+                className="w-full p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors"
               >
-                {/* Informações do usuário (clicável) */}
-                <button
-                  onClick={() => handleUserClick(user.id)}
-                  className="flex items-center gap-3 flex-1 text-left hover:opacity-80 transition-opacity focus:outline-none" // ✅ REMOVE BORDA DE FOCO
-                >
-                  {/* Avatar */}
-                  {user.profilePhoto ? (
-                    <img
-                      src={resolveImageUrl(user.profilePhoto)}
-                      alt={user.name}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                  ) : (
-                    <AvatarInitials
-                      name={user.name}
-                      className="w-12 h-12 text-lg"
-                    />
-                  )}
-
-                  {/* Informações do usuário */}
-                  <div className="flex-1 min-w-0">
-                    <Typography
-                      variant="h3"
-                      className="text-sm font-semibold text-gray-900 truncate hover:text-blue-600 transition-colors" // ✅ AZUL HARMONIZADO
+                <div className="flex items-center justify-between gap-3 w-full">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <button
+                      onClick={() => handleUserClick(user.id)}
+                      className="flex-shrink-0 hover:opacity-80 transition-opacity focus:outline-none"
                     >
-                      {user.name}
-                    </Typography>
-                    {user.profileType && (
-                      <Typography
-                        variant="p"
-                        className="text-xs text-gray-500 truncate"
-                      >
-                        {user.profileType}
-                      </Typography>
-                    )}
-                  </div>
-                </button>
+                      {user.profilePhoto ? (
+                        <img
+                          src={resolveImageUrl(user.profilePhoto)}
+                          alt={user.name}
+                          className="w-12 h-12 rounded-full object-cover"
+                        />
+                      ) : (
+                        <AvatarInitials
+                          name={user.name}
+                          className="w-12 h-12 text-lg"
+                        />
+                      )}
+                    </button>
 
-                {/* Botão de Follow (apenas para outros usuários) */}
-                {currentUser && user.id !== currentUser.id && (
-                  <div className="ml-3 flex-shrink-0">
-                    <FollowButton
-                      targetUserId={user.id}
-                      isFollowing={user.isFollowing}
-                      onFollowChange={(isFollowing) =>
-                        handleFollowChange(user.id, isFollowing)
-                      }
-                      size="sm"
-                      variant="outline"
-                    />
+                    {/* Informações do usuário */}
+                    <button
+                      onClick={() => handleUserClick(user.id)}
+                      className="flex-1 min-w-0 text-left hover:opacity-80 transition-opacity focus:outline-none"
+                    >
+                      <div className="min-w-0">
+                        <Typography
+                          variant="h3"
+                          className="text-sm font-semibold text-gray-900 truncate hover:text-blue-600 transition-colors"
+                        >
+                          {user.name}
+                        </Typography>
+                        {user.profileType && (
+                          <Typography
+                            variant="p"
+                            className="text-xs text-gray-500 truncate"
+                          >
+                            {user.profileType}
+                          </Typography>
+                        )}
+                      </div>
+                    </button>
                   </div>
-                )}
 
-                {/* Indicador para o próprio usuário */}
-                {currentUser && user.id === currentUser.id && (
-                  <div className="ml-3 flex-shrink-0">
-                    <span className="text-xs text-gray-500 px-2 py-1">
-                      Você
-                    </span>
+                  <div className="flex-shrink-0 ml-2">
+                    {currentUser && user.id !== currentUser.id ? (
+                      <FollowButton
+                        targetUserId={user.id}
+                        isFollowing={user.isFollowing}
+                        onFollowChange={(isFollowing) =>
+                          handleFollowChange(user.id, isFollowing)
+                        }
+                        size="sm"
+                        variant="outline"
+                      />
+                    ) : currentUser && user.id === currentUser.id ? (
+                      <span className="text-xs text-gray-500 px-2 py-1 whitespace-nowrap">
+                        Você
+                      </span>
+                    ) : null}
                   </div>
-                )}
+                </div>
               </div>
             ))
           )}

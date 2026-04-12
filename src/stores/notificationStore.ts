@@ -15,6 +15,7 @@ export interface Notification {
   };
   post?: {
     id: number;
+    share_id?: number;
     content_preview: string;
     image?: string;
   };

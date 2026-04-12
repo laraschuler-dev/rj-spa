@@ -1,4 +1,3 @@
-// src/components/HeaderFeed.tsx
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -10,12 +9,13 @@ import {
   FiGift,
 } from 'react-icons/fi';
 import MobileMenuFeed from '../ui/MobileMenuFeed';
-import SearchBar from '../SearchBar';
-import SearchBarMobile from '../SearchBarMobile';
-import NotificationDropdown from '../NotificationDropdown';
+import SearchBar from '../ui/SearchBar';
+import SearchBarMobile from '../ui/SearchBarMobile';
+import NotificationDropdown from '../ui/NotificationDropdown';
 import { useNotifications } from '../../hooks/useNotifications';
 import { UserDropdownMenu } from '../ui/UserDropdownMenu';
 import { Sparkles } from 'lucide-react';
+import { useScrollStore } from '../../stores/scrollStore';
 
 const HeaderFeed: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -27,26 +27,48 @@ const HeaderFeed: React.FC = () => {
     fetchUnreadCount();
   }, [fetchUnreadCount]);
 
-  // Evita marcar notificações como lidas várias vezes por mesma abertura
   const [hasMarkedOnOpen, setHasMarkedOnOpen] = useState(false);
 
   useEffect(() => {
     if (!isNotificationsOpen) {
-      // Resetar controle ao fechar dropdown
       setHasMarkedOnOpen(false);
       return;
     }
 
-    // Só executa uma vez por abertura
     if (!hasMarkedOnOpen) {
       markAllAsRead();
       setHasMarkedOnOpen(true);
     }
   }, [isNotificationsOpen, hasMarkedOnOpen, markAllAsRead]);
 
+  const { shouldRestoreNotifications, clearNotificationsRestore } =
+    useScrollStore();
+
+  useEffect(() => {
+    console.log('🔔 HeaderFeed - Effect triggered', {
+      shouldRestoreNotifications,
+      pathname: location.pathname,
+      state: location.state,
+    });
+
+    const shouldOpenNotifications =
+      shouldRestoreNotifications || location.state?.restoreNotifications;
+
+    if (shouldOpenNotifications && location.pathname === '/feed') {
+      setIsNotificationsOpen(true);
+
+      // Limpa ambos os estados
+      clearNotificationsRestore();
+      // Limpa o state da location para evitar reabertura
+      window.history.replaceState(
+        { ...location.state, restoreNotifications: false },
+        ''
+      );
+    }
+  }, [shouldRestoreNotifications, location, clearNotificationsRestore]);
+
   return (
     <header className="bg-primary text-background py-4 px-4 md:px-6 flex items-center justify-between fixed top-0 left-0 w-full z-50 border-b border-primary-dark/20">
-      {/* Logo + Navegação Principal */}
       <div className="flex items-center gap-2 md:gap-10 flex-shrink-0">
         {/* Logo */}
         <Link
@@ -106,12 +128,10 @@ const HeaderFeed: React.FC = () => {
         </nav>
       </div>
 
-      {/* SearchBar - Centralizado com mais espaço */}
       <div className="hidden md:flex flex-1 max-w-2xl mx-10">
         <SearchBar />
       </div>
 
-      {/* Área do Usuário COM UserDropdownMenu */}
       <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
         <div className="md:hidden">
           <SearchBarMobile />
@@ -119,7 +139,6 @@ const HeaderFeed: React.FC = () => {
 
         {/* Ícones de Ação */}
         <div className="flex items-center gap-1 md:gap-2 bg-primary-dark/20 rounded-lg p-1">
-          {/* 🔔 Notificações */}
           <div className="relative">
             <button
               onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
@@ -140,13 +159,11 @@ const HeaderFeed: React.FC = () => {
             />
           </div>
 
-          {/* UserDropdownMenu*/}
           <div className="hidden md:block">
             <UserDropdownMenu variant="header" />
           </div>
         </div>
 
-        {/* Separador Visual */}
         <div className="hidden md:block h-5 w-px bg-primary-dark/50 mx-1"></div>
 
         {/* Menu Mobile */}
@@ -159,7 +176,6 @@ const HeaderFeed: React.FC = () => {
         </button>
       </div>
 
-      {/* Menu Mobile */}
       <MobileMenuFeed
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}

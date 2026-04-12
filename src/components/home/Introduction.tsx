@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
-import Button from './ui/Button';
-import Typography from './ui/Typography';
+import Button from '../ui/Button';
+import Typography from '../ui/Typography';
 import { Link } from 'react-router-dom';
 
 const Introduction = () => {
@@ -9,7 +9,6 @@ const Introduction = () => {
       id="introduction"
       className="relative h-screen flex flex-col justify-start pt-24 text-center px-6 md:px-12 lg:px-24 mb-6 mt-4"
     >
-      {/* Caminho correto - remova "public/" e use barras normais */}
       <div
         className="absolute inset-0 bg-[url('/img/intro-bg2.png')] bg-cover bg-top bg-no-repeat"
         style={{ backgroundPosition: 'center 40%' }}

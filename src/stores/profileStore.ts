@@ -38,7 +38,7 @@ export interface ProfileState {
   decrementFollowing: () => void;
 }
 
-export const useProfileStore = create<ProfileState>((set, get) => ({
+export const useProfileStore = create<ProfileState>((set) => ({
   user: null,
   profile: null,
   loading: false,
@@ -52,13 +52,14 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
   clearProfile: () => set({ user: null, profile: null }),
   setLoading: (loading: boolean) => set({ loading }),
 
-  // Na profileStore.ts, verifique se o updateFollowStats está correto:
   updateFollowStats: (followStats) =>
     set((state) => ({
       profile: state.profile
         ? {
             ...state.profile,
             followStats: {
+              followersCount: state.profile.followStats?.followersCount || 0,
+              followingCount: state.profile.followStats?.followingCount || 0,
               ...state.profile.followStats,
               ...followStats,
             },

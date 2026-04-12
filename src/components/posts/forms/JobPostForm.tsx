@@ -1,4 +1,3 @@
-// src/components/posts/forms/JobPostForm.tsx
 import React, { useState, FormEvent, ChangeEvent } from 'react';
 import Typography from '../../ui/Typography';
 import SubmitButton from '../../ui/SubmitButton';
@@ -37,7 +36,7 @@ const JobPostForm: React.FC<JobPostFormProps> = ({
     title: initialData?.title ?? '',
     requirements: initialData?.requirements ?? '',
     content: initialData?.content ?? '',
-    images: initialData?.images ?? [], // suporta {id, url} ou File
+    images: initialData?.images ?? [],
   });
 
   const handleChange = (
@@ -56,7 +55,7 @@ const JobPostForm: React.FC<JobPostFormProps> = ({
 
     try {
       const postData = new FormData();
-      postData.append('categoria_idcategoria', '7'); // JOB_OFFER
+      postData.append('categoria_idcategoria', '7');
       postData.append('content', formData.content || formData.title);
 
       const metadata = {
@@ -80,7 +79,6 @@ const JobPostForm: React.FC<JobPostFormProps> = ({
 
       await onSubmit(postData);
     } catch (err: any) {
-      // Tratamento de erro padronizado
       if (err.response?.data?.error) {
         toast.error(err.response.data.error);
       } else if (err.request) {
@@ -91,7 +89,6 @@ const JobPostForm: React.FC<JobPostFormProps> = ({
         );
       }
     } finally {
-      // Reativa o botão após o envio (sucesso ou erro)
       setIsSubmitting(false);
     }
   };

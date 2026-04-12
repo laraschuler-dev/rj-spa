@@ -1,4 +1,3 @@
-// components/account-settings/sections/PasswordSection.tsx
 import React from 'react';
 import Typography from '../ui/Typography';
 import SubmitButton from '../ui/SubmitButton';

@@ -1,4 +1,3 @@
-// components/VerificationLoader.tsx
 import React from 'react';
 
 interface VerificationLoaderProps {

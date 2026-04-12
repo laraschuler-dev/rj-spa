@@ -1,4 +1,3 @@
-// src/components/posts/forms/CoursePostForm.tsx
 import React, { useState, FormEvent } from 'react';
 import Typography from '../../ui/Typography';
 import SubmitButton from '../../ui/SubmitButton';
@@ -40,7 +39,7 @@ const CoursePostForm: React.FC<CoursePostFormProps> = ({
     format: initialData?.format ?? '',
     duration: initialData?.duration ?? '',
     requirements: initialData?.requirements ?? '',
-    images: initialData?.images ?? [], // já suporta {id, url} ou novos arquivos
+    images: initialData?.images ?? [],
   });
 
   const handleChange = (
@@ -85,7 +84,6 @@ const CoursePostForm: React.FC<CoursePostFormProps> = ({
 
       await onSubmit(postData);
     } catch (err: any) {
-      // Tratamento de erro padronizado
       if (err.response?.data?.error) {
         toast.error(err.response.data.error);
       } else if (err.request) {
@@ -96,7 +94,6 @@ const CoursePostForm: React.FC<CoursePostFormProps> = ({
         );
       }
     } finally {
-      // Reativa o botão após o envio (sucesso ou erro)
       setIsSubmitting(false);
     }
   };

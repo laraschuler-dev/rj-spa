@@ -19,8 +19,8 @@ const FollowButton: React.FC<FollowButtonProps> = ({
 }) => {
   const { user: currentUser } = useAuth();
   const { followUser, unfollowUser, loading, checkIsFollowing } = useFollow();
-  const [isFollowing, setIsFollowing] = useState<boolean | null>(null); // <- começa como null (indefinido)
-  const [isLoadingStatus, setIsLoadingStatus] = useState(true); // <- flag de carregamento inicial
+  const [isFollowing, setIsFollowing] = useState<boolean | null>(null);
+  const [isLoadingStatus, setIsLoadingStatus] = useState(true);
 
   // Verifica o status de follow quando o componente monta
   useEffect(() => {
@@ -80,7 +80,6 @@ const FollowButton: React.FC<FollowButtonProps> = ({
     }
   };
 
-  // Classes originais preservadas
   const sizeClasses = {
     sm: 'px-3 py-1.5 text-xs',
     md: 'px-4 py-2 text-sm',

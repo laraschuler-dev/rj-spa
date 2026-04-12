@@ -5,23 +5,21 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
-import AuthInitializer from './components/AuthInitializer';
+import AuthInitializer from './components/auth/AuthInitializer';
 import CustomToastContainer from './components/ui/CustomToastContainer';
-import { PrivateRoute } from './components/PrivateRoute';
-import Contact from './components/Contact';
+import { PrivateRoute } from './components/auth/PrivateRoute';
+import Contact from './components/home/Contact';
 import Feed from './pages/Feed';
 import ProfileView from './pages/ProfileView';
 import ProfileEdit from './pages/ProfileEdit';
 import AccountSettings from './pages/AccountSettings';
-import CreatePostPage from './pages/posts/CreatePostPage';
+import CreatePostPage from './pages/CreatePostPage';
 import EventsPage from './pages/EventsPage';
 import DonationsPage from './pages/DonationsPage';
 import ServicesPage from './pages/ServicesPage';
 import PostDetailsPage from './pages/PostDetailsPage';
 import EmailVerification from './pages/EmailVerification';
 import VerifyPending from './pages/VerifyPending';
-import RecoverVerification from './pages/RecoverVerification';
-import { VerificationLoader } from './components/auth/VerificationLoader';
 
 const App = () => {
   return (
@@ -35,10 +33,6 @@ const App = () => {
             <Route path="/register" element={<Register />} />
             <Route path="/verify-email" element={<EmailVerification />} />
             <Route path="/verify-pending" element={<VerifyPending />} />
-            <Route
-              path="/recover-verification"
-              element={<RecoverVerification />}
-            />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/contact" element={<Contact />} />
@@ -53,9 +47,9 @@ const App = () => {
               <Route path="/events" element={<EventsPage />} />
               <Route path="/donations" element={<DonationsPage />} />
               <Route path="/services" element={<ServicesPage />} />
-              <Route path="/posts/:postId" element={<PostDetailsPage />} />
+              <Route path="/post/:id" element={<PostDetailsPage />} />
               <Route
-                path="/posts/:postId/share/:shareId"
+                path="/post/:id/share/:shareId"
                 element={<PostDetailsPage />}
               />
               <Route path="/profile" element={<ProfileView />} />

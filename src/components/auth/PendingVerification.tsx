@@ -1,6 +1,4 @@
-// components/PendingVerification.tsx
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import Typography from '../ui/Typography';
 import SubmitButton from '../ui/SubmitButton';
 
@@ -13,8 +11,6 @@ export const PendingVerification: React.FC<PendingVerificationProps> = ({
   loading,
   onResend,
 }) => {
-  const navigate = useNavigate();
-
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-background">
       <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-md w-[90%] sm:w-full max-w-md text-center">

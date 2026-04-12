@@ -1,4 +1,3 @@
-// src/components/posts/PostFormFactory.tsx
 import CampaignPostForm from './forms/CampaignPostForm';
 import ComplaintPostForm from './forms/ComplaintPostForm';
 import CoursePostForm from './forms/CoursePostForm';

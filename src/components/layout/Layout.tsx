@@ -1,4 +1,3 @@
-// Layout.tsx - VERSÃO DEFINITIVA
 import React from 'react';
 import Header from './Header';
 import HeaderFeed from './HeaderFeed';
@@ -17,10 +16,8 @@ const Layout: React.FC<LayoutProps> = ({ children, variant = 'default' }) => {
     <div className="flex flex-col min-h-screen bg-background text-gray-800">
       {isFeed ? <HeaderFeed /> : <Header />}
 
-      {/* Container principal que SEMPRE tem altura suficiente */}
       <div className="flex flex-1 min-h-[120vh]">
         {' '}
-        {/* ← ALTURA MÍNIMA GIGANTE */}
         <Sidebar />
         <main
           className={`flex-1 pt-20 px-4 md:px-8 pb-8 ${

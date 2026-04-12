@@ -1,4 +1,3 @@
-// src/components/posts/PostPreviewCard.tsx
 import Typography from '../ui/Typography';
 import { resolveImageUrl } from '../../utils/resolveImageUrl';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
@@ -18,6 +17,7 @@ interface PostPreviewCardProps {
     title?: string;
     isUnavailable?: boolean;
     originalAuthorDeleted?: boolean;
+    originalPostDeleted?: boolean;
   };
   content?: string;
   images?: { id: number; url: string }[];
@@ -32,7 +32,6 @@ const PostPreviewCard: React.FC<PostPreviewCardProps> = ({
   images,
   isAnonymous = false,
 }) => {
-  // ✅ Função melhorada para renderizar avatar
   const renderAuthorAvatar = () => {
     const isAuthorRemoved =
       author.id === 0 && author.name === 'Usuário Removido';
@@ -66,7 +65,7 @@ const PostPreviewCard: React.FC<PostPreviewCardProps> = ({
     }
   };
 
-  // ✅ Função para determinar o nome do autor
+  // Função para determinar o nome do autor
   const getAuthorName = () => {
     if (isAnonymous) return 'Anônimo';
     if (author.id === 0 && author.name === 'Usuário Removido')

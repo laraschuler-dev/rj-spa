@@ -1,12 +1,12 @@
 // src/components/SearchBarMobile.tsx
 import React, { useState, useCallback, useRef } from 'react';
-import { useUserSearch } from '../hooks/useUserSearch';
+import { useUserSearch } from '../../hooks/useUserSearch';
 import { Link } from 'react-router-dom';
-import { resolveImageUrl } from '../utils/resolveImageUrl';
+import { resolveImageUrl } from '../../utils/resolveImageUrl';
 import { FiSearch, FiX } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { translateProfileType } from '../utils/translateProfileType';
-import AvatarInitials from './ui/AvatarInitials';
+import { translateProfileType } from '../../utils/translateProfileType';
+import AvatarInitials from './AvatarInitials';
 
 const SearchBarMobile: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);

@@ -2,8 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import useAuthStore from '../stores/authStore';
 import api from '../services/api';
+import useAuthStore from '../stores/authStore';
 
 export const useLogin = () => {
   const [formData, setFormData] = useState({ emailOrPhone: '', password: '' });
@@ -11,7 +11,12 @@ export const useLogin = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/feed';
+
+  // ✅ CORREÇÃO: Aceita tanto string quanto objeto com pathname
+  const from =
+    typeof location.state?.from === 'string'
+      ? location.state.from
+      : location.state?.from?.pathname || '/feed';
 
   const setToken = useAuthStore((state) => state.setToken);
   const validateToken = useAuthStore((state) => state.validateToken);
@@ -53,21 +58,15 @@ export const useLogin = () => {
     if (err.response?.data?.error) {
       const message = err.response.data.error;
 
-      if (message.toLowerCase().includes('não verificado')) {
+      /*if (message.toLowerCase().includes('não verificado')) {
         toast.warning('Verifique seu e-mail antes de entrar.');
         const email = formData.emailOrPhone.includes('@')
           ? formData.emailOrPhone
           : null;
-
-        if (email) {
-          localStorage.setItem('pendingEmail', email);
-          navigate('/verify-pending');
-        } else {
-          // ✅ NOVO: Redireciona para recuperação
-          navigate('/recover-verification');
-        }
+        if (email) localStorage.setItem('pendingEmail', email);
+        navigate('/verify-pending');
         return;
-      }
+      }*/
 
       toast.error(message);
     } else if (err.request) {

@@ -36,6 +36,13 @@ interface PostStoreState {
     shareId?: number
   ) => void;
   removeComment: (postId: number, commentId: number, shareId?: number) => void;
+
+  fetchPostDetails: (
+    postId: number,
+    shareId?: number
+  ) => Promise<PostListItem | null>;
+
+  resetPosts: () => void;
 }
 
 export const usePostStore = create<PostStoreState>((set, get) => ({
@@ -46,9 +53,8 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
 
   setPosts: (posts) => set({ posts }),
 
+  // No postStore.ts - método updatePost (ATUALIZADO)
   updatePost: (updatedPost: PostListItem, addIfNotExists = false) => {
-    console.log('📝 updatePost chamado com:', updatedPost);
-    console.log('🔄 Autor do post atualizado:', updatedPost.author);
 
     set((state) => {
       const key = updatedPost.sharedBy?.shareId
@@ -69,25 +75,24 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
               ? `share-${p.sharedBy.shareId}`
               : `post-${p.id}`;
             if (pKey === key) {
-              console.log('📋 Post atual encontrado:', p);
-              console.log('👤 User do post atual:', p.user);
-
-              // NORMALIZAÇÃO: Se o post atualizado veio com 'author' mas o atual tem 'user'
-              // Ou se precisamos manter compatibilidade
               const normalizedPost = {
                 ...updatedPost,
-                // Garante que ambas as propriedades existam para compatibilidade
                 author: updatedPost.author || p.author,
-                user: updatedPost.author || p.user, // Se 'user' for usado em outros lugares
+                user: updatedPost.author || p.user,
               };
 
               return {
-                ...p, // mantém tudo do post atual (incluindo 'user')
-                ...normalizedPost, // sobrescreve com dados normalizados
-                // Preserva estado local importante
+                ...p,
+                ...normalizedPost,
+                // PRESERVA OS CONTADORES E ESTADO LOCAL
                 liked: p.liked,
                 attending: p.attending,
                 likeCount: p.likeCount,
+                likesCount: updatedPost.likesCount ?? p.likesCount,
+                commentsCount: updatedPost.commentsCount ?? p.commentsCount,
+                sharesCount: updatedPost.sharesCount ?? p.sharesCount,
+                attendanceCount:
+                  updatedPost.attendanceCount ?? p.attendanceCount,
               };
             }
             return p;
@@ -228,23 +233,86 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
     }));
   },
 
+  fetchPostDetails: async (postId: number, shareId?: number) => {
+    try {
+      const params = shareId ? { shareId } : undefined;
+      const res = await axios.get(`/posts/${postId}`, { params });
+
+      const fetchedPost = res.data;
+
+      // ✅ NORMALIZAÇÃO GARANTINDO CONTADORES
+      const normalizedPost: PostListItem = {
+        ...fetchedPost,
+        id: fetchedPost.id,
+        liked: fetchedPost.likedByUser ?? fetchedPost.liked ?? false,
+
+        // ✅ GARANTIR que os contadores vêm da API
+        likesCount: fetchedPost.likesCount ?? fetchedPost.likeCount ?? 0,
+        commentsCount: fetchedPost.commentsCount ?? 0,
+        sharesCount: fetchedPost.sharesCount ?? 0,
+        attendanceCount: fetchedPost.attendanceCount ?? 0,
+
+        user: fetchedPost.user ?? fetchedPost.author,
+        author: fetchedPost.author ?? fetchedPost.user,
+        images: Array.isArray(fetchedPost.images)
+          ? fetchedPost.images.map((img: any) =>
+              typeof img === 'string' ? img : img.url
+            )
+          : [],
+        sharedBy: fetchedPost.sharedBy
+          ? {
+              ...fetchedPost.sharedBy,
+              shareId: fetchedPost.sharedBy.shareId,
+              postId: fetchedPost.sharedBy.postId,
+            }
+          : undefined,
+        categoria_idcategoria:
+          fetchedPost.categoryId ?? fetchedPost.categoria_idcategoria,
+        metadata: fetchedPost.metadata,
+        createdAt: fetchedPost.createdAt,
+        uniqueKey:
+          fetchedPost.uniqueKey ||
+          (shareId ? `share-${shareId}` : `post-${postId}`),
+      };
+
+      set((state) => {
+        const key = shareId ? `share-${shareId}` : `post-${postId}`;
+
+        const existingIndex = state.posts.findIndex((p) => {
+          const pKey = p.sharedBy?.shareId
+            ? `share-${p.sharedBy.shareId}`
+            : `post-${p.id}`;
+          return pKey === key;
+        });
+
+        let newPosts;
+        if (existingIndex >= 0) {
+          // ✅ SUBSTITUI o post existente
+          newPosts = [...state.posts];
+          newPosts[existingIndex] = normalizedPost;
+        } else {
+          // ✅ ADICIONA novo post
+          newPosts = [normalizedPost, ...state.posts];
+        }
+
+        return { posts: newPosts };
+      });
+
+      return normalizedPost;
+    } catch (err) {
+      console.error('❌ STORE: Erro ao buscar post:', err);
+      throw err;
+    }
+  },
+
   fetchPosts: async (isInitialLoad: boolean = false) => {
     const { loading, page } = get();
-    console.log('📄 fetchPosts chamado', {
-      isInitialLoad,
-      currentPage: page,
-      loading,
-    });
-    if (loading) {
-      console.log('⏳ Já está carregando, ignorando...');
-      return;
-    }
+    if (loading) return;
 
     set({ loading: true });
 
     try {
       const currentPage = isInitialLoad ? 1 : page;
-      console.log('fetchPosts -> usando page:', currentPage);
 
       const res = await axios.get('/posts', {
         params: { page: currentPage, limit: 10 },
@@ -253,12 +321,22 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
       const postsFromApi: PostListItem[] = res.data.posts;
       const pagination = res.data.pagination;
 
+      // ✅ NORMALIZA OS POSTS DO FEED TAMBÉM
+      const normalizedPosts = postsFromApi.map((post) => ({
+        ...post,
+        // Garante que os contadores existam mesmo no feed
+        likesCount: post.likesCount ?? post.likeCount ?? 0,
+        commentsCount: post.commentsCount ?? 0,
+        sharesCount: post.sharesCount ?? 0,
+        attendanceCount: post.attendanceCount ?? 0,
+      }));
+
       set((state) => {
         const newPosts = isInitialLoad
-          ? postsFromApi
+          ? normalizedPosts
           : [
               ...state.posts,
-              ...postsFromApi.filter(
+              ...normalizedPosts.filter(
                 (p) =>
                   !state.posts.some(
                     (existing) => existing.uniqueKey === p.uniqueKey
@@ -338,5 +416,14 @@ export const usePostStore = create<PostStoreState>((set, get) => ({
 
   refreshUserPosts: async (userId: number, requestingUserId: number) => {
     await get().fetchUserPosts(userId, requestingUserId, true);
+  },
+
+  resetPosts: () => {
+    set({
+      posts: [],
+      page: 1,
+      hasMore: true,
+      loading: false,
+    });
   },
 }));

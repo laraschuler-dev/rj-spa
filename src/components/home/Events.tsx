@@ -2,33 +2,121 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import { Pagination, Navigation } from 'swiper/modules';
-import Typography from './ui/Typography';
-import CardButton from './ui/CardButton';
-import { useHomeEvents } from '../hooks/useHomeData';
-import { resolveImageUrl } from '../utils/resolveImageUrl';
-import formatDateBR from '../utils/formatDateBR';
+import Typography from '../ui/Typography';
+import CardButton from '../ui/CardButton';
+import { useHomeEvents } from '../../hooks/useHomeData';
+import { resolveImageUrl } from '../../utils/resolveImageUrl';
+import formatDateBR from '../../utils/formatDateBR';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import { toast } from 'react-toastify';
+import { useScrollStore } from '../../stores/scrollStore';
 
 export default function Eventos() {
   const { events, loading, error } = useHomeEvents(6);
   const [imageErrors, setImageErrors] = useState<{ [key: string]: boolean }>(
     {}
   );
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const [loadingButtons, setLoadingButtons] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   const handleImageError = (id: string) => {
     setImageErrors((prev) => ({ ...prev, [id]: true }));
   };
 
+  const setScrollTarget = useScrollStore((s) => s.setScrollTarget);
+
+  const handleEventClick = async (event: any) => {
+    const postId = event.postId || event.id;
+    const targetUrl = `/post/${postId}`;
+
+    if (!isAuthenticated) {
+      toast.info('Faça login para ver os detalhes do evento');
+      navigate('/login', {
+        state: {
+          from: targetUrl,
+        },
+      });
+      return;
+    }
+
+    setLoadingButtons((prev) => ({ ...prev, [event.id]: true }));
+
+    try {
+      setScrollTarget('events', window.scrollY);
+      navigate(targetUrl);
+    } catch (error) {
+      console.error('Erro ao navegar:', error);
+    } finally {
+      setLoadingButtons((prev) => ({ ...prev, [event.id]: false }));
+    }
+  };
+
   if (loading) {
-    return <section>...Carregando...</section>;
+    return (
+      <section
+        id="events"
+        className="w-full py-12 px-4 md:px-8 bg-gray-50 mb-6"
+      >
+        <div className="max-w-3xl mx-auto text-center">
+          <Typography
+            variant="h1"
+            className="text-3xl md:text-5xl font-bold text-primary"
+          >
+            Eventos Disponíveis
+          </Typography>
+          <Typography variant="p" className="text-gray-600 mt-2">
+            Carregando eventos...
+          </Typography>
+        </div>
+      </section>
+    );
   }
 
   if (error) {
-    return <section>...Erro...</section>;
+    return (
+      <section
+        id="events"
+        className="w-full py-12 px-4 md:px-8 bg-gray-50 mb-6"
+      >
+        <div className="max-w-3xl mx-auto text-center">
+          <Typography
+            variant="h1"
+            className="text-3xl md:text-5xl font-bold text-primary"
+          >
+            Eventos Disponíveis
+          </Typography>
+          <Typography variant="p" className="text-red-600 mt-2">
+            {error}
+          </Typography>
+        </div>
+      </section>
+    );
   }
 
   if (events.length === 0) {
-    return <section>...Nenhum evento...</section>;
+    return (
+      <section
+        id="events"
+        className="w-full py-12 px-4 md:px-8 bg-gray-50 mb-6"
+      >
+        <div className="max-w-3xl mx-auto text-center">
+          <Typography
+            variant="h1"
+            className="text-3xl md:text-5xl font-bold text-primary"
+          >
+            Eventos Disponíveis
+          </Typography>
+          <Typography variant="p" className="text-gray-600 mt-2">
+            Nenhum evento disponível no momento.
+          </Typography>
+        </div>
+      </section>
+    );
   }
 
   return (
@@ -122,7 +210,13 @@ export default function Eventos() {
                   </div>
 
                   <div className="mt-2">
-                    <CardButton>Saiba Mais</CardButton>
+                    <CardButton
+                      onClick={() => handleEventClick(event)}
+                      loading={loadingButtons[event.id]}
+                      loadingText="Abrindo..."
+                    >
+                      Saiba Mais
+                    </CardButton>
                   </div>
                 </div>
               </div>

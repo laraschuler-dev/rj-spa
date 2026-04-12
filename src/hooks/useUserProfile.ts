@@ -37,10 +37,6 @@ export function useUserProfile(userId?: number) {
         // SEMPRE buscar followStats atualizados
         try {
           const followStats = await getFollowStats(id);
-          console.log(
-            '🔍 [useUserProfile] FollowStats atualizados:',
-            followStats
-          );
           if (followStats) {
             profileData.followStats = followStats;
           }
@@ -71,7 +67,6 @@ export function useUserProfile(userId?: number) {
     if (!userId || !state.profile) return;
 
     try {
-      console.log('🔄 [useUserProfile] Atualizando apenas follow stats...');
       const followStats = await getFollowStats(userId);
 
       if (followStats) {
@@ -82,10 +77,6 @@ export function useUserProfile(userId?: number) {
             followStats,
           },
         }));
-        console.log(
-          '✅ [useUserProfile] Follow stats atualizados:',
-          followStats
-        );
       }
     } catch (error) {
       console.error(

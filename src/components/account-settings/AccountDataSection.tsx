@@ -1,4 +1,3 @@
-// components/account-settings/sections/AccountDataSection.tsx
 import React from 'react';
 import Typography from '../ui/Typography';
 import SubmitButton from '../ui/SubmitButton';
@@ -33,7 +32,6 @@ export const AccountDataSection: React.FC<AccountDataSectionProps> = ({
     });
   };
 
-  // FONTE ÚNICA DA VERDADE - usar apenas o authStore
   const isEmailDisabled = user?.isSocialLogin || user?.hasGoogle;
 
   return (

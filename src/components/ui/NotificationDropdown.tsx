@@ -10,12 +10,14 @@ import {
   FiUser,
   FiCalendar,
 } from 'react-icons/fi';
-import { useNotifications } from '../hooks/useNotifications';
-import { resolveImageUrl } from '../utils/resolveImageUrl';
+import { useNotifications } from '../../hooks/useNotifications';
+import { resolveImageUrl } from '../../utils/resolveImageUrl';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import Typography from './ui/Typography';
-import AvatarInitials from './ui/AvatarInitials';
+import Typography from './Typography';
+import AvatarInitials from './AvatarInitials';
+import { useScrollStore } from '../../stores/scrollStore';
+import { useNotificationNavigation } from '../../hooks/useNotificationNavigation';
 
 interface NotificationDropdownProps {
   isOpen: boolean;
@@ -26,10 +28,25 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { notifications, unreadCount, loading, hasMore, fetchNotifications } =
-    useNotifications();
+  const {
+    notifications,
+    unreadCount,
+    loading,
+    hasMore,
+    fetchNotifications,
+    markAllAsRead,
+  } = useNotifications();
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const { navigateToPostFromNotification } = useNotificationNavigation();
+
+  // MARCA COMO LIDA QUANDO ABRE O DROPDOWN
+  useEffect(() => {
+    if (isOpen && unreadCount > 0) {
+      markAllAsRead();
+    }
+  }, [isOpen, unreadCount, markAllAsRead]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -68,7 +85,6 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   };
 
   const getNotificationIcon = (type: string) => {
-    // ✅ DETALHES EM AZUL - ícones em azul suave
     switch (type) {
       case 'LIKE':
         return <FiHeart className="w-4 h-4 text-blue-500" />;
@@ -84,6 +100,24 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
         return <FiBell className="w-4 h-4 text-blue-400" />;
     }
   };
+  const handleNotificationClick = async (notification: any) => {
+    console.log('🔔 NotificationDropdown - Clicou na notificação');
+
+    // ✅ DELEGA TUDO PARA O HOOK
+    await navigateToPostFromNotification(notification, onClose);
+  };
+
+  // NotificationDropdown.tsx - DEBUG DA STORE
+  useEffect(() => {
+    const unsubscribe = useScrollStore.subscribe((state) =>
+      console.log(
+        '🔔 NotificationDropdown - Store atualizada:',
+        state.shouldRestoreNotifications
+      )
+    );
+
+    return unsubscribe;
+  }, []);
 
   return (
     <AnimatePresence>
@@ -150,9 +184,11 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
             ) : (
               <div className="divide-y divide-gray-100">
                 {notifications.map((notification) => (
-                  <div
+                  <button
                     key={notification.id}
-                    className="p-3 md:p-4 border-l-4 border-l-blue-200 bg-white transition-colors hover:bg-gray-50" // ✅ FUNDO BRANCO E HOVER CINZA CLARO
+                    onClick={() => handleNotificationClick(notification)}
+                    className="block text-left p-3 border-l-4 border-l-blue-200 bg-white 
+  transition hover:bg-gray-50 focus:outline-none mx-auto w-full max-w-[340px]"
                   >
                     <div className="flex items-start gap-3">
                       {/* Avatar */}
@@ -176,20 +212,25 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
                               {getNotificationIcon(notification.type)}
-                              <Typography
-                                variant="h3"
-                                className="text-sm font-semibold text-gray-900 truncate"
-                              >
-                                {notification.actor.name}
-                              </Typography>
-                            </div>
 
-                            <Typography
-                              variant="p"
-                              className="text-sm text-gray-700 leading-relaxed break-words"
-                            >
-                              {notification.message}
-                            </Typography>
+                              <div className="flex items-center gap-1 min-w-0">
+                                {/* Nome com ellipsis */}
+                                <Typography
+                                  variant="h3"
+                                  className="text-sm font-semibold text-gray-900 truncate max-w-[140px]"
+                                >
+                                  {notification.actor.name}
+                                </Typography>
+
+                                {/* Mensagem continua na mesma linha */}
+                                <Typography
+                                  variant="p"
+                                  className="text-sm text-gray-700 leading-relaxed whitespace-nowrap text-ellipsis overflow-hidden"
+                                >
+                                  {notification.message}
+                                </Typography>
+                              </div>
+                            </div>
 
                             {/* Preview do post apenas para notificações com post */}
                             {notification.type !== 'FOLLOW' &&
@@ -224,16 +265,11 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                             </Typography>
                           </div>
 
-                          {/* Indicador de não lida */}
-                          {!notification.is_read && (
-                            <div className="flex-shrink-0 mt-1">
-                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                            </div>
-                          )}
+                          {/* ❌ REMOVIDO: Indicador de não lida (já marca todas como lidas ao abrir) */}
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             )}
@@ -244,7 +280,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                 <button
                   onClick={handleLoadMore}
                   disabled={loading}
-                  className="w-full py-2 text-sm text-blue-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium focus:outline-none" // ✅ HOVER CINZA CLARO
+                  className="w-full py-2 text-sm text-blue-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium focus:outline-none"
                 >
                   {loading ? (
                     <div className="flex items-center justify-center gap-2">

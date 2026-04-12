@@ -2,19 +2,60 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import { Pagination, Navigation } from 'swiper/modules';
-import Typography from './ui/Typography';
-import CardButton from './ui/CardButton';
-import { useHomeServices } from '../hooks/useHomeData';
-import { resolveImageUrl } from '../utils/resolveImageUrl';
+import Typography from '../ui/Typography';
+import CardButton from '../ui/CardButton';
+import { useHomeServices } from '../../hooks/useHomeData';
+import { resolveImageUrl } from '../../utils/resolveImageUrl';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import { toast } from 'react-toastify';
+import { useScrollStore } from '../../stores/scrollStore';
 
 export default function Services() {
   const { services, loading, error } = useHomeServices(6);
   const [imageErrors, setImageErrors] = useState<{ [key: string]: boolean }>(
     {}
   );
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const [loadingButtons, setLoadingButtons] = useState<{
+    [key: string]: boolean;
+  }>({});
+
   const handleImageError = (id: string) => {
     setImageErrors((prev) => ({ ...prev, [id]: true }));
+  };
+
+  const setScrollTarget = useScrollStore((s) => s.setScrollTarget);
+
+  const handleServiceClick = async (service: any) => {
+    const postId = service.postId || service.id;
+    const targetUrl = `/post/${postId}`;
+
+    if (!isAuthenticated) {
+      toast.info('Faça login para ver os detalhes do serviço');
+      navigate('/login', {
+        state: {
+          from: targetUrl,
+        },
+      });
+      return;
+    }
+
+    setLoadingButtons((prev) => ({ ...prev, [service.id]: true }));
+
+    try {
+      // grava na store QUAL seção e qual posição de scroll
+      setScrollTarget('services', window.scrollY);
+
+      // navega para detalhes normalmente
+      navigate(targetUrl);
+    } catch (error) {
+      console.error('Erro ao navegar:', error);
+    } finally {
+      setLoadingButtons((prev) => ({ ...prev, [service.id]: false }));
+    }
   };
 
   if (loading) {
@@ -126,7 +167,6 @@ export default function Services() {
           {services.map((service) => (
             <SwiperSlide key={service.id}>
               <div className="bg-white border rounded-lg shadow-md overflow-hidden flex flex-col h-full">
-                {/* Container da imagem com altura fixa mas proporção preservada */}
                 <div
                   className={`w-full aspect-[4/3] flex items-center justify-center rounded-t-lg overflow-hidden ${
                     !service.image || imageErrors[String(service.id)]
@@ -146,7 +186,6 @@ export default function Services() {
                   />
                 </div>
 
-                {/* Resto do conteúdo permanece igual */}
                 <div className="p-3 flex flex-col flex-1">
                   <div className="h-10 mb-1">
                     <Typography
@@ -167,7 +206,13 @@ export default function Services() {
                   </div>
 
                   <div className="mt-2">
-                    <CardButton>Saiba Mais</CardButton>
+                    <CardButton
+                      onClick={() => handleServiceClick(service)}
+                      loading={loadingButtons[service.id]}
+                      loadingText="Abrindo..."
+                    >
+                      Saiba Mais
+                    </CardButton>
                   </div>
                 </div>
               </div>
@@ -175,7 +220,6 @@ export default function Services() {
           ))}
         </Swiper>
 
-        {/* Botões de navegação - posicionados fora do card */}
         <div className="swiper-button-prev text-3xl absolute left-0 top-1/2 transform -translate-y-1/2 text-gray-700 hover:text-blue-600"></div>
         <div className="swiper-button-next text-3xl absolute right-0 top-1/2 transform -translate-y-1/2 text-gray-700 hover:text-blue-600"></div>
       </div>

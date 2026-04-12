@@ -40,7 +40,7 @@ const AccountSettings: React.FC = () => {
 
   return (
     <main className="relative min-h-screen flex items-center justify-center bg-background px-4 py-12">
-      <BackButton to="/feed" className="fixed top-6 left-6 z-50" />
+      <BackButton className="fixed top-6 left-6 z-50" />
 
       <div className="w-full max-w-2xl bg-white p-8 rounded-2xl shadow-md space-y-4">
         <Typography variant="h2" className="text-primary text-center mb-6">
@@ -93,9 +93,6 @@ const AccountSettings: React.FC = () => {
           showUnlinkModal={socialConnections.showUnlinkModal}
           onShowUnlinkModalChange={socialConnections.setShowUnlinkModal}
           isUnlinking={socialConnections.isLoading}
-          onGoogleLinkSuccess={(idToken: string) =>
-            socialConnections.linkGoogleAccount(idToken)
-          }
         />
 
         <DeleteAccountSection
